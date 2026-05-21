@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+import type { NextConfig } from "next";
+export default nextConfig;
+
 const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -7,6 +10,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+
+
+
   images: {
     remotePatterns: [
       {
