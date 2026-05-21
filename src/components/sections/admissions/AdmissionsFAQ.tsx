@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const faqs = [
   {
     q: "When do admissions open for session 2025–26?",
-    a: "Admissions for session 2025–26 are currently open. We recommend applying early as seats are limited and filled on a first-come, first-served basis.",
+    a: "Admissions for session 2026–27 are currently open. We recommend applying early as seats are limited and filled on a first-come, first-served basis.",
   },
   {
     q: "Is there an entrance test for admission?",
