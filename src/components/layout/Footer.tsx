@@ -44,7 +44,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-brand-slate">
               <li className="flex items-start gap-3">
                 <MapPin size={15} className="mt-0.5 shrink-0 text-brand-gold" />
-                <span>123 Education Avenue, Knowledge Park,<br />City — 000000</span>
+                <span>Sudarshan Vihar,New By-Pass,Patna,Bihar-800027<br />City — 000000</span>
               </li>
               <li>
                 <a href="tel:+919102997549" className="flex items-center gap-3 transition-colors hover:text-brand-gold">

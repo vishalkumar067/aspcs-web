@@ -438,9 +438,14 @@ export default function GalleryPage() {
               className="max-h-[85vh] max-w-4xl overflow-hidden rounded-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={`h-[60vh] w-full bg-gradient-to-br ${lightboxAlbum.gradient} flex items-center justify-center`}>
-                <p className="text-white/40">Image {lightboxIndex + 1}</p>
-              </div>
+              <div className="relative h-[60vh] w-full">
+  <Image
+    src={lightboxAlbum.images[lightboxIndex]}
+    alt={`${lightboxAlbum.title} ${lightboxIndex + 1}`}
+    fill
+    className="object-contain"
+  />
+</div>
               <div className="bg-black/80 p-4 text-center text-sm text-white/70">
                 {lightboxAlbum.title} — {lightboxIndex + 1} / {lightboxAlbum.images.length}
               </div>
