@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Google Fonts Import ──────────────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* ─── CSS Custom Properties ───────────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --brand-navy:       #0B1B3E;
+  --brand-navy-light: #132252;
+  --brand-gold:       #C9A84C;
+  --brand-gold-light: #E2C578;
+  --brand-gold-pale:  #F5E9C8;
+  --brand-cream:      #FAF7F0;
+  --brand-slate:      #8A99B8;
+  --brand-muted:      #64748B;
+
+  /* Glass */
+  --glass-bg:        rgba(255, 255, 255, 0.07);
+  --glass-border:    rgba(255, 255, 255, 0.12);
+  --glass-bg-dark:   rgba(11, 27, 62, 0.55);
+
+  /* Surfaces (Light mode) */
+  --surface-bg:      #FAF7F0;
+  --surface-card:    #FFFFFF;
+  --surface-border:  rgba(11, 27, 62, 0.1);
+  --text-primary:    #0B1B3E;
+  --text-secondary:  #64748B;
+  --text-muted:      #8A99B8;
+
+  /* Radii */
+  --radius-sm:  0.5rem;
+  --radius-md:  0.75rem;
+  --radius-lg:  1rem;
+  --radius-xl:  1.5rem;
+  --radius-2xl: 2rem;
+
+  /* Fonts */
+  --font-playfair:   "Playfair Display", Georgia, serif;
+  --font-dm-sans:    "DM Sans", system-ui, sans-serif;
+  --font-jetbrains:  "JetBrains Mono", monospace;
+}
+
+.dark {
+  --surface-bg:     #080F22;
+  --surface-card:   #0F1E3A;
+  --surface-border: rgba(201, 168, 76, 0.12);
+  --text-primary:   #F5E9C8;
+  --text-secondary: #8A99B8;
+  --text-muted:     #64748B;
+}
+
+/* ─── Base Resets ─────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    @apply box-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+    font-family: var(--font-dm-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-[var(--surface-bg)] text-[var(--text-primary)] transition-colors duration-300;
+    font-family: var(--font-dm-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair);
+    @apply font-semibold tracking-tight text-[var(--text-primary)];
+  }
+
+  ::selection {
+    background-color: var(--brand-gold);
+    color: var(--brand-navy);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar        { @apply w-1.5 h-1.5; }
+  ::-webkit-scrollbar-track  { background: var(--surface-bg); }
+  ::-webkit-scrollbar-thumb  { @apply rounded-full; background: var(--brand-gold); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--brand-gold-light); }
+}
+
+/* ─── Component Utilities ─────────────────────────────────────────────────── */
+@layer components {
+
+  /* Glass card */
+  .glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    @apply backdrop-blur-xl;
+  }
+  .glass-dark {
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--glass-border);
+    @apply backdrop-blur-xl;
+  }
+
+  /* Gold shimmer text */
+  .text-gold-shimmer {
+    background: linear-gradient(
+      105deg,
+      var(--brand-gold) 0%,
+      var(--brand-gold-light) 50%,
+      var(--brand-gold) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Section padding */
+  .section-pad {
+    @apply px-4 py-20 sm:px-6 lg:px-8 lg:py-28;
+  }
+
+  /* Container */
+  .container-aspcs {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply relative inline-flex items-center gap-2 rounded-xl
+           bg-brand-gold px-6 py-3 text-sm font-semibold
+           text-brand-navy shadow-gold transition-all duration-300
+           hover:-translate-y-0.5 hover:shadow-glow-gold
+           active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-outline {
+    @apply relative inline-flex items-center gap-2 rounded-xl
+           border border-brand-gold/40 px-6 py-3 text-sm font-semibold
+           text-brand-gold transition-all duration-300
+           hover:border-brand-gold hover:bg-brand-gold/10
+           hover:-translate-y-0.5 active:translate-y-0;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 rounded-xl px-6 py-3
+           text-sm font-semibold transition-all duration-200
+           hover:bg-brand-navy/5 dark:hover:bg-white/5;
+  }
+
+  /* Input */
+  .input-field {
+    @apply w-full rounded-xl border border-[var(--surface-border)]
+           bg-[var(--surface-card)] px-4 py-3 text-sm
+           text-[var(--text-primary)] placeholder:text-[var(--text-muted)]
+           outline-none transition-all duration-200
+           focus:border-brand-gold/60 focus:ring-2 focus:ring-brand-gold/20;
+  }
+
+  /* Section heading */
+  .section-eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full
+           border border-brand-gold/30 bg-brand-gold/10
+           px-4 py-1.5 text-xs font-semibold uppercase
+           tracking-widest text-brand-gold;
+  }
+
+  /* Card */
+  .card {
+    @apply rounded-2xl border border-[var(--surface-border)]
+           bg-[var(--surface-card)] shadow-card
+           transition-all duration-300 hover:shadow-card-hover;
+  }
+
+  /* Divider line gold */
+  .divider-gold {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent;
+  }
+}
+
+/* ─── Utility Overrides ───────────────────────────────────────────────────── */
+@layer utilities {
+  .text-balance  { text-wrap: balance; }
+  .text-pretty   { text-wrap: pretty; }
+  .animate-delay-100 { animation-delay: 100ms; }
+  .animate-delay-200 { animation-delay: 200ms; }
+  .animate-delay-300 { animation-delay: 300ms; }
+  .animate-delay-400 { animation-delay: 400ms; }
+  .animate-delay-500 { animation-delay: 500ms; }
+  .animate-delay-700 { animation-delay: 700ms; }
+  .opacity-init-0    { opacity: 0; }
+}
+
+/* ─── Page Transition ─────────────────────────────────────────────────────── */
+.page-enter {
+  animation: fade-up 0.5s ease-out forwards;
+}
