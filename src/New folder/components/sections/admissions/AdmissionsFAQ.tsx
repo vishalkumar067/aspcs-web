@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "What is the fee structure?",
-    a: "Our fee structure varies by grade. Please contact our admissions office at +91-XXXX-XXXXXX or visit the school in person for a detailed fee breakdown. We also offer instalment payment options.",
+    a: "Our fee structure varies by grade. Please contact our admissions office at +91-91029-97549 or visit the school in person for a detailed fee breakdown. We also offer instalment payment options.",
   },
   {
     q: "Does ASPCS offer any scholarships?",
@@ -123,7 +123,7 @@ export default function AdmissionsFAQ() {
           >
             Can't find your answer? Call us at{" "}
             <a href="tel:+91XXXXXXXXXX" className="text-brand-gold hover:underline">
-              +91-XXXX-XXXXXX
+              +91-91029-97549
             </a>
           </motion.p>
         </div>
