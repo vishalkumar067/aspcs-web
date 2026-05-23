@@ -105,7 +105,7 @@ export default function MandatoryDisclosurePage() {
                     ["4", "COMPLETE ADDRESS WITH PIN CODE",    "Sudarshan Vihar, New Bypass Road, Jaganpura, Patna - 800027"],
                     ["5", "PRINCIPAL NAME & QUALIFICATION",    "MR. OM PRAKASH SINGH, M.Sc., B.Ed."],
                     ["6", "SCHOOL EMAIL ID",                   "info@aspcspatna.ac.in"],
-                    ["7", "CONTACT DETAILS (LANDLINE/MOBILE)", "06123212614"],
+                    ["7", "CONTACT DETAILS (LANDLINE/MOBILE)", "+91-91029 97549"],
                   ].map(([sno, info, detail], i) => (
                     <tr key={sno} className={`border-b border-[var(--surface-border)] transition-colors hover:bg-brand-crimson/4 ${i % 2 === 0 ? "" : "bg-[var(--surface-bg)]"}`}>
                       <td className="px-4 py-3 text-[var(--text-muted)]">{sno}</td>

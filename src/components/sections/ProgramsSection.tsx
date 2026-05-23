@@ -35,16 +35,28 @@ const programs = [
     description:
       "Project-based science, mathematics and humanities programmes cultivating analytical and critical thinking.",
   },
-  {
-    icon: Monitor,
-    title: "Secondary",
-    grades: "Grade IX – X",
-    color: "from-violet-400/20 to-violet-600/10",
-    border: "border-violet-400/25",
-    iconColor: "text-violet-400",
-    description:
-      "Board-aligned curriculum with mentored study groups, career counselling and strong board exam preparation.",
-  },
+{
+  icon: Monitor,
+  title: "Secondary",
+  grades: "Grade IX – X",
+  color: "from-violet-400/20 to-violet-600/10",
+  border: "border-violet-400/25",
+  iconColor: "text-violet-400",
+  description:
+    "Board-aligned curriculum with mentored study groups, career counselling and strong board exam preparation.",
+},
+
+{
+  icon: Monitor,
+  title: "Senior Secondary",
+  grades: "Grade XI – XII",
+  color: "from-indigo-400/20 to-indigo-600/10",
+  border: "border-indigo-400/25",
+  iconColor: "text-indigo-400",
+  description:
+    "Advanced streams in science, commerce and humanities with career-focused mentorship and university preparation.",
+},
+
   {
     icon: Music,
     title: "Arts & Culture",

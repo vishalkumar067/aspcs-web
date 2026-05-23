@@ -12,12 +12,12 @@ const socials = [
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-brand-black text-white">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-brand-crimson/50 to-transparent" />
+    <footer className="relative overflow-hidden bg-brand-teal-deep text-white">
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-brand-sage/40 to-transparent" />
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-brand-crimson/5 blur-3xl" />
-        <div className="absolute -right-32 top-0 h-96 w-96 rounded-full bg-brand-maroon/10 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-brand-teal/20 blur-3xl" />
+        <div className="absolute -right-32 top-0 h-96 w-96 rounded-full bg-brand-sage/10 blur-3xl" />
       </div>
 
       <div className="container-aspcs relative z-10 py-16">
@@ -25,45 +25,43 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="mb-6 flex items-center gap-3">
-              <div className="relative flex h-11 w-11 overflow-hidden rounded-xl">
+              <div className="relative flex h-11 w-11 overflow-hidden rounded-xl bg-white/10">
                 <Image src="/logo.png" alt="ASPCS Logo" width={44} height={44} className="object-contain" />
               </div>
               <div>
                 <div className="font-display text-xl font-bold tracking-wide">ASPCS</div>
-                <div className="text-[9px] font-medium uppercase tracking-[0.15em] text-brand-gold">
+                <div className="text-[9px] font-medium uppercase tracking-[0.15em] text-brand-sage">
                   School of Creative Sciences
                 </div>
               </div>
             </Link>
 
-            <p className="mb-8 max-w-sm text-sm leading-relaxed text-brand-slate">
+            <p className="mb-8 max-w-sm text-sm leading-relaxed text-white/70">
               Nurturing young minds with world-class education, creative thinking,
-              and holistic development since 1980. Building tomorrow's leaders today.
+              and holistic development since 1980. Building tomorrow&apos;s leaders today.
             </p>
 
-            <ul className="space-y-3 text-sm text-brand-slate">
+            <ul className="space-y-3 text-sm text-white/60">
               <li className="flex items-start gap-3">
-                <MapPin size={15} className="mt-0.5 shrink-0 text-brand-gold" />
-                <span>Sudarshan Vihar,New By-Pass,Patna<br />Bihar-800027</span>
+                <MapPin size={15} className="mt-0.5 shrink-0 text-brand-sage" />
+                <span>Sudarshan Vihar,New By-Pass<br />Patna — 800013</span>
               </li>
               <li>
-                <a href="tel:+919102997549" className="flex items-center gap-3 transition-colors hover:text-brand-gold">
-                  <Phone size={15} className="shrink-0 text-brand-gold" />+91-91029 97549
+                <a href="tel:+919102997549" className="flex items-center gap-3 transition-colors hover:text-brand-sage">
+                  <Phone size={15} className="shrink-0 text-brand-sage" />+91-91029 97549
                 </a>
               </li>
               <li>
-                <a href="mailto:info@aspcs.patna.ac.in" className="flex items-center gap-3 transition-colors hover:text-brand-gold">
-                  <Mail size={15} className="shrink-0 text-brand-gold" />info@aspcs.patna.ac.in
+                <a href="mailto:info@aspcs.patna.ac.in" className="flex items-center gap-3 transition-colors hover:text-brand-sage">
+                  <Mail size={15} className="shrink-0 text-brand-sage" />info@aspcs.patna.ac.in
                 </a>
               </li>
             </ul>
 
             <div className="mt-8 flex items-center gap-3">
               {socials.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label} href={href} aria-label={label}
-                  target="_blank" rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-crimson/20 text-brand-slate transition-all duration-200 hover:border-brand-gold/40 hover:bg-brand-gold/10 hover:text-brand-gold"
+                <a key={label} href={href} aria-label={label} target="_blank" rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-white/50 transition-all hover:border-brand-sage/40 hover:bg-brand-sage/10 hover:text-brand-sage"
                 >
                   <Icon size={15} />
                 </a>
@@ -71,53 +69,47 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h4 className="mb-5 text-xs font-semibold uppercase tracking-widest text-brand-gold">Quick Links</h4>
+            <h4 className="mb-5 text-xs font-semibold uppercase tracking-widest text-brand-sage">Quick Links</h4>
             <ul className="space-y-3">
               {FOOTER_LINKS.quickLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-brand-slate transition-colors hover:text-brand-gold">{link.label}</Link>
+                  <Link href={link.href} className="text-sm text-white/60 transition-colors hover:text-brand-sage">{link.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Academics */}
           <div>
-            <h4 className="mb-5 text-xs font-semibold uppercase tracking-widest text-brand-gold">Academics</h4>
+            <h4 className="mb-5 text-xs font-semibold uppercase tracking-widest text-brand-sage">Academics</h4>
             <ul className="space-y-3">
               {FOOTER_LINKS.academics.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-brand-slate transition-colors hover:text-brand-gold">{link.label}</Link>
+                  <Link href={link.href} className="text-sm text-white/60 transition-colors hover:text-brand-sage">{link.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Policies + CTA */}
           <div>
-            <h4 className="mb-5 text-xs font-semibold uppercase tracking-widest text-brand-gold">Policies</h4>
+            <h4 className="mb-5 text-xs font-semibold uppercase tracking-widest text-brand-sage">Policies</h4>
             <ul className="space-y-3">
               {FOOTER_LINKS.policies.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-brand-slate transition-colors hover:text-brand-gold">{link.label}</Link>
+                  <Link href={link.href} className="text-sm text-white/60 transition-colors hover:text-brand-sage">{link.label}</Link>
                 </li>
               ))}
             </ul>
 
-            <div className="mt-8 rounded-2xl border border-brand-crimson/30 bg-brand-crimson/10 p-5">
-              <p className="mb-1 text-sm font-semibold text-white">Admissions Open</p>
-              <p className="mb-4 text-xs text-brand-slate">Session 2026–27</p>
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
+              <p className="mb-1 text-sm font-semibold">Admissions Open</p>
+              <p className="mb-4 text-xs text-white/50">Session 2025–26</p>
               <Link href="/admissions" className="btn-primary w-full justify-center py-2.5 text-xs">Apply Now</Link>
-              <Link href="/admin/login" className="btn-secondary w-full justify-center py-2.5 text-xs mt-2">
-                Admin
-              </Link>
             </div>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-brand-crimson/15 pt-8 text-xs text-brand-slate sm:flex-row">
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-white/40 sm:flex-row">
           <p>© {new Date().getFullYear()} ASPCS. All rights reserved.</p>
           <p>Designed with care for future innovators</p>
         </div>

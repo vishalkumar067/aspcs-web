@@ -153,7 +153,7 @@ export default function AdminSettingsPage() {
 
         <div className="space-y-3">
           {[
-            { label: "New admission inquiry",     desc: "Get notified when a new inquiry is submitted" },
+            { label: "New admission enquiry",     desc: "Get notified when a new inquiry is submitted" },
             { label: "Notice published",          desc: "Notify when a notice goes live" },
             { label: "Weekly summary",            desc: "Receive a weekly report every Monday" },
           ].map((item, i) => (
