@@ -26,7 +26,7 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="mb-6 flex items-center gap-3">
               <div className="relative flex h-11 w-11 overflow-hidden rounded-xl bg-white/10">
-                <Image src="/logo.png" alt="ASPCS Logo" width={44} height={44} className="object-contain" />
+                <Image src="/package.jsonnpm run buildnpm run build" alt="ASPCS Logo" width={44} height={44} className="object-contain" />
               </div>
               <div>
                 <div className="font-display text-xl font-bold tracking-wide">ASPCS</div>
