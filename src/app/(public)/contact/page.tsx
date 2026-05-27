@@ -261,9 +261,9 @@ export default function ContactPage() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <MapPin size={32} className="mb-3 text-brand-gold" />
                   <p className="text-sm font-semibold text-white">ASPCS School Campus</p>
-                  <p className="mt-1 text-xs text-brand-slate">123 Education Avenue, City</p>
+                  <p className="mt-1 text-xs text-brand-slate">Sudarshan Vihar, New ByPass, Jaganpura, Patna, Bihar — 800027</p>
                   <a
-                    href="https://maps.google.com"
+                    href="https://maps.goo.gl/6ATX3hgqotnigGSU9"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-outline mt-4 py-2 text-xs"
@@ -291,13 +291,13 @@ export default function ContactPage() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gold/10">
                       <Phone size={15} className="text-brand-gold" />
                     </div>
-                    +91-XXXX-XXXXXX
+                    +91-XXXXX-XXXXXX
                   </a>
                   <a href="mailto:info@aspcs.edu.in" className="flex items-center gap-3 text-sm text-[var(--text-secondary)] transition-colors hover:text-brand-gold">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gold/10">
                       <Mail size={15} className="text-brand-gold" />
                     </div>
-                    info@aspcs.edu.in
+                  info@aspcspatna.ac.in
                   </a>
                 </div>
 

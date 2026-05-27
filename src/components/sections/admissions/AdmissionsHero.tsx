@@ -31,7 +31,7 @@ export default function AdmissionsHero() {
         >
           <span className="section-eyebrow mb-6 inline-flex">
             <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-brand-gold" />
-            Admissions Open — Session 2025–26
+            Admissions Open — Session 2026–27
           </span>
 
           <h1 className="mb-6 font-display text-display-md font-bold text-white lg:text-display-lg">
@@ -42,7 +42,7 @@ export default function AdmissionsHero() {
 
           <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-brand-slate">
             Join a community of curious minds and dedicated educators. Applications
-            for session 2025–26 are now open across all grades — Nursery to Class X.
+            for session 2026-27 are now open across all grades — Nursery to Class IX and XI.
           </p>
 
           {/* Quick contact */}
@@ -60,7 +60,7 @@ export default function AdmissionsHero() {
             {[
               "Free school tour",
               "Online application",
-              "Quick response within 48 hrs",
+              "Quick response within 30 minutes",
               "Transparent process",
             ].map((item) => (
               <span
