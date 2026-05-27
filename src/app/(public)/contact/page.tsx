@@ -111,7 +111,7 @@ export default function ContactPage() {
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-brand-slate">
               Have a question about admissions, academics, or anything else?
-              We're here to help. Reach out and we'll respond within 24 hours.
+              We're here to help. Reach out and we'll respond within 30 Minutesgit add.
             </p>
           </motion.div>
         </div>
@@ -263,7 +263,7 @@ export default function ContactPage() {
                   <p className="text-sm font-semibold text-white">ASPCS School Campus</p>
                   <p className="mt-1 text-xs text-brand-slate">Sudarshan Vihar, New ByPass, Jaganpura, Patna, Bihar — 800027</p>
                   <a
-                    href="https://maps.goo.gl/6ATX3hgqotnigGSU9"
+                    href="https://maps.app.goo.gl/6ATX3hgqotnigGSU9"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-outline mt-4 py-2 text-xs"
@@ -291,7 +291,7 @@ export default function ContactPage() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gold/10">
                       <Phone size={15} className="text-brand-gold" />
                     </div>
-                    +91-XXXXX-XXXXXX
+                    +91-91029-1029
                   </a>
                   <a href="mailto:info@aspcs.edu.in" className="flex items-center gap-3 text-sm text-[var(--text-secondary)] transition-colors hover:text-brand-gold">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gold/10">

@@ -123,7 +123,7 @@ export default function AdmissionsFAQ() {
           >
             Can't find your answer? Call us at{" "}
             <a href="tel:+91XXXXXXXXXX" className="text-brand-gold hover:underline">
-              +91-XXXX-XXXXXX
+              +91-91029-97549
             </a>
           </motion.p>
         </div>

@@ -117,7 +117,7 @@ export default function AdmissionsEligibility() {
                 href="tel:+91XXXXXXXXXX"
                 className="mt-3 inline-flex text-sm font-semibold text-brand-gold hover:underline"
               >
-                +91-XXXX-XXXXXX →
+                +91-91029-97549
               </a>
             </div>
           </motion.div>
