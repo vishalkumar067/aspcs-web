@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const faqs = [
   {
     q: "When do admissions open for session 2025–26?",
-    a: "Admissions for session 2025–26 are currently open. We recommend applying early as seats are limited and filled on a first-come, first-served basis.",
+    a: "Admissions for session 2026–27 are currently open. We recommend applying early as seats are limited and filled on a first-come, first-served basis.",
   },
   {
     q: "Is there an entrance test for admission?",
@@ -123,7 +123,7 @@ export default function AdmissionsFAQ() {
           >
             Can't find your answer? Call us at{" "}
             <a href="tel:+91XXXXXXXXXX" className="text-brand-gold hover:underline">
-              +91-XXXX-XXXXXX
+              +91-91029-97549
             </a>
           </motion.p>
         </div>

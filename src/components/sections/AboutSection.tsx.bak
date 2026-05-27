@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 
 const pillars = [
@@ -47,15 +46,9 @@ export default function AboutSection() {
               {/* Replace with <Image> when actual photo is available */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
                 <div className="mb-4 font-display text-6xl font-bold text-brand-gold/15">ASPCS</div>
-               <Image
-                               src="/images/gallery/image_19.jpg"
-                               alt="ASPCS School"
-                               fill
-                               priority
-                               className="object-cover"
-                             />
+                <div className="text-sm text-brand-slate/60">School photo goes here</div>
+              </div>
             </div>
-             </div>
 
             {/* Floating badge — Years */}
             <motion.div
@@ -98,7 +91,7 @@ export default function AboutSection() {
             </motion.h2>
 
             <motion.p variants={fadeUp} className="mb-4 text-[var(--text-secondary)] leading-relaxed">
-              Founded in 1980, ASPCS has stood at the forefront of quality education — blending
+              Founded in 2005, ASPCS has stood at the forefront of quality education — blending
               academic rigour with creative exploration. We believe every child carries
               extraordinary potential, and it is our mission to unlock it.
             </motion.p>

@@ -31,7 +31,7 @@ export default function AdmissionsHero() {
         >
           <span className="section-eyebrow mb-6 inline-flex">
             <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-brand-gold" />
-            Admissions Open — Session 2025–26
+            Admissions Open — Session 2026–27
           </span>
 
           <h1 className="mb-6 font-display text-display-md font-bold text-white lg:text-display-lg">

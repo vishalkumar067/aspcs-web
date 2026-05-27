@@ -2,24 +2,23 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Masonry placeholder tiles with varying aspect ratios
 const tiles = [
-  { id: 1, label: "Sports Day 2024",       span: "row-span-2",     bg: "from-sky-900 to-sky-700" },
-  { id: 2, label: "Science Fair",           span: "",               bg: "from-violet-900 to-violet-700" },
-  { id: 3, label: "Cultural Fest",          span: "",               bg: "from-rose-900 to-rose-700" },
-  { id: 4, label: "Graduation Ceremony",    span: "col-span-2",     bg: "from-amber-900 to-amber-700" },
-  { id: 5, label: "Art Exhibition",         span: "",               bg: "from-emerald-900 to-emerald-700" },
-  { id: 6, label: "Campus Infrastructure", span: "row-span-2",     bg: "from-cyan-900 to-cyan-700" },
-  { id: 7, label: "Annual Day 2024",        span: "",               bg: "from-pink-900 to-pink-700" },
+  { id: 1, label: "Sports Day 2024",       span: "row-span-2", imagePath: "/images/gallery/image_1.jpg" },
+  { id: 2, label: "Science Fair",           span: "",           imagePath: "/images/gallery/image_2.jpg" },
+  { id: 3, label: "Cultural Fest",          span: "",           imagePath: "/images/gallery/image_3.jpg" },
+  { id: 4, label: "Graduation Ceremony",    span: "col-span-2", imagePath: "/images/gallery/image_4.jpg" },
+  { id: 5, label: "Art Exhibition",         span: "",           imagePath: "/images/gallery/image_5.jpg" },
+  { id: 6, label: "Campus Infrastructure", span: "row-span-2", imagePath: "/images/gallery/image_6.jpg" },
+  { id: 7, label: "Annual Day 2024",        span: "",           imagePath: "/images/gallery/image_7.jpg" },
 ];
 
 export default function GallerySection() {
   return (
     <section className="section-pad relative overflow-hidden bg-brand-black">
-      {/* Gradient */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(201,168,76,0.07),transparent)]" />
 
       <div className="container-aspcs relative z-10">
@@ -79,32 +78,24 @@ export default function GallerySection() {
               transition={{ delay: i * 0.06 }}
               whileHover={{ scale: 1.02 }}
               className={cn(
-                "group relative overflow-hidden rounded-2xl bg-gradient-to-br cursor-pointer",
-                tile.bg,
+                "group relative overflow-hidden rounded-2xl cursor-pointer bg-brand-maroon-dark",
                 tile.span
               )}
             >
-              {/* Inner grid pattern */}
-              <div
-                className="absolute inset-0 opacity-10"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-                  backgroundSize: "20px 20px",
-                }}
+              {/* Actual Image */}
+              <Image
+                src={tile.imagePath}
+                alt={tile.label}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
 
               {/* Hover overlay */}
-              <div className="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/30" />
+              <div className="absolute inset-0 bg-black/10 transition-all duration-300 group-hover:bg-black/40" />
 
-              {/* Label */}
+              {/* Label on hover */}
               <div className="absolute inset-x-0 bottom-0 translate-y-full p-4 transition-transform duration-300 group-hover:translate-y-0">
                 <p className="text-sm font-semibold text-white">{tile.label}</p>
-              </div>
-
-              {/* Photo placeholder icon */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                <ImageIcon size={32} className="text-white" />
               </div>
             </motion.div>
           ))}

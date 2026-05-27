@@ -34,21 +34,21 @@ const infoCards = [
   {
     icon: MapPin,
     title: "Our Address",
-    lines: ["123 Education Avenue,", "Knowledge Park, City — 000000"],
+    lines: ["Sudarshan Vihar,", "New ByPass, Patna — 800027"],
     color: "text-amber-400",
     bg:    "bg-amber-400/10",
   },
   {
     icon: Phone,
     title: "Phone Numbers",
-    lines: ["+91-XXXX-XXXXXX", "+91-XXXX-XXXXXX"],
+    lines: ["+91-91029-97549", "+91-9334486072"],
     color: "text-blue-400",
     bg:    "bg-blue-400/10",
   },
   {
     icon: Mail,
     title: "Email Addresses",
-    lines: ["info@aspcs.edu.in", "admissions@aspcs.edu.in"],
+    lines: ["info@aspcspatna.ac.in", "admissions@aspcspatna.ac.in"],
     color: "text-violet-400",
     bg:    "bg-violet-400/10",
   },
@@ -261,24 +261,19 @@ export default function ContactPage() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <MapPin size={32} className="mb-3 text-brand-gold" />
                   <p className="text-sm font-semibold text-white">ASPCS School Campus</p>
-                  <p className="mt-1 text-xs text-brand-slate">123 Education Avenue, City</p>
-                  <a
-                    href="https://maps.google.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline mt-4 py-2 text-xs"
-                  >
-                    Open in Google Maps
-                  </a>
+                  <p className="mt-1 text-xs text-brand-slate">Sudarshan Vihar, New By-Pass, Patna</p>
+                 
                 </div>
-                {/* Replace above div with actual Google Maps iframe */}
-                {/* 
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=YOUR_MAP_EMBED_URL"
-                  width="100%" height="100%" style={{ border: 0 }}
-                  allowFullScreen loading="lazy"
-                />
-                */}
+   
+<iframe
+  src="https://www.google.com/maps?q=Himalayan+Public+School+Patna&output=embed"
+  width="100%"
+  height="100%"
+  style={{ border: 0 }}
+  allowFullScreen
+  loading="lazy"
+  referrerPolicy="no-referrer-when-downgrade"
+/>
               </div>
 
               {/* Quick contact card */}
@@ -291,13 +286,13 @@ export default function ContactPage() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gold/10">
                       <Phone size={15} className="text-brand-gold" />
                     </div>
-                    +91-XXXX-XXXXXX
+                    +91-91029-97549
                   </a>
                   <a href="mailto:info@aspcs.edu.in" className="flex items-center gap-3 text-sm text-[var(--text-secondary)] transition-colors hover:text-brand-gold">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gold/10">
                       <Mail size={15} className="text-brand-gold" />
                     </div>
-                    info@aspcs.edu.in
+                    info@aspcspatna.ac.in
                   </a>
                 </div>
 

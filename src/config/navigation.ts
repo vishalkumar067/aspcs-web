@@ -39,6 +39,7 @@ export const FOOTER_LINKS = {
     { label: "Notices",               href: "/notices" },
     { label: "Mandatory Disclosure",  href: "/mandatory-disclosure" },
     { label: "Contact",               href: "/contact" },
+    { label: "Admin", href: "/admin/login" },
   ],
   academics: [
     { label: "Nursery & KG",     href: "/academics/programs#early" },

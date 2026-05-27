@@ -11,24 +11,28 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          maroon:        "#6B0F1A",   // deep maroon primary
-          "maroon-light":"#8B1A26",   // lighter maroon
-          "maroon-dark": "#4A0A12",   // darker maroon
-          black:         "#0D0608",   // near black with red tint
-          "black-light": "#1A0C0E",   // slightly lighter black
-          crimson:       "#C41E3A",   // accent crimson
-          gold:          "#D4A843",   // warm gold accent
-          "gold-light":  "#E8C06A",
-          "gold-pale":   "#F5E9C8",
-          cream:         "#FAF3F0",   // warm cream for light mode
-          slate:         "#B89A9E",   // muted reddish slate
-          "slate-light": "#D4BCBF",
-          muted:         "#8A6A6E",
+          mint:          "#E8F8F5",   // soft mint background
+          "mint-light":  "#F0FAF8",   // lighter mint
+          "mint-deep":   "#C8EEE7",   // deeper mint
+          teal:          "#0D9488",   // primary teal
+          "teal-light":  "#14B8A6",   // lighter teal
+          "teal-dark":   "#0F766E",   // darker teal
+          "teal-deep":   "#115E59",   // very dark teal
+          sage:          "#6EE7B7",   // sage green accent
+          white:         "#FFFFFF",
+          cream:         "#F8FFFE",   // warm white with mint tint
+          slate:         "#5EAAA0",   // muted teal slate
+          "slate-light": "#A7D7D2",   // lighter slate
+          muted:         "#7BA9A5",   // muted text
+          dark:          "#134E4A",   // dark text
+          "dark-light":  "#1A6B65",   // slightly lighter dark
+          gold:          "#F59E0B",   // warm amber accent
+          "gold-light":  "#FCD34D",
         },
         glass: {
-          white:  "rgba(255,255,255,0.07)",
-          border: "rgba(255,255,255,0.10)",
-          dark:   "rgba(13,6,8,0.65)",
+          white:  "rgba(255,255,255,0.7)",
+          border: "rgba(13,148,136,0.15)",
+          teal:   "rgba(13,148,136,0.08)",
         },
       },
 
@@ -56,14 +60,14 @@ const config: Config = {
       borderRadius: { "4xl": "2rem", "5xl": "2.5rem" },
 
       boxShadow: {
-        "glass":      "0 8px 32px 0 rgba(13,6,8,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
-        "glass-lg":   "0 24px 64px 0 rgba(13,6,8,0.5), inset 0 1px 0 rgba(255,255,255,0.10)",
-        "crimson":    "0 0 40px rgba(196,30,58,0.3)",
-        "maroon":     "0 20px 60px rgba(107,15,26,0.5)",
-        "card":       "0 2px 20px rgba(13,6,8,0.12), 0 1px 3px rgba(13,6,8,0.08)",
-        "card-hover": "0 12px 40px rgba(107,15,26,0.2), 0 4px 12px rgba(13,6,8,0.15)",
-        "glow-gold":  "0 0 60px rgba(212,168,67,0.3), 0 0 120px rgba(212,168,67,0.1)",
-        "glow-crimson":"0 0 60px rgba(196,30,58,0.35), 0 0 120px rgba(196,30,58,0.1)",
+        "glass":       "0 8px 32px 0 rgba(13,148,136,0.10), inset 0 1px 0 rgba(255,255,255,0.8)",
+        "glass-lg":    "0 24px 64px 0 rgba(13,148,136,0.15), inset 0 1px 0 rgba(255,255,255,0.9)",
+        "teal":        "0 0 40px rgba(13,148,136,0.25)",
+        "card":        "0 2px 20px rgba(13,148,136,0.08), 0 1px 3px rgba(13,148,136,0.05)",
+        "card-hover":  "0 12px 40px rgba(13,148,136,0.18), 0 4px 12px rgba(13,148,136,0.10)",
+        "glow-teal":   "0 0 60px rgba(13,148,136,0.25), 0 0 120px rgba(13,148,136,0.10)",
+        "glow-gold":   "0 0 40px rgba(245,158,11,0.25)",
+        "soft":        "0 4px 24px rgba(13,148,136,0.06)",
       },
 
       backdropBlur: { xs: "2px", "4xl": "72px" },
@@ -75,8 +79,8 @@ const config: Config = {
         "slide-in-right": { "0%": { opacity: "0", transform: "translateX(24px)" },  "100%": { opacity: "1", transform: "translateX(0)" } },
         shimmer:          { "0%": { backgroundPosition: "-200% center" }, "100%": { backgroundPosition: "200% center" } },
         float:            { "0%, 100%": { transform: "translateY(0px)" }, "50%": { transform: "translateY(-10px)" } },
-        "pulse-crimson":  { "0%, 100%": { boxShadow: "0 0 0 0 rgba(196,30,58,0.4)" }, "50%": { boxShadow: "0 0 0 12px rgba(196,30,58,0)" } },
         marquee:          { "0%": { transform: "translateX(0%)" }, "100%": { transform: "translateX(-50%)" } },
+        "pulse-teal":     { "0%, 100%": { boxShadow: "0 0 0 0 rgba(13,148,136,0.3)" }, "50%": { boxShadow: "0 0 0 12px rgba(13,148,136,0)" } },
       },
       animation: {
         "fade-up":        "fade-up 0.6s ease-out forwards",
@@ -86,17 +90,17 @@ const config: Config = {
         "slide-in-right": "slide-in-right 0.5s ease-out forwards",
         shimmer:          "shimmer 2.5s linear infinite",
         float:            "float 4s ease-in-out infinite",
-        "pulse-crimson":  "pulse-crimson 2s ease-in-out infinite",
         marquee:          "marquee 30s linear infinite",
+        "pulse-teal":     "pulse-teal 2s ease-in-out infinite",
       },
 
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":  "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "hero-grid":       "linear-gradient(rgba(196,30,58,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(196,30,58,0.06) 1px, transparent 1px)",
-        "gold-shimmer":    "linear-gradient(105deg, transparent 40%, rgba(212,168,67,0.4) 50%, transparent 60%)",
+        "teal-shimmer":    "linear-gradient(105deg, transparent 40%, rgba(13,148,136,0.3) 50%, transparent 60%)",
+        "mint-gradient":   "linear-gradient(135deg, #E8F8F5 0%, #F0FAF8 50%, #E0F2F0 100%)",
+        "hero-pattern":    "linear-gradient(rgba(13,148,136,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(13,148,136,0.04) 1px, transparent 1px)",
       },
-      backgroundSize: { "hero-grid": "60px 60px", shimmer: "200% auto" },
+      backgroundSize: { shimmer: "200% auto", "hero-pattern": "60px 60px" },
     },
   },
   plugins: [],
