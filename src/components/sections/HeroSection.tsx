@@ -19,7 +19,7 @@ export default function HeroSection() {
     playsInline
     className="absolute inset-0 h-full w-full object-cover"
   >
-    <source src="/videos/campus-drone.mp4" type="video/mp4" />
+    <source src="/videos/Campus-Drone.mp4" type="video/mp4" />
   </video>
 
   {/* Dark Overlay */}
