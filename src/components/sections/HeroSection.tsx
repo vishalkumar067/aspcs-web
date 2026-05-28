@@ -10,6 +10,25 @@ const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.13, delay
 export default function HeroSection() {
   return (
     <section className="relative flex min-h-screen items-center overflow-hidden bg-brand-black">
+
+  {/* Background Drone Video */}
+  <video
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="absolute inset-0 h-full w-full object-cover"
+  >
+    <source src="/videos/campus-drone.mp4" type="video/mp4" />
+  </video>
+
+  {/* Dark Overlay */}
+  <div className="absolute inset-0 bg-black/60 z-[1]" />
+
+  {/* Existing Gradient overlays */}
+  <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(107,15,26,0.8),transparent)]" />
+
+  <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_50%_80%_at_80%_50%,rgba(74,10,18,0.5),transparent)]" />
       {/* Gradient overlays */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(107,15,26,0.8),transparent)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_80%_at_80%_50%,rgba(74,10,18,0.5),transparent)]" />

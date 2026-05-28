@@ -63,7 +63,7 @@ export default function AboutSection() {
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               className="absolute -bottom-6 -right-6 rounded-2xl border border-brand-gold/30 bg-brand-maroon-dark p-5 shadow-glass"
             >
-              <div className="font-display text-4xl font-bold text-brand-gold">20</div>
+              <div className="font-display text-4xl font-bold text-brand-gold">45+</div>
               <div className="text-xs font-medium text-brand-slate">Years of<br />Excellence</div>
             </motion.div>
 

@@ -185,7 +185,7 @@ export default function NoticesSection() {
                   ● Admissions Open
                 </div>
                 <h3 className="mb-3 font-display text-2xl font-bold text-white">
-                  Join ASPCS for Session 2025–26
+                  Join ASPCS for Session 2026–27
                 </h3>
                 <p className="mb-6 text-sm leading-relaxed text-brand-slate">
                   Limited seats available. Apply online now and secure your child's
