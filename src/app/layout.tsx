@@ -29,10 +29,10 @@ const jetbrains = JetBrains_Mono({
 // ─── Metadata ─────────────────────────────────────────────────────────────
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
-  title: {
-    default: "ASPCS — A Premier School of Creative Sciences",
-    template: "%s | ASPCS",
-  },
+ title: {
+  default: "Acharya Shree Sudarshan Patna Central School | Best CBSE School in Patna",
+  template: "%s | ASPCS",
+},
   description:
     "ASPCS is a forward-thinking educational institution providing world-class education with a focus on creativity, technology, and holistic development.",
   keywords: [
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ASPCS — A Premier School of Creative Sciences",
     description:
-      "World-class education with a focus on creativity and holistic development.",
+  "Acharya Shree Sudarshan Patna Central School (ASPCS), Patna, provides CBSE education with excellence in academics, sports, technology, and holistic development.",
     images: ["/og-image.png"],
   },
 

@@ -46,6 +46,16 @@ const programs = [
       "Board-aligned curriculum with mentored study groups, career counselling and strong board exam preparation.",
   },
   {
+  icon: Monitor,
+  title: "Senior Secondary",
+  grades: "Grade XI – XII",
+  color: "from-indigo-400/20 to-indigo-600/10",
+  border: "border-indigo-400/25",
+  iconColor: "text-indigo-400",
+  description:
+    "Advanced streams in science, commerce and humanities with career-focused mentorship and university preparation.",
+},
+  {
     icon: Music,
     title: "Arts & Culture",
     grades: "All Grades",

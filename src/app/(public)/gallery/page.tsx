@@ -9,58 +9,85 @@ const categories = ["ALL", "EVENTS", "SPORTS", "ACADEMICS", "CULTURAL", "INFRAST
 
 const albums = [
   {
-    id: "1", title: "Annual Sports Day 2024", category: "SPORTS",
-    imageCount: 42, date: "March 2024",
+    id: "1",
+    title: "Annual Sports Day",
+    category: "SPORTS",
+    imageCount: 42,
+    date: "March 2024",
     gradient: "from-sky-900 to-sky-700",
-    images: ["/images/gallery/image_1.jpg","/images/gallery/sports-2.jpg","/images/gallery/sports-3.jpg"],
+    images: ["/images/gallery/image_1.jpg","/images/gallery/image_2.jpg","/images/gallery/image_3.jpg"],
   },
   {
-    id: "2", title: "Science Exhibition 2024", category: "ACADEMICS",
-    imageCount: 28, date: "February 2024",
+    id: "2",
+    title: "Science Exhibition 2024",
+    category: "ACADEMICS",
+    imageCount: 28,
+    date: "February 2024",
     gradient: "from-violet-900 to-violet-700",
-    images: [],
+    images: ["/images/gallery/image_4.jpg","/images/gallery/image_5.jpg","/images/gallery/image_6.jpg"],
   },
   {
-    id: "3", title: "Cultural Fest 2024", category: "CULTURAL",
-    imageCount: 65, date: "January 2024",
+    id: "3",
+    title: "Cultural Fest 2024",
+    category: "CULTURAL",
+    imageCount: 65,
+    date: "January 2024",
     gradient: "from-rose-900 to-rose-700",
-    images: [],
+    images: ["/images/gallery/image_7.jpg","/images/gallery/image_8.jpg","/images/gallery/image_9.jpg"],
   },
   {
-    id: "4", title: "Graduation Ceremony 2024", category: "EVENTS",
-    imageCount: 34, date: "April 2024",
+    id: "4",
+    title: "Graduation Ceremony 2024",
+    category: "EVENTS",
+    imageCount: 34,
+    date: "April 2024",
     gradient: "from-amber-900 to-amber-700",
-    images: [],
+    images: ["/images/gallery/image_10.jpg","/images/gallery/image_11.jpg","/images/gallery/image_12.jpg"],
   },
   {
-    id: "5", title: "New School Building", category: "INFRASTRUCTURE",
-    imageCount: 18, date: "2024",
+    id: "5",
+    title: "New School Building",
+    category: "INFRASTRUCTURE",
+    imageCount: 18,
+    date: "2024",
     gradient: "from-emerald-900 to-emerald-700",
-    images: [],
+    images: ["/images/gallery/image_13.jpg","/images/gallery/image_14.jpg","/images/gallery/image_15.jpg"],
   },
   {
-    id: "6", title: "Inter-School Cricket Tournament", category: "SPORTS",
-    imageCount: 31, date: "March 2024",
+    id: "6",
+    title: "Inter-School Cricket Tournament",
+    category: "SPORTS",
+    imageCount: 31,
+    date: "March 2024",
     gradient: "from-cyan-900 to-cyan-700",
-    images: [],
+    images: ["/images/gallery/image_2.jpg","/images/gallery/image_8.jpg","/images/gallery/image_14.jpg"],
   },
   {
-    id: "7", title: "Annual Prize Distribution", category: "EVENTS",
-    imageCount: 22, date: "April 2024",
+    id: "7",
+    title: "Annual Prize Distribution",
+    category: "EVENTS",
+    imageCount: 22,
+    date: "April 2024",
     gradient: "from-pink-900 to-pink-700",
-    images: [],
+    images: ["/images/gallery/image_5.jpg","/images/gallery/image_9.jpg","/images/gallery/image_15.jpg"],
   },
   {
-    id: "8", title: "Art & Craft Exhibition", category: "ACADEMICS",
-    imageCount: 45, date: "February 2024",
+    id: "8",
+    title: "Art & Craft Exhibition",
+    category: "ACADEMICS",
+    imageCount: 45,
+    date: "February 2024",
     gradient: "from-orange-900 to-orange-700",
-    images: [],
+    images: ["/images/gallery/image_3.jpg","/images/gallery/image_10.jpg","/images/gallery/image_13.jpg"],
   },
   {
-    id: "9", title: "Independence Day Celebration", category: "CULTURAL",
-    imageCount: 27, date: "August 2024",
+    id: "9",
+    title: "Independence Day Celebration",
+    category: "CULTURAL",
+    imageCount: 27,
+    date: "August 2024",
     gradient: "from-indigo-900 to-indigo-700",
-    images: [],
+    images: ["/images/gallery/image_6.jpg","/images/gallery/image_11.jpg","/images/gallery/image_12.jpg"],
   },
 ];
 
@@ -150,7 +177,11 @@ export default function GalleryPage() {
                   className="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl"
                 >
                   {/* Background gradient placeholder */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${album.gradient}`} />
+                <img
+  src={album.images[0]}
+  alt={album.title}
+  className="absolute inset-0 h-full w-full object-cover"
+/>
 
                   {/* Grid pattern */}
                   <div
@@ -230,9 +261,11 @@ export default function GalleryPage() {
               className="max-h-[85vh] max-w-4xl overflow-hidden rounded-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={`h-[60vh] w-full bg-gradient-to-br ${lightboxAlbum.gradient} flex items-center justify-center`}>
-                <p className="text-white/40">Image {lightboxIndex + 1}</p>
-              </div>
+            <img
+  src={lightboxAlbum.images[lightboxIndex]}
+  alt={lightboxAlbum.title}
+  className="h-[60vh] w-full object-cover"
+/>
               <div className="bg-black/80 p-4 text-center text-sm text-white/70">
                 {lightboxAlbum.title} — {lightboxIndex + 1} / {lightboxAlbum.images.length}
               </div>

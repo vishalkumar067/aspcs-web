@@ -46,10 +46,10 @@ const infrastructure = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[var(--surface-bg)]">
+    <div className="min-h-screen bg-gradient-to-b from-brand-maroon-dark via-[#1A0F0A] to-black text-white">
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-mint via-brand-mint-light to-brand-cream pb-20 pt-36">
+      <section className="relative overflow-hidden bg-gradient-to-br from-brand-maroon-dark via-[#2B1610] to-black pb-24 pt-36">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_20%,rgba(13,148,136,0.08),transparent)]" />
         <div className="container-aspcs relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl">
@@ -75,7 +75,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── Stats Bar ─────────────────────────────────────────────── */}
-      <section className="bg-brand-teal">
+      <section className="border-y border-brand-gold/20 bg-brand-maroon-dark">
         <div className="container-aspcs">
           <div className="grid grid-cols-2 divide-x divide-white/10 lg:grid-cols-4">
             {[
