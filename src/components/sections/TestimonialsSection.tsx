@@ -79,7 +79,7 @@ export default function TestimonialsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-display text-display-xs font-bold text-brand-navy dark:text-white"
+            className="font-display text-display-xs font-bold text-[var(--text-primary)]"
           >
             Voices of Our{" "}
             <span className="text-brand-gold">Community</span>

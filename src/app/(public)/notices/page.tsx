@@ -125,7 +125,7 @@ export default function NoticesPage() {
                 className={cn(
                   "rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200",
                   activeCategory === cat
-                    ? "border-brand-gold bg-brand-gold text-brand-navy shadow-gold"
+                    ? "border-brand-gold bg-brand-gold text-brand-black shadow-[0_0_20px_rgba(212,168,67,0.3)]"
                     : "border-[var(--surface-border)] bg-[var(--surface-card)] text-[var(--text-muted)] hover:border-brand-gold/40 hover:text-brand-gold"
                 )}
               >
@@ -218,7 +218,7 @@ export default function NoticesPage() {
                   className={cn(
                     "h-9 w-9 rounded-xl border text-sm font-semibold transition-all",
                     page === i + 1
-                      ? "border-brand-gold bg-brand-gold text-brand-navy"
+                      ? "border-brand-gold bg-brand-gold text-brand-black"
                       : "border-[var(--surface-border)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:border-brand-gold/40"
                   )}
                 >

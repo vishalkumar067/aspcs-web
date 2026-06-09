@@ -109,7 +109,7 @@ export default function AdmissionsFAQ() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-display text-display-xs font-bold text-brand-navy dark:text-white"
+            className="font-display text-display-xs font-bold text-[var(--text-primary)]"
           >
             Frequently Asked{" "}
             <span className="text-brand-gold">Questions</span>

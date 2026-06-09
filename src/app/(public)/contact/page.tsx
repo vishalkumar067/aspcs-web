@@ -111,7 +111,7 @@ export default function ContactPage() {
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-brand-slate">
               Have a question about admissions, academics, or anything else?
-              We're here to help. Reach out and we'll respond within 30 Minutesgit add.
+              We're here to help. Reach out and we'll respond within 30 minutes.
             </p>
           </motion.div>
         </div>

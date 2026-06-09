@@ -20,10 +20,10 @@ const milestones = [
 ];
 
 const values = [
-  { icon: BookOpen, title: "Academic Excellence",  desc: "Rigorous curriculum balanced with creative exploration and critical thinking.", color: "bg-teal-50 text-brand-teal border-teal-100" },
-  { icon: Heart,    title: "Holistic Development", desc: "Sports, arts, and cultural activities nurture the whole child beyond academics.", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-  { icon: Users,    title: "Inclusive Community",  desc: "A safe, welcoming environment where every student feels valued and respected.", color: "bg-sky-50 text-sky-600 border-sky-100" },
-  { icon: Award,    title: "Character Building",   desc: "Instilling values of integrity, responsibility, and compassion in every student.", color: "bg-violet-50 text-violet-600 border-violet-100" },
+  { icon: BookOpen, title: "Academic Excellence",  desc: "Rigorous curriculum balanced with creative exploration and critical thinking.", color: "bg-brand-crimson/10 text-brand-crimson border-brand-crimson/20" },
+  { icon: Heart,    title: "Holistic Development", desc: "Sports, arts, and cultural activities nurture the whole child beyond academics.", color: "bg-brand-gold/10 text-brand-gold border-brand-gold/20" },
+  { icon: Users,    title: "Inclusive Community",  desc: "A safe, welcoming environment where every student feels valued and respected.", color: "bg-brand-maroon/10 text-brand-maroon-light border-brand-maroon/20" },
+  { icon: Award,    title: "Character Building",   desc: "Instilling values of integrity, responsibility, and compassion in every student.", color: "bg-brand-crimson/10 text-brand-crimson border-brand-crimson/20" },
 ];
 
 const faculty = [
@@ -46,17 +46,18 @@ const infrastructure = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-brand-maroon-dark via-[#1A0F0A] to-black text-white">
+    <div className="min-h-screen bg-[var(--surface-bg)]">
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-maroon-dark via-[#2B1610] to-black pb-24 pt-36">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_20%,rgba(13,148,136,0.08),transparent)]" />
+      <section className="relative overflow-hidden bg-brand-black pb-24 pt-36">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_20%,rgba(107,15,26,0.6),transparent)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_80%_80%,rgba(74,10,18,0.4),transparent)]" />
         <div className="container-aspcs relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl">
             <span className="section-eyebrow mb-5 inline-flex">About ASPCS</span>
-            <h1 className="font-display text-display-lg font-bold text-brand-dark">
+            <h1 className="font-display text-display-lg font-bold text-white">
               A Legacy of Learning,{" "}
-              <span className="text-teal-shimmer">A Future of Promise</span>
+              <span className="text-gold-shimmer">A Future of Promise</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-brand-slate">
               Since 1980, ASPCS has stood at the forefront of quality education in Patna —
@@ -92,7 +93,7 @@ export default function AboutPage() {
                 transition={{ delay: i * 0.08 }}
                 className="py-8 text-center"
               >
-                <p className="font-display text-3xl font-bold text-white">{stat.value}</p>
+                <p className="font-display text-3xl font-bold text-brand-gold">{stat.value}</p>
                 <p className="mt-1 text-xs text-white/70">{stat.label}</p>
               </motion.div>
             ))}
@@ -110,11 +111,11 @@ export default function AboutPage() {
               viewport={{ once: true }}
             >
               <span className="section-eyebrow mb-5 inline-flex">Our Story</span>
-              <h2 className="mb-6 font-display text-display-sm font-bold text-brand-dark">
+              <h2 className="mb-6 font-display text-display-sm font-bold text-[var(--text-primary)]">
                 Four Decades of{" "}
-                <span className="text-brand-teal">Shaping Futures</span>
+                <span className="text-brand-crimson">Shaping Futures</span>
               </h2>
-              <div className="space-y-4 text-brand-slate leading-relaxed">
+              <div className="space-y-4 text-[var(--text-secondary)] leading-relaxed">
                 <p>
                   Founded in 1980 by visionary educators, Acharya Shri Sudarshan Patna Central School
                   began as a small institution with a grand mission — to provide every child in Patna
@@ -139,8 +140,8 @@ export default function AboutPage() {
                   "Strong sports programme",
                   "Active parent community",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-brand-slate">
-                    <CheckCircle2 size={15} className="shrink-0 text-brand-teal" />
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
+                    <CheckCircle2 size={15} className="shrink-0 text-brand-crimson" />
                     {item}
                   </li>
                 ))}
@@ -154,7 +155,7 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-brand-mint shadow-glass-lg">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-brand-maroon/10 shadow-glass-lg">
                 <Image
                   src="/images/school-building.jpg"
                   alt="ASPCS School Campus"
@@ -165,18 +166,18 @@ export default function AboutPage() {
               <motion.div
                 animate={{ y: [-4, 4, -4] }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="absolute -bottom-6 -left-6 rounded-2xl border border-brand-teal/20 bg-white p-5 shadow-card"
+                className="absolute -bottom-6 -left-6 rounded-2xl border border-brand-gold/30 bg-white p-5 shadow-card"
               >
-                <p className="font-display text-3xl font-bold text-brand-teal">45+</p>
-                <p className="text-xs text-brand-slate">Years of Excellence</p>
+                <p className="font-display text-3xl font-bold text-brand-crimson">45+</p>
+                <p className="text-xs text-brand-muted">Years of Excellence</p>
               </motion.div>
               <motion.div
                 animate={{ y: [4, -4, 4] }}
                 transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                className="absolute -right-6 top-8 rounded-2xl border border-brand-teal/20 bg-white p-4 shadow-card"
+                className="absolute -right-6 top-8 rounded-2xl border border-brand-gold/20 bg-white p-4 shadow-card"
               >
                 <p className="text-2xl">🏆</p>
-                <p className="mt-1 text-xs font-semibold text-brand-dark">CBSE<br />Affiliated</p>
+                <p className="mt-1 text-xs font-semibold text-[var(--text-primary)]">CBSE<br />Affiliated</p>
               </motion.div>
             </motion.div>
           </div>
@@ -184,12 +185,12 @@ export default function AboutPage() {
       </section>
 
       {/* ── Vision & Mission ──────────────────────────────────────── */}
-      <section className="section-pad bg-brand-mint">
+      <section className="section-pad bg-brand-cream">
         <div className="container-aspcs">
           <div className="mb-14 text-center">
             <span className="section-eyebrow mb-5 inline-flex">Our Purpose</span>
-            <h2 className="font-display text-display-xs font-bold text-brand-dark">
-              Vision & <span className="text-brand-teal">Mission</span>
+            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
+              Vision & <span className="text-brand-crimson">Mission</span>
             </h2>
           </div>
 
@@ -197,12 +198,12 @@ export default function AboutPage() {
             {[
               {
                 icon: Eye, title: "Our Vision",
-                color: "bg-brand-teal text-white",
+                color: "bg-brand-crimson text-white",
                 content: "To be a premier educational institution that nurtures intellectually curious, morally grounded, and globally aware citizens who contribute meaningfully to society.",
               },
               {
                 icon: Target, title: "Our Mission",
-                color: "bg-brand-teal-deep text-white",
+                color: "bg-brand-maroon text-white",
                 content: "To provide holistic, inclusive, and excellence-driven education through innovative pedagogy, compassionate mentorship, and state-of-the-art facilities — empowering every student to discover and achieve their highest potential.",
               },
             ].map((item, i) => {
@@ -219,8 +220,8 @@ export default function AboutPage() {
                   <div className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl ${item.color}`}>
                     <Icon size={22} />
                   </div>
-                  <h3 className="mb-4 font-display text-xl font-bold text-brand-dark">{item.title}</h3>
-                  <p className="leading-relaxed text-brand-slate">{item.content}</p>
+                  <h3 className="mb-4 font-display text-xl font-bold text-[var(--text-primary)]">{item.title}</h3>
+                  <p className="leading-relaxed text-[var(--text-secondary)]">{item.content}</p>
                 </motion.div>
               );
             })}
@@ -233,8 +234,8 @@ export default function AboutPage() {
         <div className="container-aspcs">
           <div className="mb-14 text-center">
             <span className="section-eyebrow mb-5 inline-flex">What We Stand For</span>
-            <h2 className="font-display text-display-xs font-bold text-brand-dark">
-              Our Core <span className="text-brand-teal">Values</span>
+            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
+              Our Core <span className="text-brand-crimson">Values</span>
             </h2>
           </div>
 
@@ -253,8 +254,8 @@ export default function AboutPage() {
                   <div className={`mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl border ${val.color}`}>
                     <Icon size={24} />
                   </div>
-                  <h3 className="mb-2 font-display text-lg font-bold text-brand-dark">{val.title}</h3>
-                  <p className="text-sm leading-relaxed text-brand-slate">{val.desc}</p>
+                  <h3 className="mb-2 font-display text-lg font-bold text-[var(--text-primary)]">{val.title}</h3>
+                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{val.desc}</p>
                 </motion.div>
               );
             })}
@@ -263,17 +264,17 @@ export default function AboutPage() {
       </section>
 
       {/* ── Timeline ──────────────────────────────────────────────── */}
-      <section className="section-pad bg-brand-mint">
+      <section className="section-pad bg-brand-cream">
         <div className="container-aspcs">
           <div className="mb-14 text-center">
             <span className="section-eyebrow mb-5 inline-flex">Our Journey</span>
-            <h2 className="font-display text-display-xs font-bold text-brand-dark">
-              Milestones Through <span className="text-brand-teal">The Years</span>
+            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
+              Milestones Through <span className="text-brand-crimson">The Years</span>
             </h2>
           </div>
 
           <div className="relative">
-            <div className="absolute left-4 top-0 h-full w-0.5 bg-brand-teal/20 lg:left-1/2" />
+            <div className="absolute left-4 top-0 h-full w-0.5 bg-brand-crimson/20 lg:left-1/2" />
             <div className="space-y-8">
               {milestones.map((m, i) => (
                 <motion.div
@@ -287,13 +288,13 @@ export default function AboutPage() {
                   }`}
                 >
                   {/* Dot */}
-                  <div className="absolute left-2.5 top-1.5 h-3 w-3 rounded-full border-2 border-brand-teal bg-white lg:left-1/2 lg:-translate-x-1.5" />
+                  <div className="absolute left-2.5 top-1.5 h-3 w-3 rounded-full border-2 border-brand-crimson bg-white lg:left-1/2 lg:-translate-x-1.5" />
 
                   {/* Card */}
                   <div className={`card w-full p-5 lg:w-5/12 ${i % 2 === 0 ? "lg:mr-auto" : "lg:ml-auto"}`}>
-                    <span className="text-xs font-bold text-brand-teal">{m.year}</span>
-                    <h3 className="mt-1 font-display text-lg font-bold text-brand-dark">{m.title}</h3>
-                    <p className="mt-1 text-sm text-brand-slate">{m.desc}</p>
+                    <span className="text-xs font-bold text-brand-crimson">{m.year}</span>
+                    <h3 className="mt-1 font-display text-lg font-bold text-[var(--text-primary)]">{m.title}</h3>
+                    <p className="mt-1 text-sm text-[var(--text-muted)]">{m.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -309,8 +310,8 @@ export default function AboutPage() {
             <span className="section-eyebrow mb-5 inline-flex">
               <Users size={11} /> Our Team
             </span>
-            <h2 className="font-display text-display-xs font-bold text-brand-dark">
-              Meet Our <span className="text-brand-teal">Leadership</span>
+            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
+              Meet Our <span className="text-brand-crimson">Leadership</span>
             </h2>
           </div>
 
@@ -324,13 +325,13 @@ export default function AboutPage() {
                 transition={{ delay: i * 0.07 }}
                 className="card p-6 flex items-center gap-4"
               >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-teal/10 font-display text-lg font-bold text-brand-teal">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-crimson/10 font-display text-lg font-bold text-brand-crimson">
                   {f.initials}
                 </div>
                 <div>
-                  <p className="font-semibold text-brand-dark">{f.name}</p>
-                  <p className="text-sm text-brand-teal">{f.role}</p>
-                  <p className="text-xs text-brand-muted">{f.qual} · {f.dept}</p>
+                  <p className="font-semibold text-[var(--text-primary)]">{f.name}</p>
+                  <p className="text-sm text-brand-crimson">{f.role}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{f.qual} · {f.dept}</p>
                 </div>
               </motion.div>
             ))}
@@ -339,12 +340,12 @@ export default function AboutPage() {
       </section>
 
       {/* ── Infrastructure ────────────────────────────────────────── */}
-      <section className="section-pad bg-brand-mint">
+      <section className="section-pad bg-brand-cream">
         <div className="container-aspcs">
           <div className="mb-14 text-center">
             <span className="section-eyebrow mb-5 inline-flex">Campus</span>
-            <h2 className="font-display text-display-xs font-bold text-brand-dark">
-              World-Class <span className="text-brand-teal">Infrastructure</span>
+            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
+              World-Class <span className="text-brand-crimson">Infrastructure</span>
             </h2>
           </div>
 
@@ -360,8 +361,8 @@ export default function AboutPage() {
               >
                 <span className="text-3xl">{item.icon}</span>
                 <div>
-                  <p className="font-display text-xl font-bold text-brand-teal">{item.value}</p>
-                  <p className="text-sm text-brand-slate">{item.label}</p>
+                  <p className="font-display text-xl font-bold text-brand-crimson">{item.value}</p>
+                  <p className="text-sm text-[var(--text-muted)]">{item.label}</p>
                 </div>
               </motion.div>
             ))}

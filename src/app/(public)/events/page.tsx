@@ -96,14 +96,14 @@ function EventCard({ event, i }: { event: typeof events[0]; i: number }) {
       transition={{ delay: i * 0.06 }}
       className={cn(
         "card overflow-hidden transition-all duration-300",
-        event.isHighlight && "border-brand-teal/30 ring-1 ring-brand-teal/10"
+        event.isHighlight && "border-brand-crimson/30 ring-1 ring-brand-crimson/10"
       )}
     >
       <div className="flex items-start gap-4 p-5">
         {/* Date block */}
-        <div className="flex shrink-0 flex-col items-center justify-center rounded-2xl bg-brand-teal/8 border border-brand-teal/15 px-4 py-3 text-center min-w-[64px]">
-          <span className="font-display text-2xl font-bold text-brand-teal leading-none">{day}</span>
-          <span className="text-[10px] font-semibold text-brand-slate mt-0.5">{mon}</span>
+        <div className="flex shrink-0 flex-col items-center justify-center rounded-2xl bg-brand-crimson/8 border border-brand-crimson/15 px-4 py-3 text-center min-w-[64px]">
+          <span className="font-display text-2xl font-bold text-brand-crimson leading-none">{day}</span>
+          <span className="text-[10px] font-semibold text-brand-muted mt-0.5">{mon}</span>
         </div>
 
         {/* Content */}
@@ -113,15 +113,15 @@ function EventCard({ event, i }: { event: typeof events[0]; i: number }) {
               {event.category}
             </span>
             {event.isHighlight && (
-              <span className="rounded-full border border-brand-teal/30 bg-brand-teal/8 px-2.5 py-0.5 text-[10px] font-semibold text-brand-teal">
+              <span className="rounded-full border border-brand-gold/30 bg-brand-gold/8 px-2.5 py-0.5 text-[10px] font-semibold text-brand-gold">
                 Highlight
               </span>
             )}
           </div>
 
-          <h3 className="font-display text-lg font-bold text-brand-dark">{event.title}</h3>
+          <h3 className="font-display text-lg font-bold text-[var(--text-primary)]">{event.title}</h3>
 
-          <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-brand-slate">
+          <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)]">
             <span className="flex items-center gap-1">
               <Clock size={11} />
               {formatDate(event.date)}
@@ -140,7 +140,7 @@ function EventCard({ event, i }: { event: typeof events[0]; i: number }) {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="mt-3 text-sm leading-relaxed text-brand-slate overflow-hidden"
+                className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)] overflow-hidden"
               >
                 {event.description}
               </motion.p>
@@ -149,7 +149,7 @@ function EventCard({ event, i }: { event: typeof events[0]; i: number }) {
 
           <button
             onClick={() => setExpanded(!expanded)}
-            className="mt-2 flex items-center gap-1 text-xs font-semibold text-brand-teal hover:underline"
+            className="mt-2 flex items-center gap-1 text-xs font-semibold text-brand-crimson hover:underline"
           >
             {expanded ? "Show less" : "Read more"}
             <ChevronRight size={12} className={cn("transition-transform", expanded && "rotate-90")} />
@@ -174,13 +174,14 @@ export default function EventsPage() {
     <div className="min-h-screen bg-[var(--surface-bg)]">
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-mint via-brand-mint-light to-brand-cream pb-16 pt-36">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_20%,rgba(13,148,136,0.08),transparent)]" />
+      <section className="relative overflow-hidden bg-brand-black pb-16 pt-36">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,rgba(107,15,26,0.7),transparent)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_80%_80%,rgba(74,10,18,0.4),transparent)]" />
         <div className="container-aspcs relative z-10 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="section-eyebrow mb-5 inline-flex"><Calendar size={11} />Events</span>
-            <h1 className="font-display text-display-md font-bold text-brand-dark">
-              School <span className="text-teal-shimmer">Events</span>
+            <h1 className="font-display text-display-md font-bold text-white">
+              School <span className="text-gold-shimmer">Events</span>
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-brand-slate">
               Stay updated with all upcoming and past events at ASPCS —
@@ -195,7 +196,7 @@ export default function EventsPage() {
         <div className="container-aspcs">
 
           {/* Tabs */}
-          <div className="mb-8 flex items-center gap-2 rounded-2xl border border-brand-teal/15 bg-white p-1.5 w-fit">
+          <div className="mb-8 flex items-center gap-2 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-card)] p-1.5 w-fit shadow-card">
             {(["upcoming", "past"] as const).map((tab) => (
               <button
                 key={tab}
@@ -203,8 +204,8 @@ export default function EventsPage() {
                 className={cn(
                   "rounded-xl px-6 py-2.5 text-sm font-semibold capitalize transition-all",
                   activeTab === tab
-                    ? "bg-brand-teal text-white shadow-teal"
-                    : "text-brand-slate hover:text-brand-teal"
+                    ? "bg-brand-crimson text-white shadow-crimson"
+                    : "text-[var(--text-muted)] hover:text-brand-crimson"
                 )}
               >
                 {tab} Events
@@ -221,8 +222,8 @@ export default function EventsPage() {
                 className={cn(
                   "rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all",
                   activeCategory === cat
-                    ? "border-brand-teal bg-brand-teal text-white"
-                    : "border-brand-teal/20 bg-white text-brand-slate hover:border-brand-teal/40 hover:text-brand-teal"
+                    ? "border-brand-crimson bg-brand-crimson text-white"
+                    : "border-[var(--surface-border)] bg-[var(--surface-card)] text-[var(--text-muted)] hover:border-brand-crimson/40 hover:text-brand-crimson"
                 )}
               >
                 {cat}
@@ -241,7 +242,7 @@ export default function EventsPage() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="col-span-2 py-20 text-center text-brand-slate"
+                  className="col-span-2 py-20 text-center text-[var(--text-muted)]"
                 >
                   No events found in this category.
                 </motion.div>

@@ -19,7 +19,7 @@ const programs = [
   },
   {
     icon: FlaskConical, title: "Middle School", grades: "Grade VI – VIII", age: "11–14 years",
-    color: "bg-teal-50 text-teal-600 border-teal-200",
+    color: "bg-brand-crimson/10 text-brand-crimson border-brand-crimson/20",
     subjects: ["English", "Hindi", "Sanskrit", "Mathematics", "Science", "Social Science", "Computer Science"],
     desc: "Project-based science, mathematics and humanities programmes cultivating analytical and critical thinking.",
   },
@@ -74,14 +74,15 @@ export default function AcademicsPage() {
     <div className="min-h-screen bg-[var(--surface-bg)]">
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-navy via-brand-navy-light to-[#071126] pb-20 pt-36">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_20%,rgba(13,148,136,0.08),transparent)]" />
+      <section className="relative overflow-hidden bg-brand-black pb-20 pt-36">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_20%,rgba(107,15,26,0.6),transparent)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_80%_80%,rgba(74,10,18,0.4),transparent)]" />
         <div className="container-aspcs relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl">
             <span className="section-eyebrow mb-5 inline-flex">
               <BookOpen size={11} /> Academics
             </span>
-            <h1 className="font-display text-display-lg font-bold text-brand-dark">
+            <h1 className="font-display text-display-lg font-bold text-white">
               A Programme for Every{" "}
               <span className="text-gold-shimmer">Stage of Growth</span>
             </h1>
@@ -94,7 +95,7 @@ export default function AcademicsPage() {
       </section>
 
       {/* Highlights */}
-      <section className="bg-brand-navy py-10 border-y border-brand-gold/20">
+      <section className="bg-brand-maroon-dark py-10 border-y border-brand-gold/20">
         <div className="container-aspcs">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {highlights.slice(0, 4).map((h, i) => (
@@ -119,10 +120,10 @@ export default function AcademicsPage() {
         <div className="container-aspcs">
           <div className="mb-14 text-center">
             <span className="section-eyebrow mb-5 inline-flex">Our Programmes</span>
-            <h2 className="font-display text-display-xs font-bold text-brand-dark">
-              Academic <span className="text-brand-teal">Programmes</span>
+            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
+              Academic <span className="text-brand-crimson">Programmes</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-brand-slate">
+            <p className="mx-auto mt-4 max-w-xl text-[var(--text-muted)]">
               Structured learning pathways from early childhood to secondary education,
               designed around CBSE guidelines and holistic development.
             </p>
@@ -138,21 +139,21 @@ export default function AcademicsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.07 }}
-                  className="glass rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300"
+                  className="card p-6 hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl border ${prog.color}`}>
                     <Icon size={22} />
                   </div>
-                  <div className="mb-1 text-xs font-semibold uppercase tracking-widest text-brand-muted">
+                  <div className="mb-1 text-xs font-semibold uppercase tracking-widest text-[var(--text-muted)]">
                     {prog.grades} · Ages {prog.age}
                   </div>
-                  <h3 className="mb-3 font-display text-xl font-bold text-brand-dark">{prog.title}</h3>
-                  <p className="mb-4 text-sm leading-relaxed text-brand-slate">{prog.desc}</p>
+                  <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)]">{prog.title}</h3>
+                  <p className="mb-4 text-sm leading-relaxed text-[var(--text-secondary)]">{prog.desc}</p>
                   <div>
-                    <p className="mb-2 text-xs font-semibold text-brand-teal uppercase tracking-wider">Subjects</p>
+                    <p className="mb-2 text-xs font-semibold text-brand-crimson uppercase tracking-wider">Subjects</p>
                     <div className="flex flex-wrap gap-1.5">
                       {prog.subjects.map((s) => (
-                        <span key={s} className="rounded-full border border-brand-teal/15 bg-brand-mint px-2.5 py-0.5 text-[10px] font-medium text-brand-teal">
+                        <span key={s} className="rounded-full border border-brand-crimson/15 bg-brand-crimson/5 px-2.5 py-0.5 text-[10px] font-medium text-brand-crimson">
                           {s}
                         </span>
                       ))}
@@ -166,14 +167,14 @@ export default function AcademicsPage() {
       </section>
 
       {/* Curriculum */}
-      <section className="section-pad bg-brand-mint" id="curriculum">
+      <section className="section-pad bg-brand-cream" id="curriculum">
         <div className="container-aspcs">
           <div className="mb-14 text-center">
             <span className="section-eyebrow mb-5 inline-flex">
               <FileText size={11} /> Curriculum
             </span>
-            <h2 className="font-display text-display-xs font-bold text-brand-dark">
-              Our <span className="text-brand-teal">Curriculum</span> Approach
+            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
+              Our <span className="text-brand-crimson">Curriculum</span> Approach
             </h2>
           </div>
 
@@ -206,14 +207,14 @@ export default function AcademicsPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                className="glass rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300"
+                className="card p-6 hover:-translate-y-1 transition-all duration-300"
               >
-                <h3 className="mb-3 font-display text-xl font-bold text-brand-dark">{item.title}</h3>
-                <p className="mb-4 text-sm leading-relaxed text-brand-slate">{item.desc}</p>
+                <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)]">{item.title}</h3>
+                <p className="mb-4 text-sm leading-relaxed text-[var(--text-secondary)]">{item.desc}</p>
                 <ul className="space-y-2">
                   {item.points.map((p) => (
-                    <li key={p} className="flex items-center gap-2 text-sm text-brand-slate">
-                      <CheckCircle2 size={14} className="shrink-0 text-brand-teal" />
+                    <li key={p} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                      <CheckCircle2 size={14} className="shrink-0 text-brand-crimson" />
                       {p}
                     </li>
                   ))}
@@ -231,10 +232,10 @@ export default function AcademicsPage() {
             <span className="section-eyebrow mb-5 inline-flex">
               <Calendar size={11} /> Academic Calendar
             </span>
-            <h2 className="font-display text-display-xs font-bold text-brand-dark">
-              Academic <span className="text-brand-teal">Calendar 2025–26</span>
+            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
+              Academic <span className="text-brand-crimson">Calendar 2025–26</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-lg text-brand-slate">
+            <p className="mx-auto mt-4 max-w-lg text-[var(--text-muted)]">
               Key dates, events, and examinations for the academic session 2025–26.
             </p>
           </div>
@@ -250,15 +251,15 @@ export default function AcademicsPage() {
                 className="card p-5"
               >
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-teal/10">
-                    <Calendar size={16} className="text-brand-teal" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-crimson/10">
+                    <Calendar size={16} className="text-brand-crimson" />
                   </div>
-                  <h3 className="font-display text-lg font-bold text-brand-dark">{month.month}</h3>
+                  <h3 className="font-display text-lg font-bold text-[var(--text-primary)]">{month.month}</h3>
                 </div>
                 <ul className="space-y-2">
                   {month.events.map((ev) => (
-                    <li key={ev} className="flex items-start gap-2 text-sm text-brand-slate">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-teal" />
+                    <li key={ev} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-crimson" />
                       {ev}
                     </li>
                   ))}

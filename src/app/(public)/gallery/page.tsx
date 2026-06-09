@@ -152,7 +152,7 @@ export default function GalleryPage() {
                 className={cn(
                   "rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200",
                   activeCategory === cat
-                    ? "border-brand-gold bg-brand-gold text-brand-navy shadow-gold"
+                    ? "border-brand-gold bg-brand-gold text-brand-black shadow-[0_0_20px_rgba(212,168,67,0.3)]"
                     : "border-white/10 bg-white/5 text-brand-slate hover:border-brand-gold/40 hover:text-brand-gold"
                 )}
               >

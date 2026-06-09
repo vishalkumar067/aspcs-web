@@ -85,7 +85,7 @@ export default function NoticesSection() {
                   <Bell size={11} />
                   Latest Notices
                 </span>
-                <h2 className="font-display text-display-xs font-bold text-brand-navy dark:text-white">
+                <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
                   Stay <span className="text-brand-gold">Informed</span>
                 </h2>
               </div>
@@ -168,7 +168,7 @@ export default function NoticesSection() {
             className="space-y-6"
           >
             {/* Admission CTA card */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-navy to-brand-navy-light p-8 shadow-navy">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-maroon-dark to-brand-black p-8 shadow-maroon">
               {/* Background decoration */}
               <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-brand-gold/10 blur-2xl" />
               <div

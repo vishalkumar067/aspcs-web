@@ -34,7 +34,7 @@ export default function AboutSection() {
             className="relative"
           >
             {/* Main image placeholder */}
-            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-gradient-to-br from-brand-maroon-dark to-brand-maroon shadow-navy">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-gradient-to-br from-brand-maroon-dark to-brand-maroon shadow-maroon">
               {/* Pattern overlay */}
               <div
                 className="absolute inset-0 opacity-20"
@@ -91,7 +91,7 @@ export default function AboutSection() {
 
             <motion.h2
               variants={fadeUp}
-              className="mb-6 font-display text-display-sm font-bold text-brand-navy dark:text-white"
+              className="mb-6 font-display text-display-sm font-bold text-[var(--text-primary)]"
             >
               A Legacy of Learning,{" "}
               <span className="text-brand-gold">A Future of Promise</span>

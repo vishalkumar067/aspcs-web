@@ -46,7 +46,7 @@ export default function AdmissionsEligibility() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-display text-display-xs font-bold text-brand-navy dark:text-white"
+            className="font-display text-display-xs font-bold text-[var(--text-primary)]"
           >
             Are You <span className="text-brand-gold">Eligible?</span>
           </motion.h2>
@@ -136,7 +136,7 @@ export default function AdmissionsEligibility() {
             <ul className="space-y-4">
               {documents.map((doc, i) => (
                 <li key={doc} className="flex items-start gap-3">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-navy/8 dark:bg-brand-gold/10 text-[10px] font-bold text-brand-gold">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-gold/8 dark:bg-brand-gold/10 text-[10px] font-bold text-brand-gold">
                     {i + 1}
                   </span>
                   <span className="text-sm text-[var(--text-secondary)]">{doc}</span>
