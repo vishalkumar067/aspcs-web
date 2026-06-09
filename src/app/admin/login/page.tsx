@@ -143,13 +143,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Default credentials hint */}
-          <div className="mt-6 rounded-xl border border-brand-gold/20 bg-brand-gold/5 p-4">
-            <p className="text-xs font-semibold text-brand-gold">Default Credentials</p>
-            <p className="mt-1 text-xs text-brand-slate">Email: admin@aspcs.edu.in</p>
-            <p className="text-xs text-brand-slate">Password: Admin@1234</p>
-            <p className="mt-2 text-[10px] text-brand-slate/60">⚠ Change password after first login</p>
-          </div>
+         
         </div>
       </motion.div>
     </div>
