@@ -66,9 +66,9 @@ export default function Navbar() {
                 <Image src="/logo.png" alt="ASPCS Logo" width={40} height={40} className="object-contain" priority />
               </div>
               <div className="leading-tight">
-                <div className="font-display text-lg font-bold tracking-wide text-white">Acharya Shree Sudarshan</div>
+                <div className="font-display text-lg font-bold tracking-wide text-white">Acharya</div>
                 <div className="hidden text-[9px] font-medium uppercase tracking-[0.15em] text-brand-gold sm:block">
-                  Patna Central School
+                Shree Sudarshan Patna Central School
                 </div>
               </div>
             </Link>
