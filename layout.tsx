@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: process.env.NEXT_PUBLIC_APP_URL,
     siteName: "ASPCS",
-    title: "ASPCS — A Premier School of Creative Sciences",
+    title: "Acharya Shree Sudarshan Patna Central School",
     description:
       "ASPCS is a forward-thinking educational institution providing world-class education.",
     images: [

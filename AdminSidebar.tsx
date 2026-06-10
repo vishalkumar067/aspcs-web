@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import {
-  LayoutDashboard, Bell, Images, Users,
-  LogOut, GraduationCap, Settings, X, FileText, ImagePlus,
+  LayoutDashboard, Bell, Images, Users, LogOut,
+  GraduationCap, Settings, X, FileText, ImagePlus,
+  UserSquare2, Briefcase,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
@@ -13,26 +13,25 @@ import toast from "react-hot-toast";
 
 const navItems = [
   { label: "Dashboard",  href: "/admin/dashboard",   icon: LayoutDashboard },
+  { label: "Students",   href: "/admin/students",     icon: UserSquare2 },
+  { label: "TC Requests",href: "/admin/tc",           icon: FileText },
   { label: "Notices",    href: "/admin/notices",      icon: Bell },
   { label: "Gallery",    href: "/admin/gallery",      icon: Images },
   { label: "Admissions", href: "/admin/admissions",   icon: Users },
   { label: "Events",     href: "/admin/events",       icon: FileText },
+  { label: "Careers",    href: "/admin/careers",      icon: Briefcase },
   { label: "Media",      href: "/admin/media",        icon: ImagePlus },
   { label: "Settings",   href: "/admin/settings",     icon: Settings },
 ];
 
-interface SidebarProps {
-  onClose?: () => void;
-}
-
-export default function AdminSidebar({ onClose }: SidebarProps) {
+export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router   = useRouter();
   const { user, logout } = useAuthStore();
 
   const handleLogout = () => {
     logout();
-    toast.success("Logged out successfully");
+    toast.success("Logged out");
     router.push("/admin/login");
   };
 
@@ -45,29 +44,18 @@ export default function AdminSidebar({ onClose }: SidebarProps) {
           </div>
           <span className="font-display text-sm font-bold text-white">ASPCS Admin</span>
         </Link>
-        {onClose && (
-          <button onClick={onClose} className="text-brand-slate hover:text-white lg:hidden">
-            <X size={18} />
-          </button>
-        )}
+        {onClose && <button onClick={onClose} className="text-brand-slate hover:text-white lg:hidden"><X size={18} /></button>}
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
         {navItems.map((item) => {
           const Icon   = item.icon;
           const active = pathname === item.href;
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                active
-                  ? "bg-brand-crimson text-white shadow-glow-crimson"
-                  : "text-brand-slate hover:bg-brand-crimson/10 hover:text-white"
-              )}
-            >
+            <Link key={item.href} href={item.href} onClick={onClose}
+              className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
+                active ? "bg-brand-crimson text-white" : "text-brand-slate hover:bg-brand-crimson/10 hover:text-white"
+              )}>
               <Icon size={17} strokeWidth={active ? 2.5 : 2} />
               {item.label}
             </Link>
@@ -85,10 +73,8 @@ export default function AdminSidebar({ onClose }: SidebarProps) {
             <p className="truncate text-[10px] text-brand-slate">{user?.role ?? "ADMIN"}</p>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-brand-slate transition-all hover:bg-red-500/10 hover:text-red-400"
-        >
+        <button onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-brand-slate hover:bg-red-500/10 hover:text-red-400">
           <LogOut size={16} /> Sign Out
         </button>
       </div>

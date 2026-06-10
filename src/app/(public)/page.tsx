@@ -9,7 +9,7 @@ import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import CTASection         from "@/components/sections/CTASection";
 
 export const metadata: Metadata = {
-  title: "ASPCS — A Premier School of Creative Sciences",
+  title: "Acharya Shree Sudarshan Patna Central School — A Premier School of Creative Sciences",
   description:
     "ASPCS is a forward-thinking educational institution providing world-class education with a focus on creativity, technology, and holistic development. Admissions open for 2025–26.",
 };
