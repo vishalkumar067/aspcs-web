@@ -7,21 +7,24 @@ import {
   GraduationCap, Settings, X, FileText, ImagePlus,
   UserSquare2, Briefcase,
 } from "lucide-react";
+
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 const navItems = [
-  { label: "Dashboard",  href: "/admin/dashboard",   icon: LayoutDashboard },
-  { label: "Students",   href: "/admin/students",     icon: UserSquare2 },
-  { label: "TC Requests",href: "/admin/tc",           icon: FileText },
-  { label: "Notices",    href: "/admin/notices",      icon: Bell },
-  { label: "Gallery",    href: "/admin/gallery",      icon: Images },
-  { label: "Admissions", href: "/admin/admissions",   icon: Users },
-  { label: "Events",     href: "/admin/events",       icon: FileText },
-  { label: "Careers",    href: "/admin/careers",      icon: Briefcase },
-  { label: "Media",      href: "/admin/media",        icon: ImagePlus },
-  { label: "Settings",   href: "/admin/settings",     icon: Settings },
+  { label: "Dashboard",   href: "/admin/dashboard",   icon: LayoutDashboard },
+  { label: "Students",    href: "/admin/students",     icon: UserSquare2 },
+  { label: "TC Requests", href: "/admin/tc",           icon: FileText },
+  { label: "Teachers",    href: "/admin/teachers",     icon: Users },
+  { label: "Fees",        href: "/admin/fees",         icon: FileText },
+  { label: "Notices",     href: "/admin/notices",      icon: Bell },
+  { label: "Gallery",     href: "/admin/gallery",      icon: Images },
+  { label: "Admissions",  href: "/admin/admissions",   icon: Users },
+  { label: "Events",      href: "/admin/events",       icon: FileText },
+  { label: "Careers",     href: "/admin/careers",      icon: Briefcase },
+  { label: "Media",       href: "/admin/media",        icon: ImagePlus },
+  { label: "Settings",    href: "/admin/settings",     icon: Settings },
 ];
 
 export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
