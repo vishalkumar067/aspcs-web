@@ -1,87 +1,76 @@
-import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from "axios";
-import type { ApiError, ApiResponse } from "@/types";
+// ─── Central API Client ──────────────────────────────────────────────────────
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://aspcs-backend-production.up.railway.app/api/v1";
 
-// ─── Base Config ──────────────────────────────────────────────────────────
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1";
-
-const apiClient: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
-  timeout: 30_000,
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
-});
-
-// ─── Request Interceptor — attach JWT ────────────────────────────────────
-apiClient.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("aspcs_access_token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// ─── Response Interceptor — handle 401 & errors ──────────────────────────
-apiClient.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError<ApiError>) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
-
-    // Try token refresh on 401
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refreshToken = localStorage.getItem("aspcs_refresh_token");
-        if (!refreshToken) throw new Error("No refresh token");
-
-        const { data } = await axios.post<ApiResponse<{ accessToken: string }>>(
-          `${BASE_URL}/auth/refresh`,
-          { refreshToken }
-        );
-
-        const newToken = data.data.accessToken;
-        localStorage.setItem("aspcs_access_token", newToken);
-
-        if (originalRequest.headers) {
-          (originalRequest.headers as Record<string, string>).Authorization = `Bearer ${newToken}`;
-        }
-        return apiClient(originalRequest);
-      } catch {
-        // Refresh failed → clear tokens and redirect to login
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("aspcs_access_token");
-          localStorage.removeItem("aspcs_refresh_token");
-          window.location.href = "/admin/login";
-        }
-      }
-    }
-
-    return Promise.reject(error);
+function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const auth = localStorage.getItem("auth-storage");
+    if (!auth) return null;
+    const parsed = JSON.parse(auth);
+    return parsed?.state?.token ?? null;
+  } catch {
+    return null;
   }
-);
+}
 
-// ─── Typed Request Helpers ────────────────────────────────────────────────
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const token = getToken();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string> ?? {}),
+  };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(`${BASE}${path}`, { ...options, headers });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || `HTTP ${res.status}`);
+  }
+  // 204 No Content
+  if (res.status === 204) return undefined as T;
+  return res.json() as T;
+}
+
+// ─── Generic CRUD helpers ────────────────────────────────────────────────────
 export const api = {
-  get: <T>(url: string, config?: AxiosRequestConfig) =>
-    apiClient.get<ApiResponse<T>>(url, config).then((r) => r.data),
-
-  post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
-    apiClient.post<ApiResponse<T>>(url, data, config).then((r) => r.data),
-
-  put: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
-    apiClient.put<ApiResponse<T>>(url, data, config).then((r) => r.data),
-
-  patch: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
-    apiClient.patch<ApiResponse<T>>(url, data, config).then((r) => r.data),
-
-  delete: <T>(url: string, config?: AxiosRequestConfig) =>
-    apiClient.delete<ApiResponse<T>>(url, config).then((r) => r.data),
+  get:    <T>(path: string)                   => request<T>(path),
+  post:   <T>(path: string, body: unknown)    => request<T>(path, { method: "POST",   body: JSON.stringify(body) }),
+  put:    <T>(path: string, body: unknown)    => request<T>(path, { method: "PUT",    body: JSON.stringify(body) }),
+  patch:  <T>(path: string, body: unknown)    => request<T>(path, { method: "PATCH",  body: JSON.stringify(body) }),
+  delete: <T>(path: string)                   => request<T>(path, { method: "DELETE" }),
 };
 
-export default apiClient;
+// ─── Cloudinary Upload ───────────────────────────────────────────────────────
+const CLOUD_NAME   = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME   ?? "dug0g6tli";
+const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? "v0pil9fa";
+
+export async function uploadImage(file: File, folder = "aspcs"): Promise<string> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("upload_preset", UPLOAD_PRESET);
+  form.append("folder", folder);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) throw new Error("Cloudinary upload failed");
+  const data = await res.json();
+  return data.secure_url as string;
+}
+
+export async function uploadPDF(file: File, folder = "aspcs/docs"): Promise<string> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("upload_preset", UPLOAD_PRESET);
+  form.append("folder", folder);
+  form.append("resource_type", "raw");
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`, {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) throw new Error("Cloudinary PDF upload failed");
+  const data = await res.json();
+  return data.secure_url as string;
+}

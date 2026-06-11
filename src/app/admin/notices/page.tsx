@@ -1,152 +1,195 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Bell, Plus, Search, Pencil, Trash2, Eye, EyeOff,
-  FileText, X, Save, Loader2,
-} from "lucide-react";
+import { Bell, Plus, Pencil, Trash2, X, Save, Loader2, Eye, EyeOff, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { api, uploadImage, uploadPDF } from "@/lib/api";
 import toast from "react-hot-toast";
 
-type Category = "ACADEMIC" | "EXAM" | "HOLIDAY" | "ADMISSION" | "GENERAL" | "URGENT";
-type Notice = {
-  id: string; title: string; category: Category;
-  isImportant: boolean; published: boolean;
-  publishedAt: string; description?: string; pdfUrl?: string;
-};
+interface Notice {
+  id: string;
+  title: string;
+  description?: string;
+  category: string;
+  pdfUrl?: string;
+  imageUrl?: string;
+  important: boolean;
+  published: boolean;
+  publishedAt?: string;
+  createdAt: string;
+}
 
-const MOCK_NOTICES: Notice[] = [
-  { id: "1", title: "Annual Sports Day 2025",           category: "GENERAL",  isImportant: true,  published: true,  publishedAt: "2025-05-10" },
-  { id: "2", title: "Board Exam Timetable",             category: "EXAM",     isImportant: true,  published: true,  publishedAt: "2025-05-08" },
-  { id: "3", title: "Summer Holiday Announcement",      category: "HOLIDAY",  isImportant: false, published: false, publishedAt: "2025-05-06" },
-  { id: "4", title: "Parent Teacher Meeting",           category: "ACADEMIC", isImportant: false, published: true,  publishedAt: "2025-05-04" },
-  { id: "5", title: "Admissions Open 2025-26",          category: "ADMISSION",isImportant: true,  published: true,  publishedAt: "2025-05-01" },
-  { id: "6", title: "Science Exhibition Results",       category: "ACADEMIC", isImportant: false, published: true,  publishedAt: "2025-04-28" },
-];
+const CATEGORIES = ["GENERAL", "ACADEMIC", "EXAMINATION", "ADMISSION", "EVENT", "HOLIDAY", "CIRCULAR"];
 
-const categoryColors: Record<string, string> = {
-  ACADEMIC:  "bg-blue-500/15 text-blue-300 border-blue-500/30",
-  EXAM:      "bg-rose-500/15 text-rose-300 border-rose-500/30",
-  HOLIDAY:   "bg-green-500/15 text-green-300 border-green-500/30",
-  ADMISSION: "bg-brand-gold/15 text-brand-gold border-brand-gold/30",
-  GENERAL:   "bg-violet-500/15 text-violet-300 border-violet-500/30",
-  URGENT:    "bg-red-500/20 text-red-300 border-red-500/40",
-};
-
-const categories: Category[] = ["ACADEMIC", "EXAM", "HOLIDAY", "ADMISSION", "GENERAL", "URGENT"];
-
-function NoticeModal({
-  notice, onClose, onSave,
-}: {
+// ─── Modal ────────────────────────────────────────────────────────────────────
+function NoticeModal({ notice, onClose, onSaved }: {
   notice?: Notice | null;
   onClose: () => void;
-  onSave: (data: Partial<Notice>) => void;
+  onSaved: () => void;
 }) {
-  const [title, setTitle]         = useState(notice?.title ?? "");
-  const [category, setCategory]   = useState<Category>(notice?.category ?? "GENERAL");
-  const [important, setImportant] = useState(notice?.isImportant ?? false);
-  const [description, setDesc]    = useState(notice?.description ?? "");
-  const [saving, setSaving]       = useState(false);
+  const [form, setForm] = useState({
+    title:       notice?.title       ?? "",
+    description: notice?.description ?? "",
+    category:    notice?.category    ?? "GENERAL",
+    important:   notice?.important   ?? false,
+    published:   notice?.published   ?? false,
+    pdfUrl:      notice?.pdfUrl      ?? "",
+    imageUrl:    notice?.imageUrl    ?? "",
+  });
+  const [saving,       setSaving]       = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
+
+  const handlePDF = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPdf(true);
+    try {
+      const url = await uploadPDF(file, "aspcs/notices");
+      setForm((f) => ({ ...f, pdfUrl: url }));
+      toast.success("PDF uploaded!");
+    } catch {
+      toast.error("PDF upload failed");
+    } finally {
+      setUploadingPdf(false);
+    }
+  };
+
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImg(true);
+    try {
+      const url = await uploadImage(file, "aspcs/notices");
+      setForm((f) => ({ ...f, imageUrl: url }));
+      toast.success("Image uploaded!");
+    } catch {
+      toast.error("Image upload failed");
+    } finally {
+      setUploadingImg(false);
+    }
+  };
 
   const handleSave = async () => {
-    if (!title.trim()) { toast.error("Title is required"); return; }
+    if (!form.title.trim()) { toast.error("Title is required"); return; }
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
-    onSave({ title, category, isImportant: important, description });
-    setSaving(false);
-    toast.success(notice ? "Notice updated!" : "Notice created!");
-    onClose();
+    try {
+      if (notice?.id) {
+        await api.put(`/notices/${notice.id}`, form);
+        toast.success("Notice updated!");
+      } else {
+        await api.post("/notices", form);
+        toast.success("Notice created!");
+      }
+      onSaved();
+      onClose();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.95, y: 16 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.95, y: 16 }}
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
+      <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-3xl border border-brand-crimson/20 bg-brand-black p-6 shadow-glass"
-      >
+        className="w-full max-w-lg rounded-3xl border border-brand-crimson/20 bg-brand-black p-6 shadow-glass max-h-[90vh] overflow-y-auto">
+
         <div className="mb-5 flex items-center justify-between">
-          <h3 className="font-display text-lg font-bold text-white">
-            {notice ? "Edit Notice" : "Create Notice"}
-          </h3>
-          <button onClick={onClose} className="text-brand-slate hover:text-white">
-            <X size={18} />
-          </button>
+          <h3 className="font-display text-lg font-bold text-white">{notice ? "Edit Notice" : "New Notice"}</h3>
+          <button onClick={onClose} className="text-brand-slate hover:text-white"><X size={18} /></button>
         </div>
 
         <div className="space-y-4">
+          {/* Title */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-white/80">Title *</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Notice title..."
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 outline-none focus:border-brand-crimson/50 focus:ring-2 focus:ring-brand-crimson/20"
-            />
+            <label className="mb-1 block text-xs font-medium text-white/70">Title <span className="text-brand-gold">*</span></label>
+            <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="Notice title"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-white/80">Category</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value as Category)}
-                className="w-full rounded-xl border border-white/10 bg-brand-black px-4 py-3 text-sm text-white outline-none focus:border-brand-crimson/50"
-              >
-                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div className="flex flex-col justify-end">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <div
-                  onClick={() => setImportant(!important)}
-                  className={cn(
-                    "relative h-6 w-11 rounded-full transition-colors",
-                    important ? "bg-brand-crimson" : "bg-white/10"
-                  )}
-                >
-                  <div className={cn(
-                    "absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform",
-                    important ? "translate-x-6" : "translate-x-1"
-                  )} />
-                </div>
-                <span className="text-sm text-white/80">Important</span>
+          {/* Description */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-white/70">Description</label>
+            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+              rows={3} placeholder="Notice details..."
+              className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-white/70">Category</label>
+            <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="w-full rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
+              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* PDF Upload */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-white/70">Attach PDF</label>
+            <div className="flex gap-2">
+              <input value={form.pdfUrl} onChange={(e) => setForm({ ...form, pdfUrl: e.target.value })}
+                placeholder="PDF URL (or upload below)"
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
+              <label className={cn("flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-xs text-brand-slate hover:text-white",
+                uploadingPdf && "opacity-50 pointer-events-none")}>
+                {uploadingPdf ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                {uploadingPdf ? "..." : "Upload"}
+                <input type="file" accept=".pdf" className="hidden" onChange={handlePDF} />
               </label>
             </div>
+            {form.pdfUrl && <p className="mt-1 truncate text-[10px] text-brand-gold">{form.pdfUrl}</p>}
           </div>
 
+          {/* Image Upload */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-white/80">Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDesc(e.target.value)}
-              rows={3}
-              placeholder="Optional description..."
-              className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 outline-none focus:border-brand-crimson/50"
-            />
+            <label className="mb-1 block text-xs font-medium text-white/70">Image</label>
+            <div className="flex gap-2">
+              <input value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                placeholder="Image URL (or upload below)"
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
+              <label className={cn("flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-xs text-brand-slate hover:text-white",
+                uploadingImg && "opacity-50 pointer-events-none")}>
+                {uploadingImg ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                {uploadingImg ? "..." : "Upload"}
+                <input type="file" accept="image/*" className="hidden" onChange={handleImage} />
+              </label>
+            </div>
+            {form.imageUrl && (
+              <img src={form.imageUrl} alt="preview" className="mt-2 h-20 w-full rounded-lg object-cover opacity-80" />
+            )}
+          </div>
+
+          {/* Flags */}
+          <div className="flex gap-4">
+            {[
+              { key: "important", label: "Mark as Important" },
+              { key: "published", label: "Publish Now" },
+            ].map(({ key, label }) => (
+              <label key={key} className="flex cursor-pointer items-center gap-2">
+                <div onClick={() => setForm((f) => ({ ...f, [key]: !f[key as keyof typeof f] }))}
+                  className={cn("h-5 w-9 rounded-full transition-colors",
+                    form[key as keyof typeof form] ? "bg-brand-crimson" : "bg-white/10")}>
+                  <div className={cn("h-5 w-5 rounded-full bg-white shadow transition-transform",
+                    form[key as keyof typeof form] ? "translate-x-4" : "translate-x-0")} />
+                </div>
+                <span className="text-xs text-white/70">{label}</span>
+              </label>
+            ))}
           </div>
         </div>
 
         <div className="mt-6 flex gap-3">
-          <button onClick={onClose} className="flex-1 rounded-xl border border-white/10 py-2.5 text-sm text-brand-slate hover:border-white/20 hover:text-white">
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="btn-primary flex-1 justify-center py-2.5 text-sm"
-          >
+          <button onClick={onClose} className="flex-1 rounded-xl border border-white/10 py-2.5 text-sm text-brand-slate hover:text-white">Cancel</button>
+          <button onClick={handleSave} disabled={saving}
+            className="btn-primary flex-1 justify-center py-2.5 text-sm">
             {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-            {saving ? "Saving..." : "Save Notice"}
+            {saving ? "Saving..." : (notice ? "Update" : "Create")}
           </button>
         </div>
       </motion.div>
@@ -154,156 +197,142 @@ function NoticeModal({
   );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function AdminNoticesPage() {
-  const [notices, setNotices]       = useState<Notice[]>(MOCK_NOTICES);
-  const [search, setSearch]         = useState("");
-  const [modalOpen, setModalOpen]   = useState(false);
+  const [notices,    setNotices]    = useState<Notice[]>([]);
+  const [loading,    setLoading]    = useState(true);
+  const [modal,      setModal]      = useState(false);
   const [editNotice, setEditNotice] = useState<Notice | null>(null);
+  const [search,     setSearch]     = useState("");
 
-  const filtered = notices.filter((n) =>
-    n.title.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleSave = (data: Partial<Notice>) => {
-    if (editNotice) {
-      setNotices((prev) => prev.map((n) => n.id === editNotice.id ? { ...n, ...data } : n));
-    } else {
-      const newNotice: Notice = {
-        id: Date.now().toString(), published: false,
-        publishedAt: new Date().toISOString().split("T")[0],
-        ...data, title: data.title!, category: data.category!,
-        isImportant: data.isImportant ?? false,
-      };
-      setNotices((prev) => [newNotice, ...prev]);
+  const fetchNotices = async () => {
+    setLoading(true);
+    try {
+      const data = await api.get<{ content: Notice[] } | Notice[]>("/notices?size=100&sort=createdAt,desc");
+      setNotices(Array.isArray(data) ? data : data.content);
+    } catch {
+      toast.error("Failed to load notices");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const togglePublish = (id: string) => {
-    setNotices((prev) => prev.map((n) => n.id === id ? { ...n, published: !n.published } : n));
-    toast.success("Status updated");
+  useEffect(() => { fetchNotices(); }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this notice?")) return;
+    try {
+      await api.delete(`/notices/${id}`);
+      toast.success("Deleted");
+      fetchNotices();
+    } catch {
+      toast.error("Delete failed");
+    }
   };
 
-  const deleteNotice = (id: string) => {
-    setNotices((prev) => prev.filter((n) => n.id !== id));
-    toast.success("Notice deleted");
+  const togglePublish = async (notice: Notice) => {
+    try {
+      await api.patch(`/notices/${notice.id}/publish`, { published: !notice.published });
+      toast.success(notice.published ? "Unpublished" : "Published");
+      fetchNotices();
+    } catch {
+      // fallback: try PUT
+      try {
+        await api.put(`/notices/${notice.id}`, { ...notice, published: !notice.published });
+        toast.success(notice.published ? "Unpublished" : "Published");
+        fetchNotices();
+      } catch {
+        toast.error("Update failed");
+      }
+    }
   };
+
+  const filtered = notices.filter((n) =>
+    !search || n.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
-
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-white">Notices</h1>
-          <p className="mt-1 text-sm text-brand-slate">{notices.length} total notices</p>
+          <p className="mt-1 text-sm text-brand-slate">{notices.length} total · {notices.filter((n) => n.published).length} published</p>
         </div>
-        <button
-          onClick={() => { setEditNotice(null); setModalOpen(true); }}
-          className="btn-primary py-2.5 text-sm"
-        >
-          <Plus size={16} /> New Notice
+        <button onClick={() => { setEditNotice(null); setModal(true); }} className="btn-primary py-2.5 text-sm">
+          <Plus size={16} /> Add Notice
         </button>
       </div>
 
       {/* Search */}
-      <div className="relative max-w-sm">
-        <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-slate" />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search notices..."
-          className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/25 outline-none focus:border-brand-crimson/50"
-        />
-      </div>
+      <input value={search} onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search notices..."
+        className="w-full max-w-sm rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/25 outline-none focus:border-brand-crimson/50" />
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-white/8">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/8 bg-white/3">
-              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-brand-slate">Title</th>
-              <th className="hidden px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-brand-slate sm:table-cell">Category</th>
-              <th className="hidden px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-brand-slate md:table-cell">Date</th>
-              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-brand-slate">Status</th>
-              <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-brand-slate">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((notice, i) => (
-              <motion.tr
-                key={notice.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.04 }}
-                className="border-b border-white/5 transition-colors hover:bg-white/3"
-              >
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-2">
-                    <FileText size={14} className="shrink-0 text-brand-gold" />
-                    <span className="font-medium text-white line-clamp-1">{notice.title}</span>
-                    {notice.isImportant && (
-                      <span className="hidden shrink-0 rounded-full border border-brand-gold/30 bg-brand-gold/10 px-2 py-0.5 text-[10px] font-bold text-brand-gold sm:inline">
-                        Important
-                      </span>
-                    )}
-                  </div>
-                </td>
-                <td className="hidden px-5 py-4 sm:table-cell">
-                  <span className={cn("rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase", categoryColors[notice.category])}>
-                    {notice.category}
-                  </span>
-                </td>
-                <td className="hidden px-5 py-4 text-brand-slate md:table-cell">{notice.publishedAt}</td>
-                <td className="px-5 py-4">
-                  <span className={cn(
-                    "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold",
-                    notice.published
-                      ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-400"
-                      : "border-amber-500/30 bg-amber-500/15 text-amber-400"
-                  )}>
-                    {notice.published ? "Published" : "Draft"}
-                  </span>
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => togglePublish(notice.id)}
-                      title={notice.published ? "Unpublish" : "Publish"}
-                      className="rounded-lg p-1.5 text-brand-slate transition-colors hover:bg-white/5 hover:text-white"
-                    >
-                      {notice.published ? <EyeOff size={15} /> : <Eye size={15} />}
-                    </button>
-                    <button
-                      onClick={() => { setEditNotice(notice); setModalOpen(true); }}
-                      className="rounded-lg p-1.5 text-brand-slate transition-colors hover:bg-white/5 hover:text-brand-gold"
-                    >
-                      <Pencil size={15} />
-                    </button>
-                    <button
-                      onClick={() => deleteNotice(notice.id)}
-                      className="rounded-lg p-1.5 text-brand-slate transition-colors hover:bg-red-500/10 hover:text-red-400"
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={24} className="animate-spin text-brand-crimson" />
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-2xl border border-white/8">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/8 bg-white/3">
+                {["Title", "Category", "Status", "Date", ""].map((h) => (
+                  <th key={h} className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-brand-slate">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((n, i) => (
+                <motion.tr key={n.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
+                  className="border-b border-white/5 hover:bg-white/3">
+                  <td className="px-4 py-3.5">
+                    <p className="font-semibold text-white">{n.title}</p>
+                    {n.important && <span className="text-[10px] text-brand-gold">★ Important</span>}
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-[10px] text-brand-slate">{n.category}</span>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <span className={cn("rounded-full border px-2.5 py-0.5 text-[10px] font-semibold",
+                      n.published ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-gray-200 bg-gray-50 text-gray-600")}>
+                      {n.published ? "Published" : "Draft"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 text-brand-slate text-xs">
+                    {new Date(n.createdAt).toLocaleDateString("en-IN")}
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <div className="flex gap-2">
+                      <button onClick={() => togglePublish(n)} title={n.published ? "Unpublish" : "Publish"}
+                        className="rounded-lg p-1.5 text-brand-slate hover:text-brand-gold">
+                        {n.published ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                      <button onClick={() => { setEditNotice(n); setModal(true); }}
+                        className="rounded-lg p-1.5 text-brand-slate hover:text-brand-gold"><Pencil size={14} /></button>
+                      <button onClick={() => handleDelete(n.id)}
+                        className="rounded-lg p-1.5 text-brand-slate hover:text-red-400"><Trash2 size={14} /></button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+          {filtered.length === 0 && !loading && (
+            <div className="py-16 text-center text-brand-slate">
+              {search ? "No notices match your search." : "No notices yet. Click 'Add Notice' to create one."}
+            </div>
+          )}
+        </div>
+      )}
 
-        {filtered.length === 0 && (
-          <div className="py-16 text-center text-brand-slate">No notices found.</div>
-        )}
-      </div>
-
-      {/* Modal */}
       <AnimatePresence>
-        {modalOpen && (
+        {modal && (
           <NoticeModal
             notice={editNotice}
-            onClose={() => setModalOpen(false)}
-            onSave={handleSave}
+            onClose={() => { setModal(false); setEditNotice(null); }}
+            onSaved={fetchNotices}
           />
         )}
       </AnimatePresence>
