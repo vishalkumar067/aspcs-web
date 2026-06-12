@@ -208,7 +208,7 @@ export default function AdminNoticesPage() {
   const fetchNotices = async () => {
     setLoading(true);
     try {
-      const data = await api.get<{ content: Notice[] } | Notice[]>("/notices?size=100&sort=createdAt,desc");
+      const data = await api.get<{ content: Notice[] } | Notice[]>("/notices/public?size=100&sort=createdAt,desc");
       setNotices(Array.isArray(data) ? data : data.content);
     } catch {
       toast.error("Failed to load notices");
