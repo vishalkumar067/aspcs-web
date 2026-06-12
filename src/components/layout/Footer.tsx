@@ -29,9 +29,9 @@ export default function Footer() {
                 <Image src="/logo.png" alt="ASPCS Logo" width={44} height={44} className="object-contain" />
               </div>
               <div>
-                <div className="font-display text-xl font-bold tracking-wide">Acharya Shree Sudarshan</div>
+                <div className="font-display text-xl font-bold tracking-wide">Acharya</div>
                 <div className="text-[9px] font-medium uppercase tracking-[0.15em] text-brand-gold">
-                  Patna Central School
+                  Shree Sudarshan Patna Central School
                 </div>
               </div>
             </Link>

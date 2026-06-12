@@ -68,7 +68,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "ASPCS — A Premier School of Creative Sciences",
+    title: "Acharya Shree Sudarshan Patna Central School",
     description:
   "Acharya Shree Sudarshan Patna Central School (ASPCS), Patna, provides CBSE education with excellence in academics, sports, technology, and holistic development.",
     images: ["/og-image.png"],
