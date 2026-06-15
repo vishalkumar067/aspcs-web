@@ -54,7 +54,7 @@ export interface PaginatedNotices {
 export function useNotices(page = 0, size = 10, category?: string) {
   const params = new URLSearchParams({ page: String(page), size: String(size) });
   if (category && category !== "ALL") params.set("category", category);
-  return useFetch<PaginatedNotices>(`${API}/notice?${params}`, [page, size, category]);
+  return useFetch<PaginatedNotices>(`${API}/notices?${params}`, [page, size, category]);
 }
 
 // ─── Gallery Albums ───────────────────────────────────────────────────────────
