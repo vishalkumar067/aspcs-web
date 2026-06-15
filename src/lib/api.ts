@@ -5,26 +5,15 @@ const BASE = process.env.NEXT_PUBLIC_API_BASE_URL
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    // Try every possible key Zustand persist might use
-    const keys = ["auth-storage", "auth", "authStore", "aspcs-auth", "admin-auth"];
-    for (const key of keys) {
-      const raw = localStorage.getItem(key);
-      if (!raw) continue;
-      const parsed = JSON.parse(raw);
-      const token =
-        parsed?.state?.token        ??
-        parsed?.state?.accessToken  ??
-        parsed?.state?.jwt          ??
-        parsed?.token               ??
-        parsed?.accessToken         ??
-        parsed?.jwt                 ??
-        null;
-      if (token && typeof token === "string" && token.startsWith("ey")) {
-        return token;
-      }
-    }
-  } catch { /* silent */ }
-  return null;
+    // Key: "aspcs-admin-auth"  Field: state.accessToken
+    // Confirmed from authStore.ts — persist({ name: "aspcs-admin-auth" })
+    const raw = localStorage.getItem("aspcs-admin-auth");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.state?.accessToken ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -38,11 +27,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { ...options, headers });
 
   if (!res.ok) {
-    // ⚠️ Do NOT auto-redirect here — that was causing the fake "logout".
-    // Let the calling component decide what to do with 401/403.
     const text = await res.text().catch(() => "");
     let message = text;
-    try { message = JSON.parse(text)?.message ?? text; } catch { /* use raw text */ }
+    try { message = JSON.parse(text)?.message ?? text; } catch { /* use raw */ }
     throw new Error(message || `HTTP ${res.status}`);
   }
 
@@ -58,11 +45,7 @@ export const api = {
   delete: <T>(path: string)               => request<T>(path, { method: "DELETE" }),
 };
 
-// ─── Debug helper (run in browser console to see your token) ─────────────────
-// Copy-paste this in DevTools console:
-// JSON.parse(localStorage.getItem('auth-storage') || '{}')
-
-// ─── Safe list helper ─────────────────────────────────────────────────────────
+// ─── Safe array helper ────────────────────────────────────────────────────────
 export function toArray<T>(data: unknown): T[] {
   if (!data) return [];
   if (Array.isArray(data)) return data as T[];
@@ -82,7 +65,8 @@ export async function uploadImage(file: File, folder = "aspcs"): Promise<string>
   form.append("file", file);
   form.append("upload_preset", UPLOAD_PRESET);
   form.append("folder", folder);
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: form });
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+    { method: "POST", body: form });
   if (!res.ok) throw new Error("Cloudinary upload failed");
   return (await res.json()).secure_url as string;
 }
@@ -93,7 +77,8 @@ export async function uploadPDF(file: File, folder = "aspcs/docs"): Promise<stri
   form.append("upload_preset", UPLOAD_PRESET);
   form.append("folder", folder);
   form.append("resource_type", "raw");
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`, { method: "POST", body: form });
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`,
+    { method: "POST", body: form });
   if (!res.ok) throw new Error("Cloudinary PDF upload failed");
   return (await res.json()).secure_url as string;
 }
