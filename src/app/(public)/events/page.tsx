@@ -1,256 +1,169 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, MapPin, Tag, ChevronRight, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { CalendarDays, MapPin, Loader2, Star } from "lucide-react";
+import { getPublicEvents, getUpcomingEvents, type Event } from "@/lib/publicApi";
 import { cn } from "@/lib/utils";
 
-type EventCategory = "ALL" | "ACADEMIC" | "CULTURAL" | "SPORTS" | "HOLIDAY" | "EXAM";
-
-const categories: EventCategory[] = ["ALL", "ACADEMIC", "CULTURAL", "SPORTS", "HOLIDAY", "EXAM"];
-
-const categoryColors: Record<string, string> = {
-  ACADEMIC: "bg-blue-50 text-blue-700 border-blue-200",
-  CULTURAL: "bg-rose-50 text-rose-700 border-rose-200",
-  SPORTS:   "bg-green-50 text-green-700 border-green-200",
-  HOLIDAY:  "bg-amber-50 text-amber-700 border-amber-200",
-  EXAM:     "bg-violet-50 text-violet-700 border-violet-200",
+const CATEGORY_COLORS: Record<string, string> = {
+  ACADEMIC:  "bg-blue-50 text-blue-700",
+  SPORTS:    "bg-green-50 text-green-700",
+  CULTURAL:  "bg-purple-50 text-purple-700",
+  RELIGIOUS: "bg-orange-50 text-orange-700",
+  EXAM:      "bg-red-50 text-red-700",
+  HOLIDAY:   "bg-pink-50 text-pink-700",
+  OTHER:     "bg-gray-50 text-gray-700",
 };
 
-const events = [
-  {
-    id: "1", title: "Annual Sports Day 2025",
-    date: "2025-05-15", endDate: "2025-05-16",
-    venue: "School Ground", category: "SPORTS",
-    isHighlight: true, isUpcoming: true,
-    description: "Two days of exciting sporting events including athletics, team sports, and field events. All students from Grades I to X participate. Parents are cordially invited.",
-  },
-  {
-    id: "2", title: "Science & Technology Exhibition",
-    date: "2025-05-22", endDate: "",
-    venue: "School Hall", category: "ACADEMIC",
-    isHighlight: true, isUpcoming: true,
-    description: "Students showcase their science projects and innovations. Open to parents and the public. Best projects receive certificates and trophies.",
-  },
-  {
-    id: "3", title: "Cultural Fest 2025 — Tarang",
-    date: "2025-06-05", endDate: "2025-06-06",
-    venue: "Main Auditorium", category: "CULTURAL",
-    isHighlight: true, isUpcoming: true,
-    description: "Annual cultural extravaganza featuring dance, drama, music, and art. A celebration of student talent and creativity across all grades.",
-  },
-  {
-    id: "4", title: "Summer Vacation Begins",
-    date: "2025-05-31", endDate: "",
-    venue: "", category: "HOLIDAY",
-    isHighlight: false, isUpcoming: true,
-    description: "School will remain closed for summer vacation. Classes resume on 1st July 2025.",
-  },
-  {
-    id: "5", title: "Pre-Board Examinations",
-    date: "2025-06-10", endDate: "2025-06-20",
-    venue: "Classrooms", category: "EXAM",
-    isHighlight: false, isUpcoming: true,
-    description: "Pre-board examinations for Classes IX and X. Timetable will be shared separately.",
-  },
-  {
-    id: "6", title: "Annual Prize Distribution 2024",
-    date: "2024-12-15", endDate: "",
-    venue: "School Auditorium", category: "ACADEMIC",
-    isHighlight: true, isUpcoming: false,
-    description: "Celebrated the achievements of outstanding students across academics, sports, and co-curricular activities.",
-  },
-  {
-    id: "7", title: "Independence Day Celebration",
-    date: "2024-08-15", endDate: "",
-    venue: "School Ground", category: "CULTURAL",
-    isHighlight: false, isUpcoming: false,
-    description: "Flag hoisting ceremony followed by cultural performances and patriotic songs by students.",
-  },
-  {
-    id: "8", title: "Sports Meet 2024",
-    date: "2024-03-10", endDate: "2024-03-11",
-    venue: "School Ground", category: "SPORTS",
-    isHighlight: true, isUpcoming: false,
-    description: "Annual sports meet with participation from all grades. Multiple gold medals won by ASPCS students.",
-  },
-];
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-IN", {
-    day: "numeric", month: "long", year: "numeric",
-  });
-}
-
-function EventCard({ event, i }: { event: typeof events[0]; i: number }) {
-  const [expanded, setExpanded] = useState(false);
-  const date = new Date(event.date);
-  const day  = date.getDate().toString().padStart(2, "0");
-  const mon  = date.toLocaleDateString("en-IN", { month: "short" }).toUpperCase();
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: i * 0.06 }}
-      className={cn(
-        "card overflow-hidden transition-all duration-300",
-        event.isHighlight && "border-brand-crimson/30 ring-1 ring-brand-crimson/10"
-      )}
-    >
-      <div className="flex items-start gap-4 p-5">
-        {/* Date block */}
-        <div className="flex shrink-0 flex-col items-center justify-center rounded-2xl bg-brand-crimson/8 border border-brand-crimson/15 px-4 py-3 text-center min-w-[64px]">
-          <span className="font-display text-2xl font-bold text-brand-crimson leading-none">{day}</span>
-          <span className="text-[10px] font-semibold text-brand-muted mt-0.5">{mon}</span>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className={cn("rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider", categoryColors[event.category])}>
-              {event.category}
-            </span>
-            {event.isHighlight && (
-              <span className="rounded-full border border-brand-gold/30 bg-brand-gold/8 px-2.5 py-0.5 text-[10px] font-semibold text-brand-gold">
-                Highlight
-              </span>
-            )}
-          </div>
-
-          <h3 className="font-display text-lg font-bold text-[var(--text-primary)]">{event.title}</h3>
-
-          <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)]">
-            <span className="flex items-center gap-1">
-              <Clock size={11} />
-              {formatDate(event.date)}
-              {event.endDate && ` – ${formatDate(event.endDate)}`}
-            </span>
-            {event.venue && (
-              <span className="flex items-center gap-1">
-                <MapPin size={11} />{event.venue}
-              </span>
-            )}
-          </div>
-
-          <AnimatePresence>
-            {expanded && (
-              <motion.p
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)] overflow-hidden"
-              >
-                {event.description}
-              </motion.p>
-            )}
-          </AnimatePresence>
-
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="mt-2 flex items-center gap-1 text-xs font-semibold text-brand-crimson hover:underline"
-          >
-            {expanded ? "Show less" : "Read more"}
-            <ChevronRight size={12} className={cn("transition-transform", expanded && "rotate-90")} />
-          </button>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function EventsPage() {
-  const [activeCategory, setActiveCategory] = useState<EventCategory>("ALL");
-  const [activeTab, setActiveTab]           = useState<"upcoming" | "past">("upcoming");
+  const [events,   setEvents]   = useState<Event[]>([]);
+  const [upcoming, setUpcoming] = useState<Event[]>([]);
+  const [loading,  setLoading]  = useState(true);
+  const [filter,   setFilter]   = useState("ALL");
 
-  const filtered = events.filter((e) => {
-    const matchCat = activeCategory === "ALL" || e.category === activeCategory;
-    const matchTab = activeTab === "upcoming" ? e.isUpcoming : !e.isUpcoming;
-    return matchCat && matchTab;
-  });
+  useEffect(() => {
+    Promise.all([
+      getPublicEvents(0, 50),
+      getUpcomingEvents(),
+    ]).then(([all, up]) => {
+      setEvents(all);
+      setUpcoming(up);
+      setLoading(false);
+    });
+  }, []);
+
+  const CATEGORIES = ["ALL", ...Array.from(new Set(events.map(e => e.category)))];
+
+  const filtered = filter === "ALL" ? events : events.filter(e => e.category === filter);
+
+  const formatDate = (d: string) =>
+    new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
   return (
-    <div className="min-h-screen bg-[var(--surface-bg)]">
-
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-brand-black pb-16 pt-36">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,rgba(107,15,26,0.7),transparent)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_80%_80%,rgba(74,10,18,0.4),transparent)]" />
-        <div className="container-aspcs relative z-10 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="section-eyebrow mb-5 inline-flex"><Calendar size={11} />Events</span>
-            <h1 className="font-display text-display-md font-bold text-white">
-              School <span className="text-gold-shimmer">Events</span>
-            </h1>
-            <p className="mx-auto mt-4 max-w-xl text-brand-slate">
-              Stay updated with all upcoming and past events at ASPCS —
-              from sports days to cultural fests and academic programmes.
-            </p>
-          </motion.div>
+    <main className="min-h-screen bg-brand-black">
+      {/* Header */}
+      <section className="relative border-b border-brand-crimson/20 bg-gradient-to-b from-brand-maroon/20 to-transparent py-16">
+        <div className="container mx-auto px-4 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-crimson/30 bg-brand-crimson/10 px-4 py-2">
+            <CalendarDays size={14} className="text-brand-gold" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold">School Calendar</span>
+          </div>
+          <h1 className="font-display text-4xl font-black text-white md:text-5xl">Events</h1>
+          <p className="mx-auto mt-4 max-w-xl text-brand-slate">
+            Explore all upcoming and past school events, activities, and programmes.
+          </p>
         </div>
       </section>
 
-      {/* Content */}
-      <section className="section-pad pt-10">
-        <div className="container-aspcs">
-
-          {/* Tabs */}
-          <div className="mb-8 flex items-center gap-2 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-card)] p-1.5 w-fit shadow-card">
-            {(["upcoming", "past"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  "rounded-xl px-6 py-2.5 text-sm font-semibold capitalize transition-all",
-                  activeTab === tab
-                    ? "bg-brand-crimson text-white shadow-crimson"
-                    : "text-[var(--text-muted)] hover:text-brand-crimson"
-                )}
-              >
-                {tab} Events
-              </button>
-            ))}
+      <div className="container mx-auto px-4 py-10">
+        {loading ? (
+          <div className="flex items-center justify-center py-32">
+            <Loader2 size={28} className="animate-spin text-brand-crimson" />
           </div>
+        ) : (
+          <>
+            {/* Upcoming events strip */}
+            {upcoming.length > 0 && (
+              <div className="mb-10">
+                <h2 className="mb-4 font-display text-lg font-bold text-white">
+                  <span className="text-brand-gold">↑</span> Upcoming Events
+                </h2>
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {upcoming.map(ev => (
+                    <div key={ev.id}
+                      className="flex min-w-56 shrink-0 items-center gap-3 rounded-2xl border border-brand-crimson/20 bg-brand-crimson/10 p-4">
+                      <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-brand-crimson text-white">
+                        <span className="text-xs font-bold leading-none">
+                          {new Date(ev.startDate).toLocaleDateString("en-IN", { day: "numeric" })}
+                        </span>
+                        <span className="text-[9px] uppercase">
+                          {new Date(ev.startDate).toLocaleDateString("en-IN", { month: "short" })}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-white">{ev.title}</p>
+                        {ev.venue && <p className="truncate text-xs text-brand-slate">{ev.venue}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {/* Category filters */}
-          <div className="mb-8 flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={cn(
-                  "rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all",
-                  activeCategory === cat
-                    ? "border-brand-crimson bg-brand-crimson text-white"
-                    : "border-[var(--surface-border)] bg-[var(--surface-card)] text-[var(--text-muted)] hover:border-brand-crimson/40 hover:text-brand-crimson"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+            {/* Category filter */}
+            <div className="mb-6 flex flex-wrap gap-2">
+              {CATEGORIES.map(c => (
+                <button key={c} onClick={() => setFilter(c)}
+                  className={cn("rounded-full px-4 py-1.5 text-xs font-semibold transition-all",
+                    filter === c ? "bg-brand-crimson text-white" : "bg-white/5 text-brand-slate hover:bg-white/10")}>
+                  {c}
+                </button>
+              ))}
+            </div>
 
-          {/* Events list */}
-          <div className="grid gap-4 lg:grid-cols-2">
-            <AnimatePresence mode="popLayout">
-              {filtered.length > 0 ? (
-                filtered.map((event, i) => (
-                  <EventCard key={event.id} event={event} i={i} />
-                ))
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="col-span-2 py-20 text-center text-[var(--text-muted)]"
-                >
-                  No events found in this category.
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </section>
-    </div>
+            {/* Event grid */}
+            {filtered.length === 0 ? (
+              <div className="rounded-3xl border border-white/8 py-24 text-center text-brand-slate">
+                No events found.
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.map((ev, i) => (
+                  <motion.div key={ev.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="group overflow-hidden rounded-3xl border border-white/8 bg-white/3 transition-all hover:border-brand-crimson/30">
+
+                    {ev.imageUrl ? (
+                      <img src={ev.imageUrl} alt={ev.title}
+                        className="h-44 w-full object-cover transition-transform group-hover:scale-105" />
+                    ) : (
+                      <div className="flex h-44 items-center justify-center bg-gradient-to-br from-brand-maroon/30 to-brand-crimson/10">
+                        <CalendarDays size={40} className="text-brand-crimson/40" />
+                      </div>
+                    )}
+
+                    <div className="p-5">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
+                          CATEGORY_COLORS[ev.category] ?? "bg-white/10 text-white/60")}>
+                          {ev.category}
+                        </span>
+                        {ev.highlight && (
+                          <Star size={14} className="text-brand-gold fill-brand-gold" />
+                        )}
+                      </div>
+
+                      <h3 className="font-display text-base font-bold text-white group-hover:text-brand-crimson transition-colors">
+                        {ev.title}
+                      </h3>
+
+                      {ev.description && (
+                        <p className="mt-1.5 line-clamp-2 text-sm text-brand-slate">{ev.description}</p>
+                      )}
+
+                      <div className="mt-4 space-y-1.5 text-xs text-brand-slate">
+                        <div className="flex items-center gap-1.5">
+                          <CalendarDays size={12} />
+                          {formatDate(ev.startDate)}
+                          {ev.endDate && ev.endDate !== ev.startDate && ` – ${formatDate(ev.endDate)}`}
+                        </div>
+                        {ev.venue && (
+                          <div className="flex items-center gap-1.5">
+                            <MapPin size={12} />{ev.venue}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </main>
   );
 }

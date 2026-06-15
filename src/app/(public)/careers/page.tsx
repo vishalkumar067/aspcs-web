@@ -1,349 +1,231 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, MapPin, Clock, Users, ChevronDown, Send, Loader2, X, CheckCircle2 } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { Briefcase, X, Loader2, Calendar, Users, ChevronRight } from "lucide-react";
+import { getActiveJobs, type JobListing } from "@/lib/publicApi";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
-const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1";
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL
+  ?? "https://aspcs-backend-production.up.railway.app/api/v1";
 
-// Mock data — replace with API call
-const JOBS = [
-  {
-    id: "1", title: "PGT Mathematics", department: "Mathematics",
-    type: "FULL_TIME", experience: "3-5 years", qualification: "M.Sc. Mathematics + B.Ed.",
-    vacancies: 2, lastDate: "2025-06-30", active: true,
-    description: "We are looking for an experienced PGT Mathematics teacher to join our secondary section. The candidate should have strong subject knowledge and the ability to prepare students for CBSE board examinations.",
-    requirements: "M.Sc. Mathematics with B.Ed. degree\nMinimum 3 years teaching experience\nCBSE board teaching experience preferred\nStrong communication skills",
-    responsibilities: "Teach Mathematics for Classes IX-X\nPrepare lesson plans and study material\nConduct regular assessments\nMentor students for board examinations",
-  },
-  {
-    id: "2", title: "TGT English", department: "English",
-    type: "FULL_TIME", experience: "2-4 years", qualification: "M.A. English + B.Ed.",
-    vacancies: 1, lastDate: "2025-06-30", active: true,
-    description: "Seeking a dynamic TGT English teacher for our middle school section. The ideal candidate should have excellent communication skills and a passion for literature.",
-    requirements: "M.A. English with B.Ed.\nMinimum 2 years experience\nExcellent spoken and written English",
-    responsibilities: "Teach English for Classes VI-VIII\nOrganize reading and writing activities\nPrepare students for olympiads",
-  },
-  {
-    id: "3", title: "PRT Science", department: "Science",
-    type: "FULL_TIME", experience: "1-3 years", qualification: "B.Sc. + B.Ed.",
-    vacancies: 2, lastDate: "2025-07-15", active: true,
-    description: "Looking for enthusiastic PRT Science teachers to join our primary section with a focus on hands-on learning and scientific curiosity.",
-    requirements: "B.Sc. with B.Ed. degree\nPassion for teaching young children\nCreative teaching methods",
-    responsibilities: "Teach EVS/Science for Classes III-V\nConduct science experiments\nOrganize science fair projects",
-  },
-  {
-    id: "4", title: "Computer Science Teacher", department: "Computer Science",
-    type: "FULL_TIME", experience: "2-5 years", qualification: "B.Tech/MCA + B.Ed.",
-    vacancies: 1, lastDate: "2025-07-31", active: true,
-    description: "Seeking a qualified Computer Science teacher to teach programming, web development basics, and digital literacy across multiple grades.",
-    requirements: "B.Tech/MCA with B.Ed.\nProficiency in Python, HTML, MS Office\nExperience in teaching coding to students",
-    responsibilities: "Teach Computer Science/IT for Classes VI-X\nMaintain computer lab\nTeach coding fundamentals",
-  },
-];
+// ─── Apply Modal ─────────────────────────────────────────────────────────────
+function ApplyModal({ job, onClose }: { job: JobListing; onClose: () => void }) {
+  const [form, setForm] = useState({
+    name: "", email: "", phone: "", qualification: "",
+    experience: "", coverLetter: "", resumeUrl: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
 
-const applySchema = z.object({
-  name:         z.string().min(2, "Name required"),
-  email:        z.string().email("Valid email required"),
-  phone:        z.string().min(10, "Phone required"),
-  qualification:z.string().min(2, "Qualification required"),
-  experience:   z.string().optional(),
-  coverLetter:  z.string().optional(),
-});
-type ApplyForm = z.infer<typeof applySchema>;
-
-function JobCard({ job }: { job: typeof JOBS[0] }) {
-  const [expanded, setExpanded]   = useState(false);
-  const [showForm, setShowForm]   = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading]     = useState(false);
-
-  const { register, handleSubmit, formState: { errors }, reset } =
-    useForm<ApplyForm>({ resolver: zodResolver(applySchema) });
-
-  const onSubmit = async (data: ApplyForm) => {
-    setLoading(true);
+  const handleSubmit = async () => {
+    if (!form.name || !form.email || !form.phone) {
+      toast.error("Name, email and phone are required");
+      return;
+    }
+    setSubmitting(true);
     try {
-      const res  = await fetch(`${API}/careers/jobs/${job.id}/apply`, {
-        method:  "POST",
+      const res = await fetch(`${BASE}/careers/jobs/${job.id}/apply`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(data),
+        body: JSON.stringify(form),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.message ?? "Application failed");
-      setSubmitted(true);
-      reset();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Application failed");
+      if (!res.ok) throw new Error("Failed");
+      toast.success("Application submitted successfully!");
+      onClose();
+    } catch {
+      toast.error("Failed to submit. Please try again.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
+  const field = (key: keyof typeof form, label: string, type = "text", required = false) => (
+    <div key={key}>
+      <label className="mb-1 block text-xs font-medium text-white/70">
+        {label} {required && <span className="text-brand-gold">*</span>}
+      </label>
+      <input type={type} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })}
+        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
+    </div>
+  );
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="card overflow-hidden"
-    >
-      {/* Job header */}
-      <div className="p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-crimson/10">
-              <Briefcase size={20} className="text-brand-crimson" />
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{job.title}</h3>
-              <p className="mt-0.5 text-sm text-[var(--text-muted)]">{job.department}</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <span className="flex items-center gap-1 rounded-full border border-brand-crimson/20 bg-brand-crimson/8 px-3 py-0.5 text-xs font-medium text-brand-crimson">
-                  <Clock size={11} /> {job.type.replace("_", " ")}
-                </span>
-                <span className="flex items-center gap-1 rounded-full border border-[var(--surface-border)] bg-[var(--surface-bg)] px-3 py-0.5 text-xs text-[var(--text-muted)]">
-                  <Users size={11} /> {job.vacancies} {job.vacancies === 1 ? "vacancy" : "vacancies"}
-                </span>
-                <span className="flex items-center gap-1 rounded-full border border-[var(--surface-border)] bg-[var(--surface-bg)] px-3 py-0.5 text-xs text-[var(--text-muted)]">
-                  <MapPin size={11} /> Patna, Bihar
-                </span>
-              </div>
-            </div>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={onClose}>
+      <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+        onClick={e => e.stopPropagation()}
+        className="w-full max-w-lg rounded-3xl border border-brand-crimson/20 bg-brand-black p-6 shadow-glass max-h-[90vh] overflow-y-auto">
+
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <h3 className="font-display text-lg font-bold text-white">Apply for {job.title}</h3>
+            <p className="text-sm text-brand-slate">{job.department}</p>
           </div>
-          <div className="text-right shrink-0">
-            <p className="text-xs text-[var(--text-muted)]">Last Date</p>
-            <p className="text-sm font-bold text-brand-crimson">{job.lastDate}</p>
+          <button onClick={onClose} className="shrink-0 text-brand-slate hover:text-white"><X size={18} /></button>
+        </div>
+
+        <div className="space-y-3">
+          {field("name",          "Full Name",       "text",  true)}
+          {field("email",         "Email",           "email", true)}
+          {field("phone",         "Phone",           "tel",   true)}
+          {field("qualification", "Qualification")}
+          {field("experience",    "Experience")}
+          {field("resumeUrl",     "Resume Link (Google Drive / Dropbox)")}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-white/70">Cover Letter</label>
+            <textarea value={form.coverLetter} onChange={e => setForm({ ...form, coverLetter: e.target.value })}
+              rows={4} placeholder="Why are you a good fit for this role?"
+              className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <span className="text-[var(--text-muted)]">Experience: </span>
-            <span className="font-medium text-[var(--text-primary)]">{job.experience}</span>
-          </div>
-          <div>
-            <span className="text-[var(--text-muted)]">Qualification: </span>
-            <span className="font-medium text-[var(--text-primary)]">{job.qualification}</span>
-          </div>
-        </div>
-
-        <div className="mt-4 flex gap-3">
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="btn-ghost flex items-center gap-1.5 px-4 py-2 text-sm"
-          >
-            {expanded ? "Less" : "More"} Details
-            <ChevronDown size={14} className={cn("transition-transform", expanded && "rotate-180")} />
-          </button>
-          <button
-            onClick={() => setShowForm(true)}
-            className="btn-primary py-2 text-sm"
-          >
-            <Send size={14} /> Apply Now
+        <div className="mt-5 flex gap-3">
+          <button onClick={onClose} className="flex-1 rounded-xl border border-white/10 py-2.5 text-sm text-brand-slate hover:text-white">Cancel</button>
+          <button onClick={handleSubmit} disabled={submitting} className="btn-primary flex-1 justify-center py-2.5 text-sm">
+            {submitting ? <Loader2 size={15} className="animate-spin" /> : null}
+            {submitting ? "Submitting..." : "Submit Application"}
           </button>
         </div>
-      </div>
-
-      {/* Expanded details */}
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-[var(--surface-border)]"
-          >
-            <div className="grid gap-6 p-6 sm:grid-cols-3">
-              <div>
-                <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-brand-crimson">Description</h4>
-                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{job.description}</p>
-              </div>
-              <div>
-                <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-brand-crimson">Requirements</h4>
-                <ul className="space-y-1">
-                  {job.requirements.split("\n").map((r, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-crimson" />
-                      {r}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-brand-crimson">Responsibilities</h4>
-                <ul className="space-y-1">
-                  {job.responsibilities.split("\n").map((r, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-crimson" />
-                      {r}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Application Modal */}
-      <AnimatePresence>
-        {showForm && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-            onClick={() => !loading && setShowForm(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg rounded-3xl border border-[var(--surface-border)] bg-[var(--surface-card)] p-6 shadow-glass-lg max-h-[90vh] overflow-y-auto"
-            >
-              {submitted ? (
-                <div className="py-8 text-center">
-                  <CheckCircle2 size={48} className="mx-auto mb-4 text-brand-teal" />
-                  <h3 className="mb-2 font-display text-xl font-bold text-[var(--text-primary)]">Application Sent!</h3>
-                  <p className="mb-6 text-[var(--text-secondary)]">Thank you for applying. We will contact you within 7 working days.</p>
-                  <button onClick={() => { setShowForm(false); setSubmitted(false); }} className="btn-primary">Close</button>
-                </div>
-              ) : (
-                <>
-                  <div className="mb-5 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-display text-lg font-bold text-[var(--text-primary)]">Apply for {job.title}</h3>
-                      <p className="text-xs text-[var(--text-muted)]">{job.department}</p>
-                    </div>
-                    <button onClick={() => setShowForm(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
-                      <X size={18} />
-                    </button>
-                  </div>
-
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-[var(--text-primary)]">Full Name *</label>
-                        <input {...register("name")} placeholder="Your full name"
-                          className={cn("input-field", errors.name && "border-red-400")} />
-                        {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-[var(--text-primary)]">Email *</label>
-                        <input {...register("email")} type="email" placeholder="email@example.com"
-                          className={cn("input-field", errors.email && "border-red-400")} />
-                        {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
-                      </div>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-[var(--text-primary)]">Phone *</label>
-                        <input {...register("phone")} type="tel" placeholder="+91 XXXXX XXXXX"
-                          className={cn("input-field", errors.phone && "border-red-400")} />
-                        {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>}
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-[var(--text-primary)]">Qualification *</label>
-                        <input {...register("qualification")} placeholder="e.g. M.Sc. + B.Ed."
-                          className={cn("input-field", errors.qualification && "border-red-400")} />
-                        {errors.qualification && <p className="mt-1 text-xs text-red-500">{errors.qualification.message}</p>}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-sm font-medium text-[var(--text-primary)]">Years of Experience</label>
-                      <input {...register("experience")} placeholder="e.g. 3 years" className="input-field" />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-sm font-medium text-[var(--text-primary)]">Cover Letter</label>
-                      <textarea {...register("coverLetter")} rows={4} placeholder="Why are you the right fit for this role?"
-                        className="input-field resize-none" />
-                    </div>
-                    <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3">
-                      {loading ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : <><Send size={15} /> Submit Application</>}
-                    </button>
-                  </form>
-                </>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </motion.div>
     </motion.div>
   );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function CareersPage() {
+  const [jobs,      setJobs]      = useState<JobListing[]>([]);
+  const [loading,   setLoading]   = useState(true);
+  const [selected,  setSelected]  = useState<JobListing | null>(null);
+  const [applying,  setApplying]  = useState<JobListing | null>(null);
+  const [dept,      setDept]      = useState("ALL");
+
+  useEffect(() => {
+    getActiveJobs(0, 50).then(data => { setJobs(data); setLoading(false); });
+  }, []);
+
+  const depts = ["ALL", ...Array.from(new Set(jobs.map(j => j.department)))];
+  const filtered = dept === "ALL" ? jobs : jobs.filter(j => j.department === dept);
+
   return (
-    <div className="min-h-screen bg-[var(--surface-bg)]">
-
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-brand-black pb-20 pt-36">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,rgba(107,15,26,0.8),transparent)]" />
-        <div className="container-aspcs relative z-10 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="section-eyebrow mb-5 inline-flex"><Briefcase size={11} />Careers</span>
-            <h1 className="font-display text-display-md font-bold text-white">
-              Join Our <span className="text-brand-gold">Team</span>
-            </h1>
-            <p className="mx-auto mt-4 max-w-xl text-brand-slate">
-              Be part of a passionate team shaping the future of education at ASPCS.
-              We value dedication, creativity, and a love for teaching.
-            </p>
-          </motion.div>
-
-          {/* Perks */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-10 flex flex-wrap items-center justify-center gap-3"
-          >
-            {["Competitive Salary", "Professional Development", "Supportive Environment", "CBSE Affiliated", "Health Benefits"].map((perk) => (
-              <span key={perk} className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs text-brand-slate">
-                ✓ {perk}
-              </span>
-            ))}
-          </motion.div>
+    <main className="min-h-screen bg-brand-black">
+      {/* Header */}
+      <section className="border-b border-brand-crimson/20 bg-gradient-to-b from-brand-maroon/20 to-transparent py-16">
+        <div className="container mx-auto px-4 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-crimson/30 bg-brand-crimson/10 px-4 py-2">
+            <Briefcase size={14} className="text-brand-gold" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold">Join Our Team</span>
+          </div>
+          <h1 className="font-display text-4xl font-black text-white md:text-5xl">Careers</h1>
+          <p className="mx-auto mt-4 max-w-xl text-brand-slate">
+            Become part of the ASPCS family. We're looking for passionate educators and staff.
+          </p>
         </div>
       </section>
 
-      {/* Job listings */}
-      <section className="section-pad">
-        <div className="container-aspcs">
-          <div className="mb-10 flex items-center justify-between">
-            <div>
-              <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
-                Current <span className="text-brand-crimson">Openings</span>
-              </h2>
-              <p className="mt-1 text-[var(--text-muted)]">{JOBS.length} positions available</p>
-            </div>
+      <div className="container mx-auto px-4 py-10">
+        {loading ? (
+          <div className="flex items-center justify-center py-32">
+            <Loader2 size={28} className="animate-spin text-brand-crimson" />
           </div>
+        ) : (
+          <>
+            {/* Department filter */}
+            {depts.length > 1 && (
+              <div className="mb-6 flex flex-wrap gap-2">
+                {depts.map(d => (
+                  <button key={d} onClick={() => setDept(d)}
+                    className={cn("rounded-full px-4 py-1.5 text-xs font-semibold transition-all",
+                      dept === d ? "bg-brand-crimson text-white" : "bg-white/5 text-brand-slate hover:bg-white/10")}>
+                    {d}
+                  </button>
+                ))}
+              </div>
+            )}
 
-          <div className="space-y-4">
-            {JOBS.map((job) => <JobCard key={job.id} job={job} />)}
-          </div>
+            {filtered.length === 0 ? (
+              <div className="rounded-3xl border border-white/8 py-24 text-center">
+                <Briefcase size={40} className="mx-auto mb-4 text-brand-slate/30" />
+                <p className="text-brand-slate">No open positions at the moment. Check back soon.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filtered.map((job, i) => (
+                  <motion.div key={job.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="group rounded-2xl border border-white/8 bg-white/3 p-6 transition-all hover:border-brand-crimson/30">
 
-          {/* No suitable position */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-10 rounded-3xl border border-[var(--surface-border)] bg-[var(--surface-card)] p-8 text-center"
-          >
-            <h3 className="mb-2 font-display text-xl font-bold text-[var(--text-primary)]">
-              Don&apos;t see a suitable role?
-            </h3>
-            <p className="mb-6 text-[var(--text-secondary)]">
-              Send us your resume and we&apos;ll keep it on file for future openings.
-            </p>
-            <a href="mailto:hr@aspcspatna.ac.in" className="btn-primary">
-              Send Resume to hr@aspcspatna.ac.in
-            </a>
-          </motion.div>
-        </div>
-      </section>
-    </div>
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="mb-1 flex flex-wrap gap-2">
+                          <span className="rounded-full bg-brand-crimson/10 px-2.5 py-0.5 text-[10px] font-semibold text-brand-crimson">
+                            {job.type.replace("_", " ")}
+                          </span>
+                          <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-[10px] text-brand-slate">
+                            {job.department}
+                          </span>
+                        </div>
+                        <h3 className="font-display text-lg font-bold text-white group-hover:text-brand-crimson transition-colors">
+                          {job.title}
+                        </h3>
+                        <div className="mt-2 flex flex-wrap gap-4 text-xs text-brand-slate">
+                          {job.vacancies > 0 && (
+                            <span className="flex items-center gap-1"><Users size={12} />{job.vacancies} position{job.vacancies > 1 ? "s" : ""}</span>
+                          )}
+                          {job.lastDate && (
+                            <span className="flex items-center gap-1">
+                              <Calendar size={12} />
+                              Last date: {new Date(job.lastDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                            </span>
+                          )}
+                          {job.experience && <span>Exp: {job.experience}</span>}
+                          {job.salary && <span>Salary: {job.salary}</span>}
+                        </div>
+                        {selected?.id === job.id && (
+                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
+                            className="mt-4 space-y-3 text-sm text-brand-slate">
+                            <p className="whitespace-pre-line">{job.description}</p>
+                            {job.requirements && (
+                              <div>
+                                <p className="font-semibold text-white">Requirements</p>
+                                <p className="whitespace-pre-line">{job.requirements}</p>
+                              </div>
+                            )}
+                            {job.qualification && (
+                              <div>
+                                <p className="font-semibold text-white">Qualification</p>
+                                <p>{job.qualification}</p>
+                              </div>
+                            )}
+                          </motion.div>
+                        )}
+                      </div>
+
+                      <div className="flex shrink-0 gap-2">
+                        <button onClick={() => setSelected(selected?.id === job.id ? null : job)}
+                          className="flex items-center gap-1.5 rounded-xl border border-white/10 px-4 py-2 text-xs text-brand-slate hover:text-white transition-all">
+                          {selected?.id === job.id ? "Less" : "Details"}
+                          <ChevronRight size={12} className={cn("transition-transform", selected?.id === job.id && "rotate-90")} />
+                        </button>
+                        <button onClick={() => setApplying(job)}
+                          className="btn-primary px-4 py-2 text-xs">
+                          Apply Now
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {applying && <ApplyModal job={applying} onClose={() => setApplying(null)} />}
+      </AnimatePresence>
+    </main>
   );
 }
