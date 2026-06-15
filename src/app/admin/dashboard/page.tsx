@@ -3,72 +3,99 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Users, Bell, FileText, GraduationCap,
-  TrendingUp, Clock, CheckCircle, AlertCircle, Loader2,
+  Users, Bell, FileText, GraduationCap, IndianRupee,
+  ClipboardList, TrendingUp, Clock, CheckCircle, AlertCircle,
 } from "lucide-react";
-import { api, toArray } from "@/lib/api";
+import { api, toArray, unwrapData } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface Stats {
-  students:    number;
-  teachers:    number;
-  notices:     number;
-  pendingTc:   number;
-  pendingAdmissions: number;
-  todayFees:   string;
-  monthFees:   string;
-}
-
 interface RecentNotice {
-  id: string;
-  title: string;
-  category: string;
-  published: boolean;
-  createdAt: string;
+  id: string; title: string; category: string;
+  published: boolean; createdAt: string;
 }
-
 interface RecentTc {
-  id: string;
-  studentName: string;
-  admissionNo: string;
-  status: string;
-  requestedAt: string;
+  id: string; studentName: string; admissionNo: string;
+  status: string; requestedAt: string;
 }
-
 interface RecentAdmission {
-  id: string;
-  studentName: string;
-  gradeApplying: string;
-  status: string;
-  submittedAt: string;
+  id: string; studentName: string; gradeApplying: string;
+  status: string; submittedAt: string;
 }
 
-const STATUS_COLOR: Record<string, string> = {
-  PENDING:   "text-yellow-500",
-  APPROVED:  "text-blue-400",
-  ISSUED:    "text-emerald-400",
-  REJECTED:  "text-red-400",
-  CONTACTED: "text-blue-400",
-  ADMITTED:  "text-emerald-400",
+const STATUS_ICON: Record<string, React.ReactNode> = {
+  PENDING:   <Clock      size={13} className="text-yellow-400" />,
+  APPROVED:  <CheckCircle size={13} className="text-blue-400"  />,
+  ISSUED:    <CheckCircle size={13} className="text-emerald-400" />,
+  ADMITTED:  <CheckCircle size={13} className="text-emerald-400" />,
+  CONTACTED: <Clock      size={13} className="text-blue-400"  />,
+  REJECTED:  <AlertCircle size={13} className="text-red-400"  />,
 };
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-function StatCard({ label, value, icon: Icon, color, loading }: {
-  label: string; value: string | number; icon: React.ElementType;
-  color: string; loading: boolean;
+const STATUS_COLOR: Record<string, string> = {
+  PENDING:   "text-yellow-400",
+  APPROVED:  "text-blue-400",
+  ISSUED:    "text-emerald-400",
+  ADMITTED:  "text-emerald-400",
+  CONTACTED: "text-blue-400",
+  REJECTED:  "text-red-400",
+};
+
+// ─── Stat Card — matches .card pattern from other admin pages ─────────────────
+function StatCard({
+  label, value, icon: Icon, iconBg, delay, loading,
+}: {
+  label: string; value: string | number;
+  icon: React.ElementType; iconBg: string;
+  delay: number; loading: boolean;
 }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-      className="card flex items-center gap-4 p-5">
-      <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl", color)}>
-        <Icon size={20} className="text-white" />
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="card flex items-center gap-4 p-5"
+    >
+      <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", iconBg)}>
+        <Icon size={19} className="text-white" />
       </div>
-      <div>
-        <p className="text-sm text-brand-slate">{label}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-[var(--text-muted)]">{label}</p>
         {loading
-          ? <div className="mt-1 h-7 w-16 animate-pulse rounded-lg bg-white/10" />
-          : <p className="font-display text-2xl font-black text-white">{value}</p>}
+          ? <div className="mt-1.5 h-6 w-14 animate-pulse rounded-lg bg-white/10" />
+          : <p className="font-display text-xl font-black text-[var(--text-primary)]">{value}</p>
+        }
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Section card ─────────────────────────────────────────────────────────────
+function SectionCard({ title, href, children, loading }: {
+  title: string; href: string;
+  children: React.ReactNode; loading: boolean;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="card flex flex-col"
+    >
+      <div className="mb-4 flex items-center justify-between px-5 pt-5">
+        <h2 className="font-display text-sm font-bold text-[var(--text-primary)]">{title}</h2>
+        <a href={href} className="text-[10px] font-semibold uppercase tracking-wider text-brand-crimson hover:underline">
+          View all →
+        </a>
+      </div>
+
+      <div className="flex-1 px-5 pb-5">
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-11 animate-pulse rounded-xl bg-white/5" />
+            ))}
+          </div>
+        ) : children}
       </div>
     </motion.div>
   );
@@ -76,117 +103,109 @@ function StatCard({ label, value, icon: Icon, color, loading }: {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function AdminDashboardPage() {
-  const [stats,      setStats]      = useState<Stats | null>(null);
+  const [loading,    setLoading]    = useState(true);
+  const [teachers,   setTeachers]   = useState(0);
   const [notices,    setNotices]    = useState<RecentNotice[]>([]);
   const [tcList,     setTcList]     = useState<RecentTc[]>([]);
   const [admissions, setAdmissions] = useState<RecentAdmission[]>([]);
-  const [loading,    setLoading]    = useState(true);
+  const [pendingTc,  setPendingTc]  = useState(0);
+  const [pendingAdm, setPendingAdm] = useState(0);
+  const [todayFees,  setTodayFees]  = useState("₹0");
+  const [monthFees,  setMonthFees]  = useState("₹0");
 
   useEffect(() => {
+    const fmt = (n: number) =>
+      n >= 100000 ? `₹${(n / 100000).toFixed(1)}L`
+      : n >= 1000  ? `₹${(n / 1000).toFixed(1)}K`
+      : `₹${n ?? 0}`;
+
     const load = async () => {
-      try {
-        // Fire all requests in parallel
-        const [teacherStats, feeStats, noticeData, tcData, admissionData, admissionStats] =
-          await Promise.allSettled([
-            api.get<{ data: { total: number; active: number } }>("/teachers/stats"),
-            api.get<{ data: { totalAmountToday: number; totalAmountThisMonth: number } }>("/fees/dashboard"),
-            api.get<unknown>("/notices?size=5&sort=createdAt,desc"),
-            api.get<unknown>("/tc?size=5"),
-            api.get<unknown>("/admissions?size=5&sort=submittedAt,desc"),
-            api.get<{ data: { total: number; pending: number } }>("/admissions/stats"),
-          ]);
+      const [tStats, fStats, nData, tcData, admData, admStats] =
+        await Promise.allSettled([
+          api.get("/teachers/stats"),
+          api.get("/fees/dashboard"),
+          api.get("/notices?size=5&sort=createdAt,desc"),
+          api.get("/tc?size=5"),
+          api.get("/admissions?size=5&sort=submittedAt,desc"),
+          api.get("/admissions/stats"),
+        ]);
 
-        const teachers   = teacherStats.status   === "fulfilled" ? teacherStats.value   : null;
-        const fees       = feeStats.status       === "fulfilled" ? feeStats.value       : null;
-        const admStats   = admissionStats.status === "fulfilled" ? admissionStats.value : null;
-
-        const recentNotices = noticeData.status === "fulfilled"
-          ? toArray<RecentNotice>(noticeData.value) : [];
-        const recentTc = tcData.status === "fulfilled"
-          ? toArray<RecentTc>(tcData.value) : [];
-        const recentAdm = admissionData.status === "fulfilled"
-          ? toArray<RecentAdmission>(admissionData.value) : [];
-
-        const fmt = (n: number) =>
-          n >= 100000 ? `₹${(n / 100000).toFixed(1)}L`
-          : n >= 1000 ? `₹${(n / 1000).toFixed(1)}K`
-          : `₹${n}`;
-
-        setStats({
-          students:  0,                                               // add students endpoint later
-          teachers:  (teachers as any)?.data?.total ?? (teachers as any)?.total ?? 0,
-          notices:   recentNotices.length,
-          pendingTc: recentTc.filter(t => t.status === "PENDING").length,
-          pendingAdmissions: (admStats as any)?.data?.pending ?? (admStats as any)?.pending ?? 0,
-          todayFees: fmt((fees as any)?.data?.totalAmountToday  ?? (fees as any)?.totalAmountToday  ?? 0),
-          monthFees: fmt((fees as any)?.data?.totalAmountThisMonth ?? (fees as any)?.totalAmountThisMonth ?? 0),
-        });
-
-        setNotices(recentNotices.slice(0, 5));
-        setTcList(recentTc.slice(0, 5));
-        setAdmissions(recentAdm.slice(0, 5));
-      } catch (err) {
-        console.error("Dashboard load error", err);
-      } finally {
-        setLoading(false);
+      if (tStats.status   === "fulfilled") {
+        const d = (tStats.value as any)?.data ?? tStats.value as any;
+        setTeachers(d?.total ?? 0);
       }
+      if (fStats.status   === "fulfilled") {
+        const d = (fStats.value as any)?.data ?? fStats.value as any;
+        setTodayFees(fmt(d?.totalAmountToday     ?? 0));
+        setMonthFees(fmt(d?.totalAmountThisMonth ?? 0));
+      }
+      if (nData.status    === "fulfilled") setNotices(toArray<RecentNotice>(nData.value).slice(0, 5));
+      if (tcData.status   === "fulfilled") {
+        const list = toArray<RecentTc>(tcData.value).slice(0, 5);
+        setTcList(list);
+        setPendingTc(list.filter(t => t.status === "PENDING").length);
+      }
+      if (admData.status  === "fulfilled") setAdmissions(toArray<RecentAdmission>(admData.value).slice(0, 5));
+      if (admStats.status === "fulfilled") {
+        const d = (admStats.value as any)?.data ?? admStats.value as any;
+        setPendingAdm(d?.pending ?? 0);
+      }
+
+      setLoading(false);
     };
     load();
   }, []);
 
+  const today = new Date().toLocaleDateString("en-IN", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  });
+
   const statCards = [
-    { label: "Teachers",          value: stats?.teachers          ?? 0,  icon: Users,         color: "bg-blue-500" },
-    { label: "Active Notices",    value: stats?.notices           ?? 0,  icon: Bell,          color: "bg-brand-crimson" },
-    { label: "Pending TC",        value: stats?.pendingTc         ?? 0,  icon: FileText,      color: "bg-orange-500" },
-    { label: "Pending Admissions",value: stats?.pendingAdmissions ?? 0,  icon: GraduationCap, color: "bg-purple-500" },
-    { label: "Today's Fees",      value: stats?.todayFees         ?? "₹0", icon: TrendingUp,  color: "bg-emerald-500" },
-    { label: "Month's Fees",      value: stats?.monthFees         ?? "₹0", icon: TrendingUp,  color: "bg-teal-500" },
+    { label: "Teachers",           value: teachers,  icon: Users,         iconBg: "bg-brand-crimson/80",  delay: 0.05 },
+    { label: "Notices Published",  value: notices.filter(n => n.published).length, icon: Bell, iconBg: "bg-brand-maroon",  delay: 0.10 },
+    { label: "Pending TC Requests",value: pendingTc, icon: ClipboardList, iconBg: "bg-orange-500/80",     delay: 0.15 },
+    { label: "Pending Admissions", value: pendingAdm,icon: GraduationCap, iconBg: "bg-purple-500/80",     delay: 0.20 },
+    { label: "Today's Collections",value: todayFees, icon: IndianRupee,   iconBg: "bg-emerald-600/80",    delay: 0.25 },
+    { label: "Monthly Collections",value: monthFees, icon: TrendingUp,    iconBg: "bg-teal-600/80",       delay: 0.30 },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+
+      {/* Header */}
       <div>
-        <h1 className="font-display text-2xl font-bold text-white">Dashboard</h1>
-        <p className="mt-1 text-sm text-brand-slate">
-          {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-        </p>
+        <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Dashboard</h1>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">{today}</p>
       </div>
 
-      {/* Stats grid */}
+      {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {statCards.map((s, i) => (
-          <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}>
-            <StatCard {...s} loading={loading} />
-          </motion.div>
+        {statCards.map(s => (
+          <StatCard key={s.label} {...s} loading={loading} />
         ))}
       </div>
 
-      {/* Three columns */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* Three sections */}
+      <div className="grid gap-5 lg:grid-cols-3">
 
         {/* Recent Notices */}
-        <div className="card">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display font-bold text-white">Recent Notices</h2>
-            <a href="/admin/notices" className="text-xs text-brand-crimson hover:underline">View all</a>
-          </div>
-          {loading ? (
-            <div className="space-y-3">
-              {[1,2,3].map(i => <div key={i} className="h-10 animate-pulse rounded-xl bg-white/5" />)}
-            </div>
-          ) : notices.length === 0 ? (
-            <p className="text-sm text-brand-slate">No notices yet.</p>
+        <SectionCard title="Recent Notices" href="/admin/notices" loading={loading}>
+          {notices.length === 0 ? (
+            <p className="text-sm text-[var(--text-muted)]">No notices yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {notices.map(n => (
-                <div key={n.id} className="flex items-start gap-3 rounded-xl bg-white/3 p-3">
-                  <Bell size={14} className={cn("mt-0.5 shrink-0", n.published ? "text-emerald-400" : "text-brand-slate")} />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-white">{n.title}</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-brand-slate">{n.category}</span>
-                      <span className={cn("text-[10px] font-semibold", n.published ? "text-emerald-400" : "text-brand-slate")}>
+                <div key={n.id} className="flex items-start gap-3 rounded-xl bg-white/3 p-3 hover:bg-white/5 transition-colors">
+                  <div className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg",
+                    n.published ? "bg-emerald-500/20" : "bg-white/5")}>
+                    <Bell size={11} className={n.published ? "text-emerald-400" : "text-brand-slate"} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-[var(--text-primary)]">{n.title}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] text-[var(--text-muted)]">{n.category}</span>
+                      <span className={cn("text-[10px] font-semibold",
+                        n.published ? "text-emerald-400" : "text-brand-slate")}>
                         {n.published ? "Published" : "Draft"}
                       </span>
                     </div>
@@ -195,31 +214,22 @@ export default function AdminDashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </SectionCard>
 
-        {/* Recent TC Requests */}
-        <div className="card">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display font-bold text-white">TC Requests</h2>
-            <a href="/admin/tc" className="text-xs text-brand-crimson hover:underline">View all</a>
-          </div>
-          {loading ? (
-            <div className="space-y-3">
-              {[1,2,3].map(i => <div key={i} className="h-10 animate-pulse rounded-xl bg-white/5" />)}
-            </div>
-          ) : tcList.length === 0 ? (
-            <p className="text-sm text-brand-slate">No TC requests yet.</p>
+        {/* TC Requests */}
+        <SectionCard title="TC Requests" href="/admin/tc" loading={loading}>
+          {tcList.length === 0 ? (
+            <p className="text-sm text-[var(--text-muted)]">No TC requests yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {tcList.map(tc => (
-                <div key={tc.id} className="flex items-center gap-3 rounded-xl bg-white/3 p-3">
-                  {tc.status === "PENDING"  && <Clock size={14} className="shrink-0 text-yellow-500" />}
-                  {tc.status === "ISSUED"   && <CheckCircle size={14} className="shrink-0 text-emerald-400" />}
-                  {tc.status === "REJECTED" && <AlertCircle size={14} className="shrink-0 text-red-400" />}
-                  {!["PENDING","ISSUED","REJECTED"].includes(tc.status) && <FileText size={14} className="shrink-0 text-brand-slate" />}
+                <div key={tc.id} className="flex items-center gap-3 rounded-xl bg-white/3 p-3 hover:bg-white/5 transition-colors">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-white/5">
+                    {STATUS_ICON[tc.status] ?? <FileText size={11} className="text-brand-slate" />}
+                  </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white">{tc.studentName}</p>
-                    <p className="text-[10px] text-brand-slate">{tc.admissionNo}</p>
+                    <p className="truncate text-sm font-medium text-[var(--text-primary)]">{tc.studentName}</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">{tc.admissionNo}</p>
                   </div>
                   <span className={cn("shrink-0 text-[10px] font-semibold", STATUS_COLOR[tc.status] ?? "text-brand-slate")}>
                     {tc.status}
@@ -228,28 +238,22 @@ export default function AdminDashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </SectionCard>
 
-        {/* Recent Admissions */}
-        <div className="card">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display font-bold text-white">Admissions</h2>
-            <a href="/admin/admissions" className="text-xs text-brand-crimson hover:underline">View all</a>
-          </div>
-          {loading ? (
-            <div className="space-y-3">
-              {[1,2,3].map(i => <div key={i} className="h-10 animate-pulse rounded-xl bg-white/5" />)}
-            </div>
-          ) : admissions.length === 0 ? (
-            <p className="text-sm text-brand-slate">No inquiries yet.</p>
+        {/* Admissions */}
+        <SectionCard title="Admissions" href="/admin/admissions" loading={loading}>
+          {admissions.length === 0 ? (
+            <p className="text-sm text-[var(--text-muted)]">No inquiries yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {admissions.map(a => (
-                <div key={a.id} className="flex items-center gap-3 rounded-xl bg-white/3 p-3">
-                  <GraduationCap size={14} className="shrink-0 text-brand-slate" />
+                <div key={a.id} className="flex items-center gap-3 rounded-xl bg-white/3 p-3 hover:bg-white/5 transition-colors">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-brand-crimson/15">
+                    <GraduationCap size={11} className="text-brand-crimson" />
+                  </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white">{a.studentName}</p>
-                    <p className="text-[10px] text-brand-slate">Grade {a.gradeApplying}</p>
+                    <p className="truncate text-sm font-medium text-[var(--text-primary)]">{a.studentName}</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">Grade {a.gradeApplying}</p>
                   </div>
                   <span className={cn("shrink-0 text-[10px] font-semibold", STATUS_COLOR[a.status] ?? "text-brand-slate")}>
                     {a.status}
@@ -258,7 +262,8 @@ export default function AdminDashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </SectionCard>
+
       </div>
     </div>
   );
