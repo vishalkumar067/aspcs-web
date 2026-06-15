@@ -192,7 +192,7 @@ export default function AdminNoticesPage() {
   const fetchNotices = async () => {
     setLoading(true);
     try {
-      const raw = await api.get<unknown>("/notices?size=100&sort=createdAt,desc");
+      const raw = await api.get<unknown>("/notice");
       setNotices(toArray<Notice>(raw));
     } catch {
       toast.error("Failed to load notices");
