@@ -35,36 +35,59 @@ function NoticeModal({ notice, onClose, onSaved }: {
     pdfUrl:      notice?.pdfUrl      ?? "",
     imageUrl:    notice?.imageUrl    ?? "",
   });
-  const [saving, setSaving]           = useState(false);
-  const [uploadingPdf, setUploadPdf]  = useState(false);
-  const [uploadingImg, setUploadImg]  = useState(false);
+  const [saving,       setSaving]      = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
 
+  // ── await is OUTSIDE setForm — fixes "await in non-async function" ──────────
   const handlePDF = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    setUploadPdf(true);
-    try { setForm(f => ({ ...f, pdfUrl: await uploadPDF(file, "aspcs/notices") })); toast.success("PDF uploaded!"); }
-    catch { toast.error("PDF upload failed"); }
-    finally { setUploadPdf(false); }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPdf(true);
+    try {
+      const url = await uploadPDF(file, "aspcs/notices");   // await here ✓
+      setForm(f => ({ ...f, pdfUrl: url }));                // plain setter ✓
+      toast.success("PDF uploaded!");
+    } catch {
+      toast.error("PDF upload failed");
+    } finally {
+      setUploadingPdf(false);
+    }
   };
 
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    setUploadImg(true);
-    try { setForm(f => ({ ...f, imageUrl: await uploadImage(file, "aspcs/notices") })); toast.success("Image uploaded!"); }
-    catch { toast.error("Image upload failed"); }
-    finally { setUploadImg(false); }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImg(true);
+    try {
+      const url = await uploadImage(file, "aspcs/notices"); // await here ✓
+      setForm(f => ({ ...f, imageUrl: url }));              // plain setter ✓
+      toast.success("Image uploaded!");
+    } catch {
+      toast.error("Image upload failed");
+    } finally {
+      setUploadingImg(false);
+    }
   };
 
   const handleSave = async () => {
     if (!form.title.trim()) { toast.error("Title is required"); return; }
     setSaving(true);
     try {
-      notice?.id ? await api.put(`/notices/${notice.id}`, form) : await api.post("/notices", form);
-      toast.success(notice?.id ? "Notice updated!" : "Notice created!");
-      onSaved(); onClose();
+      if (notice?.id) {
+        await api.put(`/notices/${notice.id}`, form);
+        toast.success("Notice updated!");
+      } else {
+        await api.post("/notices", form);
+        toast.success("Notice created!");
+      }
+      onSaved();
+      onClose();
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Save failed");
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -108,7 +131,8 @@ function NoticeModal({ notice, onClose, onSaved }: {
               <input value={form.pdfUrl} onChange={e => setForm({ ...form, pdfUrl: e.target.value })}
                 placeholder="PDF URL or upload →"
                 className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
-              <label className={cn("flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-xs text-brand-slate hover:text-white", uploadingPdf && "pointer-events-none opacity-50")}>
+              <label className={cn("flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-xs text-brand-slate hover:text-white",
+                uploadingPdf && "pointer-events-none opacity-50")}>
                 {uploadingPdf ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                 {uploadingPdf ? "..." : "Upload"}
                 <input type="file" accept=".pdf" className="hidden" onChange={handlePDF} />
@@ -123,7 +147,8 @@ function NoticeModal({ notice, onClose, onSaved }: {
               <input value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value })}
                 placeholder="Image URL or upload →"
                 className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
-              <label className={cn("flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-xs text-brand-slate hover:text-white", uploadingImg && "pointer-events-none opacity-50")}>
+              <label className={cn("flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-xs text-brand-slate hover:text-white",
+                uploadingImg && "pointer-events-none opacity-50")}>
                 {uploadingImg ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                 {uploadingImg ? "..." : "Upload"}
                 <input type="file" accept="image/*" className="hidden" onChange={handleImage} />
@@ -133,13 +158,13 @@ function NoticeModal({ notice, onClose, onSaved }: {
           </div>
 
           <div className="flex gap-4">
-            {[{ key: "important", label: "Mark as Important" }, { key: "published", label: "Publish Now" }].map(({ key, label }) => (
+            {(["important", "published"] as const).map(key => (
               <label key={key} className="flex cursor-pointer items-center gap-2">
-                <div onClick={() => setForm(f => ({ ...f, [key]: !f[key as keyof typeof f] }))}
-                  className={cn("relative h-5 w-9 rounded-full transition-colors", form[key as keyof typeof form] ? "bg-brand-crimson" : "bg-white/10")}>
-                  <div className={cn("absolute top-0 h-5 w-5 rounded-full bg-white shadow transition-transform", form[key as keyof typeof form] ? "translate-x-4" : "translate-x-0")} />
+                <div onClick={() => setForm(f => ({ ...f, [key]: !f[key] }))}
+                  className={cn("relative h-5 w-9 rounded-full transition-colors", form[key] ? "bg-brand-crimson" : "bg-white/10")}>
+                  <div className={cn("absolute top-0 h-5 w-5 rounded-full bg-white shadow transition-transform", form[key] ? "translate-x-4" : "translate-x-0")} />
                 </div>
-                <span className="text-xs text-white/70">{label}</span>
+                <span className="text-xs text-white/70">{key === "important" ? "Mark as Important" : "Publish Now"}</span>
               </label>
             ))}
           </div>
@@ -158,7 +183,7 @@ function NoticeModal({ notice, onClose, onSaved }: {
 }
 
 export default function AdminNoticesPage() {
-  const [notices,    setNotices]    = useState<Notice[]>([]);  // always an array
+  const [notices,    setNotices]    = useState<Notice[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [modal,      setModal]      = useState(false);
   const [editNotice, setEditNotice] = useState<Notice | null>(null);
@@ -168,11 +193,13 @@ export default function AdminNoticesPage() {
     setLoading(true);
     try {
       const raw = await api.get<unknown>("/notices?size=100&sort=createdAt,desc");
-      setNotices(toArray<Notice>(raw));          // ← never undefined
+      setNotices(toArray<Notice>(raw));
     } catch {
       toast.error("Failed to load notices");
-      setNotices([]);                            // ← safe fallback
-    } finally { setLoading(false); }
+      setNotices([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchNotices(); }, []);
@@ -193,7 +220,6 @@ export default function AdminNoticesPage() {
     }
   };
 
-  // safe: notices is always Notice[] here
   const filtered = notices.filter(n =>
     !search || n.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -251,8 +277,10 @@ export default function AdminNoticesPage() {
                       <button onClick={() => togglePublish(n)} className="rounded-lg p-1.5 text-brand-slate hover:text-brand-gold">
                         {n.published ? <EyeOff size={14} /> : <Eye size={14} />}
                       </button>
-                      <button onClick={() => { setEditNotice(n); setModal(true); }} className="rounded-lg p-1.5 text-brand-slate hover:text-brand-gold"><Pencil size={14} /></button>
-                      <button onClick={() => handleDelete(n.id)} className="rounded-lg p-1.5 text-brand-slate hover:text-red-400"><Trash2 size={14} /></button>
+                      <button onClick={() => { setEditNotice(n); setModal(true); }}
+                        className="rounded-lg p-1.5 text-brand-slate hover:text-brand-gold"><Pencil size={14} /></button>
+                      <button onClick={() => handleDelete(n.id)}
+                        className="rounded-lg p-1.5 text-brand-slate hover:text-red-400"><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </motion.tr>
@@ -261,14 +289,15 @@ export default function AdminNoticesPage() {
           </table>
           {filtered.length === 0 && (
             <div className="py-16 text-center text-brand-slate">
-              {search ? "No notices match your search." : "No notices yet. Click 'Add Notice' to create one."}
+              {search ? "No notices match your search." : "No notices yet."}
             </div>
           )}
         </div>
       )}
 
       <AnimatePresence>
-        {modal && <NoticeModal notice={editNotice} onClose={() => { setModal(false); setEditNotice(null); }} onSaved={fetchNotices} />}
+        {modal && <NoticeModal notice={editNotice}
+          onClose={() => { setModal(false); setEditNotice(null); }} onSaved={fetchNotices} />}
       </AnimatePresence>
     </div>
   );

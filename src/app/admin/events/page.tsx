@@ -36,24 +36,40 @@ function EventModal({ event, onClose, onSaved }: { event?: Event | null; onClose
   const [saving,    setSaving]    = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  // ── await is OUTSIDE setForm — fixes "await in non-async function" ──────────
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
     setUploading(true);
-    try { setForm(f => ({ ...f, imageUrl: await uploadImage(file, "aspcs/events") })); toast.success("Image uploaded!"); }
-    catch { toast.error("Upload failed"); }
-    finally { setUploading(false); }
+    try {
+      const url = await uploadImage(file, "aspcs/events"); // await here ✓
+      setForm(f => ({ ...f, imageUrl: url }));             // plain setter ✓
+      toast.success("Image uploaded!");
+    } catch {
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
     if (!form.title.trim() || !form.startDate) { toast.error("Title and start date are required"); return; }
     setSaving(true);
     try {
-      event?.id ? await api.put(`/events/${event.id}`, form) : await api.post("/events", form);
-      toast.success(event?.id ? "Event updated!" : "Event created!");
-      onSaved(); onClose();
+      if (event?.id) {
+        await api.put(`/events/${event.id}`, form);
+        toast.success("Event updated!");
+      } else {
+        await api.post("/events", form);
+        toast.success("Event created!");
+      }
+      onSaved();
+      onClose();
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Save failed");
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -118,7 +134,8 @@ function EventModal({ event, onClose, onSaved }: { event?: Event | null; onClose
               <input value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value })}
                 placeholder="Image URL or upload →"
                 className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50" />
-              <label className={cn("flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-xs text-brand-slate hover:text-white", uploading && "pointer-events-none opacity-50")}>
+              <label className={cn("flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2.5 text-xs text-brand-slate hover:text-white",
+                uploading && "pointer-events-none opacity-50")}>
                 {uploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                 {uploading ? "..." : "Upload"}
                 <input type="file" accept="image/*" className="hidden" onChange={handleImage} />
@@ -149,7 +166,7 @@ function EventModal({ event, onClose, onSaved }: { event?: Event | null; onClose
 }
 
 export default function AdminEventsPage() {
-  const [events,    setEvents]    = useState<Event[]>([]);   // always an array
+  const [events,    setEvents]    = useState<Event[]>([]);
   const [loading,   setLoading]   = useState(true);
   const [modal,     setModal]     = useState(false);
   const [editEvent, setEditEvent] = useState<Event | null>(null);
@@ -158,11 +175,13 @@ export default function AdminEventsPage() {
     setLoading(true);
     try {
       const raw = await api.get<unknown>("/events?size=100&sort=startDate,desc");
-      setEvents(toArray<Event>(raw));          // ← never undefined
+      setEvents(toArray<Event>(raw));
     } catch {
       toast.error("Failed to load events");
-      setEvents([]);                           // ← safe fallback
-    } finally { setLoading(false); }
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchEvents(); }, []);
@@ -209,7 +228,8 @@ export default function AdminEventsPage() {
                     className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-white/10 py-2 text-xs text-brand-slate hover:text-brand-gold">
                     <Pencil size={12} /> Edit
                   </button>
-                  <button onClick={() => handleDelete(ev.id)} className="rounded-xl border border-white/10 p-2 text-brand-slate hover:text-red-400">
+                  <button onClick={() => handleDelete(ev.id)}
+                    className="rounded-xl border border-white/10 p-2 text-brand-slate hover:text-red-400">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -221,7 +241,8 @@ export default function AdminEventsPage() {
       )}
 
       <AnimatePresence>
-        {modal && <EventModal event={editEvent} onClose={() => { setModal(false); setEditEvent(null); }} onSaved={fetchEvents} />}
+        {modal && <EventModal event={editEvent}
+          onClose={() => { setModal(false); setEditEvent(null); }} onSaved={fetchEvents} />}
       </AnimatePresence>
     </div>
   );
