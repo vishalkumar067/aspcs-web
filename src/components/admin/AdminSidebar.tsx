@@ -2,36 +2,50 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import {
-  LayoutDashboard, Bell, Images, Users,
-  LogOut, GraduationCap, Settings, X, FileText,
+  LayoutDashboard,
+  Bell,
+  Images,
+  Users,
+  LogOut,
+  GraduationCap,
+  Settings,
+  X,
+  ImagePlus,
+  UserSquare2,
+  Briefcase,
+  CalendarDays,
+  ScrollText,
+  IndianRupee,
+  ClipboardList,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 const navItems = [
-  { label: "Dashboard",  href: "/admin/dashboard",   icon: LayoutDashboard },
-  { label: "Notices",    href: "/admin/notices",      icon: Bell },
-  { label: "Gallery",    href: "/admin/gallery",      icon: Images },
-  { label: "Admissions", href: "/admin/admissions",   icon: Users },
-  { label: "Events",     href: "/admin/events",       icon: FileText },
-  { label: "Settings",   href: "/admin/settings",     icon: Settings },
+  { label: "Dashboard",   href: "/admin/dashboard",  icon: LayoutDashboard },
+  { label: "Students",    href: "/admin/students",    icon: UserSquare2     },
+  { label: "TC Requests", href: "/admin/tc",          icon: ClipboardList   },
+  { label: "Teachers",    href: "/admin/teachers",    icon: Users           },
+  { label: "Fees",        href: "/admin/fees",        icon: IndianRupee     },
+  { label: "Notices",     href: "/admin/notices",     icon: Bell            },
+  { label: "Gallery",     href: "/admin/gallery",     icon: Images          },
+  { label: "Admissions",  href: "/admin/admissions",  icon: GraduationCap   },
+  { label: "Events",      href: "/admin/events",      icon: CalendarDays    },
+  { label: "Careers",     href: "/admin/careers",     icon: Briefcase       },
+  { label: "Media",       href: "/admin/media",       icon: ImagePlus       },
+  { label: "Settings",    href: "/admin/settings",    icon: Settings        },
 ];
 
-interface SidebarProps {
-  onClose?: () => void;
-}
-
-export default function AdminSidebar({ onClose }: SidebarProps) {
+export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router   = useRouter();
   const { user, logout } = useAuthStore();
 
   const handleLogout = () => {
     logout();
-    toast.success("Logged out successfully");
+    toast.success("Logged out");
     router.push("/admin/login");
   };
 
@@ -54,24 +68,23 @@ export default function AdminSidebar({ onClose }: SidebarProps) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        {navItems.map((item) => {
-          const Icon    = item.icon;
-          const active  = pathname === item.href;
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+        {navItems.map(({ label, href, icon: Icon }) => {
+          const active = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={href}
+              href={href}
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
                 active
-                  ? "bg-brand-crimson text-white shadow-glow-crimson"
+                  ? "bg-brand-crimson text-white"
                   : "text-brand-slate hover:bg-brand-crimson/10 hover:text-white"
               )}
             >
               <Icon size={17} strokeWidth={active ? 2.5 : 2} />
-              {item.label}
+              {label}
             </Link>
           );
         })}
@@ -81,7 +94,7 @@ export default function AdminSidebar({ onClose }: SidebarProps) {
       <div className="border-t border-brand-crimson/15 p-4">
         <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/5 px-3 py-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-crimson/20 text-xs font-bold text-brand-crimson">
-            {user?.name?.charAt(0) ?? "A"}
+            {user?.name?.charAt(0)?.toUpperCase() ?? "A"}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-semibold text-white">{user?.name ?? "Admin"}</p>
@@ -90,7 +103,7 @@ export default function AdminSidebar({ onClose }: SidebarProps) {
         </div>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-brand-slate transition-all hover:bg-red-500/10 hover:text-red-400"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-brand-slate hover:bg-red-500/10 hover:text-red-400 transition-all"
         >
           <LogOut size={16} />
           Sign Out

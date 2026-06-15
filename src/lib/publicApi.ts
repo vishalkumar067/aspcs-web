@@ -3,20 +3,27 @@ const BASE = process.env.NEXT_PUBLIC_API_BASE_URL
   ?? "https://aspcs-backend-production.up.railway.app/api/v1";
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    next: { revalidate: 60 },          // ISR: refresh every 60 s
-  });
+  const res = await fetch(`${BASE}${path}`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json() as Promise<T>;
 }
 
-function items<T>(data: unknown): T[] {
-  if (!data) return [];
-  if (Array.isArray(data)) return data as T[];
-  const d = data as Record<string, unknown>;
-  return (Array.isArray(d.content) ? d.content :
-          Array.isArray(d.data)    ? d.data    :
-          Array.isArray(d.items)   ? d.items   : []) as T[];
+// Unwraps all known response shapes including { success, data: { content: [] } }
+function items<T>(raw: unknown): T[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as T[];
+  const r = raw as Record<string, unknown>;
+  if (Array.isArray(r.content)) return r.content as T[];
+  if (Array.isArray(r.data))    return r.data    as T[];
+  if (Array.isArray(r.items))   return r.items   as T[];
+  // ApiResponse wrapping a Page: { success, data: { content: [] } }
+  if (r.data && typeof r.data === "object") {
+    const d = r.data as Record<string, unknown>;
+    if (Array.isArray(d.content)) return d.content as T[];
+    if (Array.isArray(d.items))   return d.items   as T[];
+    if (Array.isArray(d.data))    return d.data    as T[];
+  }
+  return [];
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -81,67 +88,52 @@ export interface JobListing {
 
 // ─── Notice API ───────────────────────────────────────────────────────────────
 export async function getPublishedNotices(page = 0, size = 20): Promise<Notice[]> {
-  try {
-    const data = await get<unknown>(`/notices/public?page=${page}&size=${size}`);
-    return items<Notice>(data);
-  } catch { return []; }
+  try { return items<Notice>(await get<unknown>(`/notices/public?page=${page}&size=${size}`)); }
+  catch { return []; }
 }
 
 export async function getLatestNotices(): Promise<Notice[]> {
-  try {
-    const data = await get<unknown>("/notices/public/latest");
-    return items<Notice>(data);
-  } catch { return []; }
+  try { return items<Notice>(await get<unknown>("/notices/public/latest")); }
+  catch { return []; }
 }
 
 // ─── Event API ────────────────────────────────────────────────────────────────
 export async function getPublicEvents(page = 0, size = 20): Promise<Event[]> {
-  try {
-    const data = await get<unknown>(`/events/public?page=${page}&size=${size}`);
-    return items<Event>(data);
-  } catch { return []; }
+  try { return items<Event>(await get<unknown>(`/events/public?page=${page}&size=${size}`)); }
+  catch { return []; }
 }
 
 export async function getHighlightEvents(): Promise<Event[]> {
-  try {
-    const data = await get<unknown>("/events/public/highlights");
-    return items<Event>(data);
-  } catch { return []; }
+  try { return items<Event>(await get<unknown>("/events/public/highlights")); }
+  catch { return []; }
 }
 
 export async function getUpcomingEvents(): Promise<Event[]> {
-  try {
-    const data = await get<unknown>("/events/public/upcoming");
-    return items<Event>(data);
-  } catch { return []; }
+  try { return items<Event>(await get<unknown>("/events/public/upcoming")); }
+  catch { return []; }
 }
 
 // ─── Gallery API ──────────────────────────────────────────────────────────────
 export async function getPublicAlbums(page = 0, size = 12): Promise<GalleryAlbum[]> {
-  try {
-    const data = await get<unknown>(`/gallery/public?page=${page}&size=${size}`);
-    return items<GalleryAlbum>(data);
-  } catch { return []; }
+  try { return items<GalleryAlbum>(await get<unknown>(`/gallery/public?page=${page}&size=${size}`)); }
+  catch { return []; }
 }
 
 export async function getAlbumImages(albumId: string): Promise<GalleryImage[]> {
-  try {
-    const data = await get<unknown>(`/gallery/${albumId}/images`);
-    return items<GalleryImage>(data);
-  } catch { return []; }
+  try { return items<GalleryImage>(await get<unknown>(`/gallery/${albumId}/images`)); }
+  catch { return []; }
 }
 
 // ─── Careers API ──────────────────────────────────────────────────────────────
 export async function getActiveJobs(page = 0, size = 10): Promise<JobListing[]> {
-  try {
-    const data = await get<unknown>(`/careers/jobs?page=${page}&size=${size}`);
-    return items<JobListing>(data);
-  } catch { return []; }
+  try { return items<JobListing>(await get<unknown>(`/careers/jobs?page=${page}&size=${size}`)); }
+  catch { return []; }
 }
 
 export async function getJobById(id: string): Promise<JobListing | null> {
   try {
-    const data = await get<{ data?: JobListing } | JobListing>(`/careers/jobs/${id}`);
-    return (data as Record<string, unknown>)?.data as JobListing ?? data as JobListing;
+    const raw = await get<unknown>(`/careers/jobs/${id}`);
+    const r = raw as Record<string, unknown>;
+    return (r?.data ?? raw) as JobListing;
   } catch { return null; }
 }

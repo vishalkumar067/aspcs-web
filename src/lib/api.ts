@@ -5,8 +5,6 @@ const BASE = process.env.NEXT_PUBLIC_API_BASE_URL
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    // Key: "aspcs-admin-auth"  Field: state.accessToken
-    // Confirmed from authStore.ts — persist({ name: "aspcs-admin-auth" })
     const raw = localStorage.getItem("aspcs-admin-auth");
     if (!raw) return null;
     const parsed = JSON.parse(raw);
@@ -29,7 +27,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     let message = text;
-    try { message = JSON.parse(text)?.message ?? text; } catch { /* use raw */ }
+    try { message = JSON.parse(text)?.message ?? text; } catch { /* raw */ }
     throw new Error(message || `HTTP ${res.status}`);
   }
 
@@ -45,15 +43,48 @@ export const api = {
   delete: <T>(path: string)               => request<T>(path, { method: "DELETE" }),
 };
 
-// ─── Safe array helper ────────────────────────────────────────────────────────
-export function toArray<T>(data: unknown): T[] {
-  if (!data) return [];
-  if (Array.isArray(data)) return data as T[];
-  const d = data as Record<string, unknown>;
-  if (Array.isArray(d.content)) return d.content as T[];
-  if (Array.isArray(d.data))    return d.data    as T[];
-  if (Array.isArray(d.items))   return d.items   as T[];
+// ─── toArray: unwraps all known response shapes ───────────────────────────────
+//
+//  Shape 1 — plain array:             []
+//  Shape 2 — Spring Page:             { content: [], totalElements: N }
+//  Shape 3 — ApiResponse flat:        { data: [], success: true }
+//  Shape 4 — ApiResponse + Page:      { data: { content: [], totalElements: N }, success: true }
+//
+export function toArray<T>(raw: unknown): T[] {
+  if (!raw) return [];
+
+  // Shape 1
+  if (Array.isArray(raw)) return raw as T[];
+
+  const r = raw as Record<string, unknown>;
+
+  // Shape 2 — Spring Page at top level
+  if (Array.isArray(r.content)) return r.content as T[];
+
+  // Shape 3 — data is already a plain array
+  if (Array.isArray(r.data)) return r.data as T[];
+
+  // Shape 4 — ApiResponse wrapping a Page  ← THE MISSING CASE
+  if (r.data && typeof r.data === "object" && !Array.isArray(r.data)) {
+    const d = r.data as Record<string, unknown>;
+    if (Array.isArray(d.content)) return d.content as T[];
+    if (Array.isArray(d.items))   return d.items   as T[];
+    if (Array.isArray(d.data))    return d.data    as T[];
+  }
+
+  // Fallback
+  if (Array.isArray(r.items)) return r.items as T[];
+
   return [];
+}
+
+// ─── unwrapData: get the raw data field from ApiResponse ─────────────────────
+// Use when you need scalars (stats, single objects) not arrays
+export function unwrapData<T>(raw: unknown): T | null {
+  if (!raw) return null;
+  const r = raw as Record<string, unknown>;
+  if ("data" in r) return r.data as T;
+  return raw as T;
 }
 
 // ─── Cloudinary ───────────────────────────────────────────────────────────────
