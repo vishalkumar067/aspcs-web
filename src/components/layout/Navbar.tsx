@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/config/navigation";
 
 export default function Navbar() {
-  const [scrolled, setScrolled]             = useState(false);
-  const [mobileOpen, setMobileOpen]         = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [scrolled,         setScrolled]         = useState(false);
+  const [mobileOpen,       setMobileOpen]        = useState(false);
+  const [activeDropdown,   setActiveDropdown]    = useState<string | null>(null);
   const pathname    = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -37,14 +37,12 @@ export default function Navbar() {
     <>
       <header className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-500",
-        scrolled
-          ? "bg-brand-black/96 shadow-maroon backdrop-blur-xl"
-          : "bg-transparent"
+        scrolled ? "bg-brand-black/96 shadow-maroon backdrop-blur-xl" : "bg-transparent"
       )}>
         {/* Top bar */}
         <div className="hidden border-b border-brand-crimson/20 lg:block">
           <div className="container-aspcs flex h-9 items-center justify-between text-xs text-brand-slate">
-            <span>Excellence in Education Since 1980</span>
+            <span>Excellence in Education Since 1980 · Session 2026–27</span>
             <div className="flex items-center gap-6">
               <a href="tel:+919102997549" className="flex items-center gap-1.5 transition-colors hover:text-brand-gold">
                 <Phone size={11} />+91-91029 97549
@@ -60,16 +58,18 @@ export default function Navbar() {
         <div className="container-aspcs" ref={dropdownRef}>
           <div className="flex h-16 items-center justify-between lg:h-18">
 
-            {/* Logo */}
-            <Link href="/" className="group flex items-center gap-3">
-              <div className="relative flex h-10 w-10 overflow-hidden rounded-xl transition-transform duration-300 group-hover:scale-105">
+            {/* ── Logo — fixed alignment ── */}
+            <Link href="/" className="group flex items-center gap-3 shrink-0">
+              <div className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-xl transition-transform duration-300 group-hover:scale-105">
                 <Image src="/logo.png" alt="ASPCS Logo" width={40} height={40} className="object-contain" priority />
               </div>
-              <div className="leading-tight">
-                <div className="font-display text-lg font-bold tracking-wide text-white">Acharya</div>
-                <div className="hidden text-[9px] font-medium uppercase tracking-[0.15em] text-brand-gold sm:block">
-                Shree Sudarshan Patna Central School
-                </div>
+              <div className="flex flex-col justify-center leading-none">
+                <span className="font-display text-base font-extrabold tracking-wide text-white">
+                  Acharya
+                </span>
+                <span className="hidden text-[9px] font-semibold uppercase tracking-[0.13em] text-brand-gold sm:block">
+                  Shree Sudarshan Patna Central School
+                </span>
               </div>
             </Link>
 
@@ -166,7 +166,7 @@ export default function Navbar() {
                     <div className="mb-2">
                       <button
                         onClick={() => setActiveDropdown(activeDropdown === item.href ? null : item.href)}
-                        className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-base font-semibold text-white/90"
+                        className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-base font-bold text-white"
                       >
                         {item.label}
                         <ChevronDown size={16} className={cn("transition-transform duration-200", activeDropdown === item.href && "rotate-180")} />
@@ -181,7 +181,7 @@ export default function Navbar() {
                             className="overflow-hidden"
                           >
                             {item.children.map((child) => (
-                              <Link key={child.href} href={child.href} className="block rounded-xl px-8 py-2.5 text-sm text-white/60 hover:text-brand-gold">
+                              <Link key={child.href} href={child.href} className="block rounded-xl px-8 py-2.5 text-sm font-medium text-white/70 hover:text-brand-gold">
                                 {child.label}
                               </Link>
                             ))}
@@ -192,8 +192,8 @@ export default function Navbar() {
                   ) : (
                     <Link
                       href={item.href}
-                      className={cn("mb-1 block rounded-xl px-4 py-3 text-base font-semibold transition-colors",
-                        pathname === item.href ? "text-brand-gold" : "text-white/90"
+                      className={cn("mb-1 block rounded-xl px-4 py-3 text-base font-bold transition-colors",
+                        pathname === item.href ? "text-brand-gold" : "text-white"
                       )}
                     >
                       {item.label}
@@ -204,7 +204,7 @@ export default function Navbar() {
             </nav>
             <div className="border-t border-brand-crimson/20 px-6 py-6">
               <Link href="/admissions" className="btn-primary w-full justify-center">
-                Apply for Admissions
+                Apply for Admissions 2026–27
               </Link>
             </div>
           </motion.div>

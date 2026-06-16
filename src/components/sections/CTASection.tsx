@@ -7,18 +7,10 @@ import { ArrowRight, Phone } from "lucide-react";
 export default function CTASection() {
   return (
     <section className="relative overflow-hidden bg-brand-black py-24">
-      {/* Layered background */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,rgba(196,30,58,0.08),transparent)]" />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(196,30,58,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(196,30,58,0.08) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
+      <div className="pointer-events-none absolute inset-0 opacity-20"
+        style={{ backgroundImage: "linear-gradient(rgba(196,30,58,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(196,30,58,0.08) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
 
-      {/* Glow orbs */}
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.18, 0.08] }}
         transition={{ duration: 7, repeat: Infinity }}
@@ -31,40 +23,32 @@ export default function CTASection() {
       />
 
       <div className="container-aspcs relative z-10 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
           <span className="section-eyebrow mb-6 inline-flex">
             <span className="animate-pulse inline-block h-1.5 w-1.5 rounded-full bg-brand-gold" />
-            Admissions Open — 2025–26
+            Admissions Open — 2026–27
           </span>
 
-          <h2 className="mx-auto mb-6 max-w-3xl font-display text-display-md font-bold text-white lg:text-display-lg">
+          <h2 className="mx-auto mb-6 max-w-3xl font-display text-display-md font-black text-white lg:text-display-lg">
             Give Your Child the Education{" "}
             <span className="text-gold-shimmer">They Deserve</span>
           </h2>
 
-          <p className="mx-auto mb-10 max-w-xl text-lg text-brand-slate">
-            Seats are limited. Take the first step toward an extraordinary
+          <p className="mx-auto mb-10 max-w-xl text-lg font-semibold text-white/75">
+            Seats are limited for session 2026–27. Take the first step toward an extraordinary
             educational journey at ASPCS — where every child thrives.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link href="/admissions" className="btn-primary px-10 py-4 text-base shadow-glow-crimson">
-              Apply Online Now
-              <ArrowRight size={17} />
+              Apply Online Now <ArrowRight size={17} />
             </Link>
-            <a href="tel:+91XXXXXXXXXX" className="btn-outline px-10 py-4 text-base">
-              <Phone size={16} />
-              Call Admissions
+            <a href="tel:+919102997549" className="btn-outline px-10 py-4 text-base">
+              <Phone size={16} /> Call Admissions
             </a>
           </div>
 
-          {/* Trust note */}
-          <p className="mt-8 text-sm text-brand-slate/60">
+          <p className="mt-8 text-sm font-medium text-white/40">
             Free school tour available · No hidden charges · Transparent process
           </p>
         </motion.div>
