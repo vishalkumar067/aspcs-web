@@ -3,18 +3,20 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, GraduationCap } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
 
 export default function WelcomePopup() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // Show once per session
     const seen = sessionStorage.getItem("aspcs-welcome-seen");
+
     if (!seen) {
-      const t = setTimeout(() => setOpen(true), 800);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => {
+        setOpen(true);
+      }, 800);
+
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -22,6 +24,12 @@ export default function WelcomePopup() {
     setOpen(false);
     sessionStorage.setItem("aspcs-welcome-seen", "1");
   };
+
+  const whatsappMessage = encodeURIComponent(
+    "Thank you for your interest in Patna Central School's Day Boarding Programme. Please share your child's name, class, and contact number. Our admissions team will assist you shortly."
+  );
+
+  const whatsappUrl = `https://wa.me/919102997549?text=${whatsappMessage}`;
 
   return (
     <AnimatePresence>
@@ -40,13 +48,16 @@ export default function WelcomePopup() {
           {/* Modal */}
           <motion.div
             initial={{ scale: 0.92, opacity: 0, y: 20 }}
-            animate={{ scale: 1,    opacity: 1, y: 0 }}
-            exit={{    scale: 0.92, opacity: 0, y: 20 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.92, opacity: 0, y: 20 }}
+            transition={{
+              duration: 0.35,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-brand-crimson/30 bg-brand-black shadow-[0_24px_80px_rgba(0,0,0,0.6)]"
           >
-            {/* Close button */}
+            {/* Close Button */}
             <button
               onClick={close}
               className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-brand-crimson"
@@ -55,77 +66,115 @@ export default function WelcomePopup() {
               <X size={16} />
             </button>
 
-            {/* Banner image — replace /images/welcome-banner.jpg with your actual image */}
+            {/* Banner */}
             <div className="relative h-56 w-full overflow-hidden bg-gradient-to-br from-brand-maroon to-brand-black">
-              {/* Try to load a welcome banner image; falls back to gradient */}
               <Image
                 src="/images/welcome-banner.jpg"
-                alt="ASPCS Welcome"
+                alt="Patna Central School"
                 fill
-                className="object-cover opacity-80"
-                onError={() => {}} // graceful fallback to gradient bg
                 priority
+                className="object-cover opacity-80"
               />
-              {/* Overlay */}
+
               <div className="absolute inset-0 bg-gradient-to-t from-brand-black via-brand-black/30 to-transparent" />
 
-              {/* Badge */}
+              {/* Admissions Badge */}
               <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full border border-brand-gold/40 bg-black/60 px-3 py-1.5 backdrop-blur-sm">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-brand-gold" />
+
                 <span className="text-[11px] font-bold uppercase tracking-widest text-brand-gold">
-                  Admissions Open
+                  Day Boarding Admissions Open
                 </span>
               </div>
             </div>
 
             {/* Content */}
             <div className="px-7 pb-7 pt-5">
-              {/* School logo row */}
+              {/* School Header */}
               <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-crimson/15 border border-brand-crimson/20">
-                  <GraduationCap size={20} className="text-brand-crimson" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-crimson/20 bg-brand-crimson/15">
+                  <GraduationCap
+                    size={20}
+                    className="text-brand-crimson"
+                  />
                 </div>
+
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-brand-crimson">ASPCS — Patna</p>
-                  <p className="text-xs font-semibold text-white/70">Acharya Shree Sudarshan Patna Central School</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-brand-crimson">
+                    Patna Central School
+                  </p>
+
+                  <p className="text-xs font-semibold text-white/70">
+                    Excellence in Education & Day Boarding
+                  </p>
                 </div>
               </div>
 
+              {/* Heading */}
               <h2 className="mb-2 font-display text-2xl font-black text-white">
-                Welcome to ASPCS!<br />
-                <span className="text-brand-gold">Session 2026–27</span>
+                Welcome to
+                <br />
+                <span className="text-brand-gold">
+                  Patna Central School
+                </span>
               </h2>
 
-              <p className="mb-1 text-sm font-semibold text-white">
-                🎓 Admissions Now Open — Classes Nursery to XII
-              </p>
-              <p className="mb-5 text-sm font-medium text-white/65">
-                Including <strong className="text-white">Class XI (Science & Commerce)</strong> — Senior Secondary admissions are now open. Limited seats available.
+              {/* Admissions Text */}
+              <p className="mb-2 text-sm font-semibold text-white">
+                🌟 Admissions Open for Day Boarding Programme-Class I to IX and XI
               </p>
 
-              {/* Highlights */}
+              <p className="mb-5 text-sm font-medium leading-relaxed text-white/65">
+                Give your child the advantage of structured learning,
+                supervised study hours, nutritious meals, co-curricular
+                activities, and holistic development in a safe and nurturing
+                environment.
+              </p>
+
+              {/* Stats */}
               <div className="mb-6 grid grid-cols-3 gap-2 text-center">
                 {[
-                  { value: "CBSE",    label: "Affiliated" },
-                  { value: "2,000+",  label: "Students" },
-                  { value: "98%",     label: "Pass Rate" },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-xl border border-white/8 bg-white/4 py-3">
-                    <p className="font-display text-lg font-black text-brand-gold">{s.value}</p>
-                    <p className="text-[10px] font-semibold text-white/50">{s.label}</p>
+                  {
+                    value: "CBSE",
+                    label: "Affiliated",
+                  },
+                  {
+                    value: "2,000+",
+                    label: "Students",
+                  },
+                  {
+                    value: "98%",
+                    label: "Pass Rate",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] py-3"
+                  >
+                    <p className="font-display text-lg font-black text-brand-gold">
+                      {item.value}
+                    </p>
+
+                    <p className="text-[10px] font-semibold text-white/50">
+                      {item.label}
+                    </p>
                   </div>
                 ))}
               </div>
 
-              {/* Action buttons */}
+              {/* Buttons */}
               <div className="flex gap-3">
-                <Link
-                  href="/admissions"
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={close}
-                  className="btn-primary flex-1 justify-center py-3 text-sm font-bold"
+                  className="btn-primary flex flex-1 items-center justify-center gap-2 py-3 text-sm font-bold"
                 >
-                  Apply Now <ArrowRight size={15} />
-                </Link>
+                  Apply Now
+                  <ArrowRight size={15} />
+                </a>
+
                 <button
                   onClick={close}
                   className="rounded-xl border border-white/15 px-5 py-3 text-sm font-semibold text-white/70 transition-colors hover:border-white/30 hover:text-white"
