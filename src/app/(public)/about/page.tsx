@@ -16,7 +16,7 @@ const milestones = [
   { year: "2005", title: "CBSE Affiliation",   desc: "Received CBSE affiliation, strengthening academic standards" },
   { year: "2015", title: "New Campus",         desc: "Moved to the modern 13,000 sq.mt. campus at Jaganpura" },
   { year: "2020", title: "Digital Learning",   desc: "Launched smart classrooms and digital learning platforms" },
-  { year: "2024", title: "2000+ Students",     desc: "Crossed 2,000 enrolled students across all grades" },
+  { year: "2026", title: "20000+ Students",     desc: "Crossed 2,0000 enrolled students across all grades" },
 ];
 
 const values = [
@@ -27,12 +27,15 @@ const values = [
 ];
 
 const faculty = [
-  { name: "Mr. Om Prakash Singh", role: "Principal",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "OP" },
-  { name: "Mrs. Sunita Sharma",   role: "Vice Principal",     qual: "M.A., B.Ed.",  dept: "Administration",  initials: "SS" },
-  { name: "Mr. Rajesh Kumar",     role: "Senior Teacher",     qual: "M.Sc., B.Ed.", dept: "Science",         initials: "RK" },
-  { name: "Mrs. Priya Verma",     role: "HOD English",        qual: "M.A., B.Ed.",  dept: "English",         initials: "PV" },
-  { name: "Mr. Amit Gupta",       role: "HOD Mathematics",    qual: "M.Sc., B.Ed.", dept: "Mathematics",     initials: "AG" },
-  { name: "Mrs. Kavita Singh",    role: "HOD Social Science", qual: "M.A., B.Ed.",  dept: "Social Science",  initials: "KS" },
+  { name: "Mr. Om Prakash Singh", role: "Director",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "OP" },
+  { name: "Mr. Vinay Ojha",       role: "Principal",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "VO" },
+  { name: "Mr Prabhat Kumar Singh",   role: "Vice Principal",     qual: "M.A., B.Ed.",  dept: "Administration",  initials: "PS" },
+  { name: "Mr. Ganesh Kumar Singh", role: "School Manager",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "GK" },
+  { name: "Mr. Mukesh Kumar",     role: "HOD IT",     qual: "M.Sc., B.Ed.", dept: "IT",         initials: "MK" },
+  { name: "Mrs. Shweta Ojha",     role: "Incharge - Senior Secondary",        qual: "M.A., B.Ed.",  dept: "Chemistry",         initials: "SO" },
+  { name: "Mr. Sanjeev Kumar Singh",       role: "Incharge - Secondary",    qual: "M.Sc., B.Ed.", dept: "Mathematics",     initials: "SS" },
+  { name: "Mr Ashok Kumar ",    role: "Incharge - Upper Primary", qual: "M.A., B.Ed.",  dept: "Social Science",  initials: "AK" },
+  { name: "Mrs. Varsha Singh", role: "Incharge - Primary",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "VS" },
 ];
 
 const infrastructure = [
@@ -54,7 +57,7 @@ export default function AboutPage() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_80%_80%,rgba(74,10,18,0.4),transparent)]" />
         <div className="container-aspcs relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl">
-            <span className="section-eyebrow mb-5 inline-flex">About ASPCS</span>
+            <span className="section-eyebrow mb-5 inline-flex">About Acharya Shree Sudarshan Patna Central School</span>
             <h1 className="font-display text-display-lg font-bold text-white">
               A Legacy of Learning,{" "}
               <span className="text-gold-shimmer">A Future of Promise</span>
@@ -82,7 +85,7 @@ export default function AboutPage() {
             {[
               { value: "45+",   label: "Years of Excellence" },
               { value: "2,000+",label: "Students Enrolled" },
-              { value: "91",    label: "Qualified Teachers" },
+              { value: "120+",    label: "Qualified Teachers" },
               { value: "98%",   label: "Board Pass Rate" },
             ].map((stat, i) => (
               <motion.div
