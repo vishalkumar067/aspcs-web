@@ -438,6 +438,7 @@ export default function ChairmanPageClient() {
       />
     </motion.div>
   ))}
+</div>
 
           <p className="mt-4 text-center text-[10px] font-medium text-white/30">
             Acharya Shree Sudarshan Patna Central School Campus
