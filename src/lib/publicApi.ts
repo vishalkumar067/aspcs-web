@@ -120,7 +120,7 @@ export async function getPublicAlbums(page = 0, size = 12): Promise<GalleryAlbum
 }
 
 export async function getAlbumImages(albumId: string): Promise<GalleryImage[]> {
-  try { return items<GalleryImage>(await get<unknown>(`/gallery/${albumId}/images`)); }
+  try { return items<GalleryImage>(await get<unknown>(`/gallery/public/${albumId}/images`)); }
   catch { return []; }
 }
 
