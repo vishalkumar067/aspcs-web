@@ -409,29 +409,37 @@ export default function ChairmanPageClient() {
           >
             A Glimpse of ASPCS
           </motion.h3>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-           {[
-  "/gallery/image_1.jpg",
-  "/gallery/image_2.jpg",
-  "/gallery/image_3.jpg",
-  "/gallery/image_4.jpg",
-  "/gallery/image_5.jpg",
-  "/gallery/image_6.jpg",
-  "/gallery/image_7.jpg",
-  "/gallery/image_8.jpg",
-  "/gallery/image_9.jpg",
-  "/gallery/image_10.jpg",
-].map((src, i) => (
-                <Image
-                  src={src}
-                  alt={`ASPCS Campus ${i + 1}`}
-                  fill
-                  className="object-cover opacity-80 transition-transform duration-300 hover:scale-105"
-                  onError={() => {}}
-                />
-              </motion.div>
-            ))}
-          </div>
+       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+  {[
+    "/gallery/image_1.jpg",
+    "/gallery/image_2.jpg",
+    "/gallery/image_3.jpg",
+    "/gallery/image_4.jpg",
+    "/gallery/image_5.jpg",
+    "/gallery/image_6.jpg",
+    "/gallery/image_7.jpg",
+    "/gallery/image_8.jpg",
+    "/gallery/image_9.jpg",
+    "/gallery/image_10.jpg",
+  ].map((src, i) => (
+    <motion.div
+      key={i}
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ delay: i * 0.06 }}
+      className="relative h-28 overflow-hidden rounded-2xl bg-brand-maroon/20"
+    >
+      <Image
+        src={src}
+        alt={`ASPCS Campus ${i + 1}`}
+        fill
+        className="object-cover opacity-80 transition-transform duration-300 hover:scale-105"
+        onError={() => {}}
+      />
+    </motion.div>
+  ))}
+</div>
           <p className="mt-4 text-center text-[10px] font-medium text-white/30">
             Acharya Shree Sudarshan Patna Central School Campus
           </p>
