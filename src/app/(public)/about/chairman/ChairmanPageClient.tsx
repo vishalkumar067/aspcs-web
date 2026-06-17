@@ -409,18 +409,18 @@ export default function ChairmanPageClient() {
           >
             A Glimpse of ASPCS
           </motion.h3>
-       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
   {[
-    "/gallery/image_1.jpg",
-    "/gallery/image_2.jpg",
-    "/gallery/image_3.jpg",
-    "/gallery/image_4.jpg",
-    "/gallery/image_5.jpg",
-    "/gallery/image_6.jpg",
-    "/gallery/image_7.jpg",
-    "/gallery/image_8.jpg",
-    "/gallery/image_9.jpg",
-    "/gallery/image_10.jpg",
+    "/images/gallery/image_1.jpg",
+    "/images/gallery/image_2.jpg",
+    "/images/gallery/image_3.jpg",
+    "/images/gallery/image_4.jpg",
+    "/images/gallery/image_5.jpg",
+    "/images/gallery/image_6.jpg",
+    "/images/gallery/image_7.jpg",
+    "/images/gallery/image_8.jpg",
+    "/images/gallery/image_9.jpg",
+    "/images/gallery/image_10.jpg",
   ].map((src, i) => (
     <motion.div
       key={i}
@@ -429,6 +429,16 @@ export default function ChairmanPageClient() {
       viewport={{ once: true }}
       transition={{ delay: i * 0.06 }}
       className="relative h-28 overflow-hidden rounded-2xl bg-brand-maroon/20"
+    >
+      <Image
+        src={src}
+        alt={`ASPCS Campus ${i + 1}`}
+        fill
+        className="object-cover opacity-80 transition-transform duration-300 hover:scale-105"
+      />
+    </motion.div>
+  ))}
+</div>className="relative h-28 overflow-hidden rounded-2xl bg-brand-maroon/20"
     >
       <Image
         src={src}
