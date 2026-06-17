@@ -29,30 +29,37 @@ const CHAIRMAN = {
 
     With warm regards and best wishes for your continued success,
   `,
-  youtubeVideoId: "w3WcNmQE",   // ← Replace with actual YouTube video ID
+  youtubeVideoId:  "w3WcNmQE-y0",   // ← Replace with actual YouTube video ID
   // e.g. for https://www.youtube.com/watch?v=ABC123xyz, use "ABC123xyz"
   showVideo: true,
 };
 
 const LEADERS = [
-  {
-    id: "executive-chairman",
-    role:     "Executive Chairman",
-    name:     "Dr. B.K Sudarshan",
-    image:    "/images/exec-chairman.jpg",   // place photo at public/images/exec-chairman.jpg
-    quote:    "We believe every child carries within them the seed of greatness.",
-    message: `
-      Dear Members of the ASPCS Family,
+{
+  id: "executive-chairman",
+  role: "Executive Chairman",
+  name: "Dr. B.K. Sudarshan",
+ credentials:
+  "Ph.D. (South Korea) • MBA (USA) • M.A. (Delhi University) • Educationist & Entrepreneur",
+  image: "/images/exec-chairman.jpg",
+  quote:
+    "Education empowers individuals, strengthens communities, and transforms nations.",
+  message: `
+    Dear Members of the ASPCS Family,
 
-      As Executive Chairman, I have had the privilege of witnessing ASPCS grow from strength to strength. Our school stands today as a testament to the power of perseverance, vision, and collective effort.
+    It is my privilege to serve as the Executive Chairman of Acharya Shree Sudarshan Patna Central School.
 
-      My focus has always been on building systems that empower our teachers to teach better, our students to learn deeper, and our institution to serve wider. We have invested significantly in infrastructure, digital learning tools, and teacher training programmes — all with one goal: ensuring that every child who walks through our gates receives an education worthy of their potential.
+    My academic journey includes an M.A. from Delhi University, an MBA from the United States, and a Ph.D. from South Korea. These experiences have shaped my vision of creating institutions that combine academic excellence, innovation, and strong values.
 
-      I am particularly excited about our Senior Secondary (Class XI–XII) programme, which we have expanded to include Science and Commerce streams with state-of-the-art laboratories and experienced faculty.
+    At ASPCS, our mission is to nurture future-ready leaders through quality education, modern infrastructure, technology-enabled learning, and holistic development.
 
-      I invite you to be part of this journey of transformation. Together, we shall build a generation of thinkers, creators, and compassionate leaders.
-    `,
-  },
+    Together with our dedicated teachers, supportive parents, and talented students, we continue to build an institution that inspires excellence and transforms lives.
+
+    Thank you for your trust and support.
+
+    Together, we shall build a brighter future through education, innovation, and service.
+  `,
+},
   {
     id: "director",
     role:     "Director",
@@ -94,6 +101,7 @@ const LEADERS = [
       With warm regards,
     `,
   },
+  
 ];
 
 const STATS = [
@@ -174,9 +182,19 @@ function LeaderCard({ leader }: { leader: typeof LEADERS[0] }) {
         {/* Name */}
         <div className="absolute inset-x-0 bottom-0 p-5">
           <p className="font-display text-lg font-black text-white">{leader.name}</p>
-          {"credentials" in leader && (
-            <p className="text-xs font-semibold text-brand-gold">{(leader as any).credentials}</p>
-          )}
+        {"credentials" in leader && (
+  <>
+    <p className="text-xs font-semibold text-brand-gold">
+      {(leader as any).credentials}
+    </p>
+
+    {leader.id === "executive-chairman" && (
+      <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-brand-gold">
+        Featured in Outlook Business • June 2026
+      </p>
+    )}
+  </>
+)}
         </div>
       </div>
 
@@ -312,11 +330,14 @@ export default function ChairmanPageClient() {
                   className="group relative cursor-pointer overflow-hidden rounded-2xl border border-brand-crimson/20 bg-brand-black"
                   onClick={() => setVideoOpen(true)}
                 >
-                  <img
-                    src={`https://img.youtube.com/vi/${CHAIRMAN.youtubeVideoId}/maxresdefault.jpg`}
-                    alt="Watch Chairman's Message"
-                    className="h-44 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+<img
+  src={`https://img.youtube.com/vi/${CHAIRMAN.youtubeVideoId}/hqdefault.jpg`}
+  alt="Watch Chairman's Message"
+  className="h-44 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+  onError={(e) => {
+    e.currentTarget.src = `https://img.youtube.com/vi/${CHAIRMAN.youtubeVideoId}/mqdefault.jpg`;
+  }}
+/>
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 transition-colors group-hover:bg-black/40">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-crimson shadow-glow-crimson transition-transform duration-300 group-hover:scale-110">
                       <Play size={22} className="translate-x-0.5 fill-white text-white" />
@@ -389,17 +410,18 @@ export default function ChairmanPageClient() {
             A Glimpse of ASPCS
           </motion.h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {[
-              
-            ].map((src, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
-                className="relative h-28 overflow-hidden rounded-2xl bg-brand-maroon/20"
-              >
+           {[
+  "/gallery/image_1.jpg",
+  "/gallery/image_2.jpg",
+  "/gallery/image_3.jpg",
+  "/gallery/image_4.jpg",
+  "/gallery/image_5.jpg",
+  "/gallery/image_6.jpg",
+  "/gallery/image_7.jpg",
+  "/gallery/image_8.jpg",
+  "/gallery/image_9.jpg",
+  "/gallery/image_10.jpg",
+].map((src, i) => (
                 <Image
                   src={src}
                   alt={`ASPCS Campus ${i + 1}`}
@@ -411,7 +433,7 @@ export default function ChairmanPageClient() {
             ))}
           </div>
           <p className="mt-4 text-center text-[10px] font-medium text-white/30">
-            Place your school photos at public/images/school-1.jpg through school-6.jpg
+            Acharya Shree Sudarshan Patna Central School Campus
           </p>
         </div>
       </section>
