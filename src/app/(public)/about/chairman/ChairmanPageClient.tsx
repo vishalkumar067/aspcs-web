@@ -438,18 +438,7 @@ export default function ChairmanPageClient() {
       />
     </motion.div>
   ))}
-</div>className="relative h-28 overflow-hidden rounded-2xl bg-brand-maroon/20"
-    >
-      <Image
-        src={src}
-        alt={`ASPCS Campus ${i + 1}`}
-        fill
-        className="object-cover opacity-80 transition-transform duration-300 hover:scale-105"
-        onError={() => {}}
-      />
-    </motion.div>
-  ))}
-</div>
+
           <p className="mt-4 text-center text-[10px] font-medium text-white/30">
             Acharya Shree Sudarshan Patna Central School Campus
           </p>
