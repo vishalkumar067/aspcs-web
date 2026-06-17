@@ -9,7 +9,7 @@ import { Quote, Play, X, GraduationCap, Star, BookOpen, Users } from "lucide-rea
    EDIT THIS DATA to update the page content
 ───────────────────────────────────────────────────────────────────────────── */
 const CHAIRMAN = {
-  name:        "Sh. [Chairman's Full Name]",
+  name:        "Raj Rishi Acharya Shree Sudarshan Ji Maharaj",
   title:       "Chairman",
   subtitle:    "Acharya Shree Sudarshan Patna Central School",
   image:       "/images/chairman.jpg",      // place photo at public/images/chairman.jpg
@@ -29,7 +29,7 @@ const CHAIRMAN = {
 
     With warm regards and best wishes for your continued success,
   `,
-  youtubeVideoId: "dQw4w9WgXcQ",   // ← Replace with actual YouTube video ID
+  youtubeVideoId: "w3WcNmQE",   // ← Replace with actual YouTube video ID
   // e.g. for https://www.youtube.com/watch?v=ABC123xyz, use "ABC123xyz"
   showVideo: true,
 };
@@ -38,7 +38,7 @@ const LEADERS = [
   {
     id: "executive-chairman",
     role:     "Executive Chairman",
-    name:     "Sh. [Executive Chairman's Name]",
+    name:     "Dr. B.K Sudarshan",
     image:    "/images/exec-chairman.jpg",   // place photo at public/images/exec-chairman.jpg
     quote:    "We believe every child carries within them the seed of greatness.",
     message: `
@@ -56,7 +56,7 @@ const LEADERS = [
   {
     id: "director",
     role:     "Director",
-    name:     "Sh./Dr. [Director's Full Name]",
+    name:     "Sh O.P Singh",
     image:    "/images/director.jpg",        // place photo at public/images/director.jpg
     quote:    "Excellence is not an act but a habit — and we build that habit every day.",
     message: `
@@ -74,7 +74,7 @@ const LEADERS = [
   {
     id: "principal",
     role:     "Principal",
-    name:     "Mr./Ms. [Principal's Full Name]",
+    name:     "Mr. Vinay Ojha",
     credentials: "M.Sc., B.Ed., M.Ed.",
     image:    "/images/principal.jpg",       // place photo at public/images/principal.jpg
     quote:    "A school's greatest achievement is not a rank — it is the character of its students.",
@@ -390,12 +390,7 @@ export default function ChairmanPageClient() {
           </motion.h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {[
-              "/images/school-1.jpg",
-              "/images/school-2.jpg",
-              "/images/school-3.jpg",
-              "/images/school-4.jpg",
-              "/images/school-5.jpg",
-              "/images/school-6.jpg",
+              
             ].map((src, i) => (
               <motion.div
                 key={i}
