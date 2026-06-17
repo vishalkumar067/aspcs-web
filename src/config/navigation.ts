@@ -8,6 +8,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: "About", href: "/about",
     children: [
       { label: "About ASPCS",          href: "/about" },
+      { label: "Chairman's Message",   href: "/about/chairman" },
       { label: "Principal's Message",  href: "/about#principal" },
       { label: "Vision & Mission",     href: "/about#vision" },
       { label: "Infrastructure",       href: "/about#infrastructure" },
