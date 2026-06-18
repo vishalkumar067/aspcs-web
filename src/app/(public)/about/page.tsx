@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2, ArrowRight, Award, BookOpen, Heart, Target, Eye } from "lucide-react";
+import { CheckCircle2, ArrowRight, Award, Users, BookOpen, Heart, Target, Eye } from "lucide-react";
 import FacultyGrid, { FacultyCard } from "@/components/ui/FacultyCard";
 
 const fadeUp = {
