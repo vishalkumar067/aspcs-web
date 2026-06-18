@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2, ArrowRight, Award, Users, BookOpen, Heart, Target, Eye } from "lucide-react";
+import { CheckCircle2, ArrowRight, Award, BookOpen, Heart, Target, Eye } from "lucide-react";
+import FacultyGrid, { FacultyCard } from "@/components/ui/FacultyCard";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -16,7 +17,7 @@ const milestones = [
   { year: "2005", title: "CBSE Affiliation",   desc: "Received CBSE affiliation, strengthening academic standards" },
   { year: "2015", title: "New Campus",         desc: "Moved to the modern 13,000 sq.mt. campus at Jaganpura" },
   { year: "2020", title: "Digital Learning",   desc: "Launched smart classrooms and digital learning platforms" },
-  { year: "2026", title: "20000+ Students",     desc: "Crossed 2,0000 enrolled students across all grades" },
+  { year: "2024", title: "2000+ Students",     desc: "Crossed 2,000 enrolled students across all grades" },
 ];
 
 const values = [
@@ -24,18 +25,6 @@ const values = [
   { icon: Heart,    title: "Holistic Development", desc: "Sports, arts, and cultural activities nurture the whole child beyond academics.", color: "bg-brand-gold/10 text-brand-gold border-brand-gold/20" },
   { icon: Users,    title: "Inclusive Community",  desc: "A safe, welcoming environment where every student feels valued and respected.", color: "bg-brand-maroon/10 text-brand-maroon-light border-brand-maroon/20" },
   { icon: Award,    title: "Character Building",   desc: "Instilling values of integrity, responsibility, and compassion in every student.", color: "bg-brand-crimson/10 text-brand-crimson border-brand-crimson/20" },
-];
-
-const faculty = [
-  { name: "Mr. Om Prakash Singh", role: "Director",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "OP" },
-  { name: "Mr. Vinay Ojha",       role: "Principal",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "VO" },
-  { name: "Mr Prabhat Kumar Singh",   role: "Vice Principal",     qual: "M.A., B.Ed.",  dept: "Administration",  initials: "PS" },
-  { name: "Mr. Ganesh Kumar Singh", role: "School Manager",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "GK" },
-  { name: "Mr. Mukesh Kumar",     role: "HOD IT",     qual: "M.Sc., B.Ed.", dept: "IT",         initials: "MK" },
-  { name: "Mrs. Shweta Ojha",     role: "Incharge - Senior Secondary",        qual: "M.A., B.Ed.",  dept: "Chemistry",         initials: "SO" },
-  { name: "Mr. Sanjeev Kumar Singh",       role: "Incharge - Secondary",    qual: "M.Sc., B.Ed.", dept: "Mathematics",     initials: "SS" },
-  { name: "Mr Ashok Kumar ",    role: "Incharge - Upper Primary", qual: "M.A., B.Ed.",  dept: "Social Science",  initials: "AK" },
-  { name: "Mrs. Varsha Singh", role: "Incharge - Primary",          qual: "M.Sc., B.Ed.", dept: "Administration",  initials: "VS" },
 ];
 
 const infrastructure = [
@@ -57,7 +46,7 @@ export default function AboutPage() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_80%_80%,rgba(74,10,18,0.4),transparent)]" />
         <div className="container-aspcs relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl">
-            <span className="section-eyebrow mb-5 inline-flex">About Acharya Shree Sudarshan Patna Central School</span>
+            <span className="section-eyebrow mb-5 inline-flex">About ASPCS</span>
             <h1 className="font-display text-display-lg font-bold text-white">
               A Legacy of Learning,{" "}
               <span className="text-gold-shimmer">A Future of Promise</span>
@@ -85,7 +74,7 @@ export default function AboutPage() {
             {[
               { value: "45+",   label: "Years of Excellence" },
               { value: "2,000+",label: "Students Enrolled" },
-              { value: "120+",    label: "Qualified Teachers" },
+              { value: "91",    label: "Qualified Teachers" },
               { value: "98%",   label: "Board Pass Rate" },
             ].map((stat, i) => (
               <motion.div
@@ -307,40 +296,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── Faculty ───────────────────────────────────────────────── */}
-      <section className="section-pad">
-        <div className="container-aspcs">
-          <div className="mb-14 text-center">
-            <span className="section-eyebrow mb-5 inline-flex">
-              <Users size={11} /> Our Team
-            </span>
-            <h2 className="font-display text-display-xs font-bold text-[var(--text-primary)]">
-              Meet Our <span className="text-brand-crimson">Leadership</span>
-            </h2>
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {faculty.map((f, i) => (
-              <motion.div
-                key={f.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
-                className="card p-6 flex items-center gap-4"
-              >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-crimson/10 font-display text-lg font-bold text-brand-crimson">
-                  {f.initials}
-                </div>
-                <div>
-                  <p className="font-semibold text-[var(--text-primary)]">{f.name}</p>
-                  <p className="text-sm text-brand-crimson">{f.role}</p>
-                  <p className="text-xs text-[var(--text-muted)]">{f.qual} · {f.dept}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FacultyGrid />
 
       {/* ── Infrastructure ────────────────────────────────────────── */}
       <section className="section-pad bg-brand-cream">
