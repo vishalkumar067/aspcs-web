@@ -13,6 +13,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router   = useRouter();
   const pathname = usePathname();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const role = useAuthStore((s) => s.user?.role);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -21,6 +22,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.push("/admin/login");
     }
   }, [mounted, isAuthenticated, pathname, router]);
+
+  // Teachers are scoped to the Progress Reports module only. Any other
+  // /admin/* route (dashboard, students, fees, etc.) redirects them back,
+  // except change-password — every role needs that regardless of scope.
+  useEffect(() => {
+    if (mounted && isAuthenticated && role === "TEACHER" &&
+        pathname !== "/admin/login" &&
+        pathname !== "/admin/change-password" &&
+        !pathname.startsWith("/admin/progress-reports")) {
+      router.push("/admin/progress-reports");
+    }
+  }, [mounted, isAuthenticated, role, pathname, router]);
 
   // Show login page without layout
   if (pathname === "/admin/login") return <>{children}</>;

@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
 
       login(json.data.user, json.data.tokens.accessToken);
       toast.success(`Welcome back, ${json.data.user.name}!`);
-      router.push("/admin/dashboard");
+      router.push(json.data.user.role === "TEACHER" ? "/admin/progress-reports" : "/admin/dashboard");
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {

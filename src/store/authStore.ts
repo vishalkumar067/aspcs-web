@@ -8,6 +8,7 @@ interface AdminUser {
   name: string;
   email: string;
   role: string;
+  teacherId?: string | null;
 }
 
 interface AuthState {
