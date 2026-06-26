@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, Pencil, Trash2, X, Save, Loader2, Phone } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, X, Save, Loader2, Phone, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api, toArray } from "@/lib/api";
 import toast from "react-hot-toast";
@@ -33,7 +34,7 @@ function StudentModal({ student, onClose, onSaved }: { student?: Student|null; o
     }
     setSaving(true);
     try {
-      student?.id ? await api.put(`/students/${student.id}`,form) : await api.post("/students",form);
+      if (student?.id) { await api.put(`/students/${student.id}`,form); } else { await api.post("/students",form); }
       toast.success(student?.id?"Updated!":"Student enrolled!"); onSaved(); onClose();
     } catch (err: unknown) { toast.error(err instanceof Error?err.message:"Save failed"); }
     finally { setSaving(false); }
@@ -93,12 +94,12 @@ function StudentModal({ student, onClose, onSaved }: { student?: Student|null; o
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-white/70">Father's Name</label>
+              <label className="mb-1 block text-xs font-medium text-white/70">Father&apos;s Name</label>
               <input value={form.fatherName} onChange={e=>setForm({...form,fatherName:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50"/>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-white/70">Mother's Name</label>
+              <label className="mb-1 block text-xs font-medium text-white/70">Mother&apos;s Name</label>
               <input value={form.motherName} onChange={e=>setForm({...form,motherName:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-brand-crimson/50"/>
             </div>
@@ -164,9 +165,15 @@ export default function AdminStudentsPage() {
           <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Students</h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">{students.length} enrolled</p>
         </div>
-        <button onClick={()=>{setEdit(null);setModal(true);}} className="btn-primary py-2.5 text-sm">
-          <Plus size={16}/> Enroll Student
-        </button>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/students/import"
+            className="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-medium text-white hover:border-brand-gold/40">
+            <UploadCloud size={16}/> Import
+          </Link>
+          <button onClick={()=>{setEdit(null);setModal(true);}} className="btn-primary py-2.5 text-sm">
+            <Plus size={16}/> Enroll Student
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-3">

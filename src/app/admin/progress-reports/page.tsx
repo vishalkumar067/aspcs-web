@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
-import { CalendarDays, ClipboardCheck, FilePlus2, Mail, MessageCircle, History, BarChart3 } from "lucide-react";
+import { CalendarDays, ClipboardCheck, FilePlus2, Mail, MessageCircle, History, BarChart3, UploadCloud } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
 const ALL_LINKS = [
+  { label: "Import Students",        href: "/admin/students/import",              icon: UploadCloud,    roles: ["SUPER_ADMIN","ADMIN","EDITOR","TEACHER"], desc: "Bulk add or update students from a CSV/Excel file." },
   { label: "Reporting Cycles",       href: "/admin/progress-reports/cycles",      icon: CalendarDays,   roles: ["SUPER_ADMIN","ADMIN","EDITOR","TEACHER"], desc: "Create and manage 15-day reporting periods." },
   { label: "Student Assessments",    href: "/admin/progress-reports/assessments", icon: ClipboardCheck, roles: ["SUPER_ADMIN","ADMIN","TEACHER"],          desc: "Enter attendance, marks, and behaviour for a class." },
   { label: "Report Generation",      href: "/admin/progress-reports/generate",    icon: FilePlus2,      roles: ["SUPER_ADMIN","ADMIN","TEACHER"],          desc: "Generate PDFs and notify parents for a whole class." },

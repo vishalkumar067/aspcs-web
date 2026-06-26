@@ -25,11 +25,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // Teachers are scoped to the Progress Reports module only. Any other
   // /admin/* route (dashboard, students, fees, etc.) redirects them back,
-  // except change-password — every role needs that regardless of scope.
+  // except change-password and the student import tool — both are
+  // explicitly available to every authenticated role regardless of scope.
   useEffect(() => {
     if (mounted && isAuthenticated && role === "TEACHER" &&
         pathname !== "/admin/login" &&
         pathname !== "/admin/change-password" &&
+        pathname !== "/admin/students/import" &&
         !pathname.startsWith("/admin/progress-reports")) {
       router.push("/admin/progress-reports");
     }
