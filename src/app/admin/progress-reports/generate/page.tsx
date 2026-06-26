@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Loader2, FileText, Mail, MessageCircle, CheckCircle2, XCircle, Sparkles } from "lucide-react";
+import { Loader2, FileText, Mail, MessageCircle, CheckCircle2, XCircle, Sparkles, Download } from "lucide-react";
 import { api, unwrapData, toArray } from "@/lib/api";
 import toast from "react-hot-toast";
 
@@ -9,7 +9,7 @@ const SECTIONS = ["A","B","C","D"];
 
 interface Cycle { id: string; name: string; status: string; }
 interface DispatchOutcome {
-  studentId: string; studentName: string;
+  studentId: string; studentName: string; reportId?: string;
   pdfGenerated: boolean; emailSent: boolean; whatsappSent: boolean; error?: string;
 }
 
@@ -22,6 +22,21 @@ export default function ReportGenerationPage() {
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
   const [dispatching, setDispatching] = useState(false);
   const [results, setResults] = useState<DispatchOutcome[] | null>(null);
+
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const handleDownload = async (reportId: string, studentName: string) => {
+    setDownloadingId(reportId);
+    try {
+      // Backend names the file from the student + cycle itself, so this is
+      // just a fallback in case that header is ever missing for some reason.
+      await api.downloadFile(`/progress-reports/reports/${reportId}/download`, `${studentName}.pdf`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Download failed");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   useEffect(() => {
     api.get("/progress-reports/cycles")
@@ -87,6 +102,10 @@ export default function ReportGenerationPage() {
           </label>
         </div>
 
+        <p className="mb-4 text-xs text-white/50">
+          The PDF is always generated, even if both checkboxes above are unchecked — you can download each one from the results table below.
+        </p>
+
         <button onClick={handleDispatch} disabled={dispatching} className="btn-primary px-5 py-3 text-sm">
           {dispatching ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
           {dispatching ? "Generating & Sending..." : "Generate Reports & Notify Parents"}
@@ -98,7 +117,7 @@ export default function ReportGenerationPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/8 bg-white/3">
-                {["Student", "PDF", "Email", "WhatsApp", "Error"].map(h => (
+                {["Student", "PDF", "Download", "Email", "WhatsApp", "Error"].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-brand-slate">{h}</th>
                 ))}
               </tr>
@@ -108,6 +127,15 @@ export default function ReportGenerationPage() {
                 <tr key={r.studentId} className="border-b border-white/5">
                   <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{r.studentName}</td>
                   <td className="px-4 py-3">{r.pdfGenerated ? <CheckCircle2 size={15} className="text-emerald-400" /> : <XCircle size={15} className="text-red-400" />}</td>
+                  <td className="px-4 py-3">
+                    {r.pdfGenerated && r.reportId ? (
+                      <button onClick={() => handleDownload(r.reportId!, r.studentName)} disabled={downloadingId === r.reportId}
+                        className="flex items-center gap-1.5 text-xs font-medium text-brand-gold hover:text-brand-gold/80">
+                        {downloadingId === r.reportId ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
+                        Download
+                      </button>
+                    ) : <span className="text-white/30">-</span>}
+                  </td>
                   <td className="px-4 py-3">{r.emailSent ? <CheckCircle2 size={15} className="text-emerald-400" /> : <span className="text-white/30">-</span>}</td>
                   <td className="px-4 py-3">{r.whatsappSent ? <CheckCircle2 size={15} className="text-emerald-400" /> : <span className="text-white/30">-</span>}</td>
                   <td className="px-4 py-3 text-xs text-red-400">{r.error ?? ""}</td>

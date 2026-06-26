@@ -46,13 +46,25 @@ export const api = {
   delete: <T>(path: string)               => request<T>(path, { method: "DELETE" }),
   upload: <T>(path: string, formData: FormData) => request<T>(path, { method: "POST", body: formData }),
   // For binary responses (file downloads) — request() always calls res.json(),
-  // which would throw on an .xlsx byte stream, so this bypasses that.
-  downloadFile: async (path: string, filename: string): Promise<void> => {
+  // which would throw on an .xlsx/.pdf byte stream, so this bypasses that.
+  // `fallbackFilename` is only used if the server's Content-Disposition
+  // header is missing for some reason; the server-set name (e.g.
+  // "Rahul_Kumar_Test_Cycle.pdf") is always preferred when present, since
+  // that's the one the backend deliberately built from real student/cycle data.
+  downloadFile: async (path: string, fallbackFilename: string): Promise<void> => {
     const token = getToken();
     const headers: Record<string, string> = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
     const res = await fetch(`${BASE}${path}`, { headers });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    let filename = fallbackFilename;
+    const disposition = res.headers.get("Content-Disposition");
+    if (disposition) {
+      const match = disposition.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
+      if (match?.[1]) filename = decodeURIComponent(match[1].replace(/"/g, ""));
+    }
+
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
