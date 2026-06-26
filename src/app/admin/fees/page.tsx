@@ -96,7 +96,7 @@ function PaymentModal({ categories, onClose, onSaved }: { categories: FeeCategor
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Class</label>
-              <select value={form.class} onChange={e=>setForm({...form,class:e.target.value})}
+              <select data-theme="dark-select" value={form.class} onChange={e=>setForm({...form,class:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 <option value="">Select</option>
                 {CLASSES.map(c=><option key={c} value={c}>{c}</option>)}
@@ -105,7 +105,7 @@ function PaymentModal({ categories, onClose, onSaved }: { categories: FeeCategor
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-white/70">Fee Category <span className="text-brand-gold">*</span></label>
-            <select value={form.categoryId} onChange={e=>setForm({...form,categoryId:e.target.value})}
+            <select data-theme="dark-select" value={form.categoryId} onChange={e=>setForm({...form,categoryId:e.target.value})}
               className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
               {categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
@@ -129,14 +129,14 @@ function PaymentModal({ categories, onClose, onSaved }: { categories: FeeCategor
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Method</label>
-              <select value={form.paymentMethod} onChange={e=>setForm({...form,paymentMethod:e.target.value})}
+              <select data-theme="dark-select" value={form.paymentMethod} onChange={e=>setForm({...form,paymentMethod:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 {METHODS.map(m=><option key={m} value={m}>{m}</option>)}
               </select>
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Month</label>
-              <select value={form.month} onChange={e=>setForm({...form,month:e.target.value})}
+              <select data-theme="dark-select" value={form.month} onChange={e=>setForm({...form,month:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 {MONTHS.map(m=><option key={m} value={m}>{m}</option>)}
               </select>

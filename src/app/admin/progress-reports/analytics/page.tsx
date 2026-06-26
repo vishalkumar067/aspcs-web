@@ -52,7 +52,7 @@ export default function AnalyticsPage() {
           <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Analytics</h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">Progress report completion and parent communication overview.</p>
         </div>
-        <select value={cycleId} onChange={e => setCycleId(e.target.value)}
+        <select data-theme="dark-select" value={cycleId} onChange={e => setCycleId(e.target.value)}
           className="rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
           {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>

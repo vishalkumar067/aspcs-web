@@ -70,7 +70,7 @@ function JobModal({ job, onClose, onSaved }: { job?: Job|null; onClose:()=>void;
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Type</label>
-              <select value={form.type} onChange={e=>setForm({...form,type:e.target.value})}
+              <select data-theme="dark-select" value={form.type} onChange={e=>setForm({...form,type:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 {JOB_TYPES.map(t=><option key={t} value={t}>{t.replace("_"," ")}</option>)}
               </select>
@@ -247,7 +247,7 @@ export default function AdminCareersPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3.5">
-                    <select value={a.status} onChange={e=>handleAppStatus(a.id,e.target.value)}
+                    <select data-theme="dark-select" value={a.status} onChange={e=>handleAppStatus(a.id,e.target.value)}
                       className="rounded-xl border border-white/10 bg-brand-black px-2 py-1.5 text-xs text-white outline-none">
                       {["APPLIED","SHORTLISTED","INTERVIEW","SELECTED","REJECTED"].map(s=><option key={s} value={s}>{s}</option>)}
                     </select>

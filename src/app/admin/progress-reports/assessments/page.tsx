@@ -117,17 +117,17 @@ export default function AssessmentEntryPage() {
 
       {/* Selectors */}
       <div className="flex flex-wrap gap-3">
-        <select value={cycleId} onChange={e => setCycleId(e.target.value)}
+        <select data-theme="dark-select" value={cycleId} onChange={e => setCycleId(e.target.value)}
           className="rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
           <option value="">Select cycle...</option>
           {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
-        <select value={className} onChange={e => setClassName(e.target.value)}
+        <select data-theme="dark-select" value={className} onChange={e => setClassName(e.target.value)}
           className="rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
           <option value="">Select class...</option>
           {CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <select value={section} onChange={e => setSection(e.target.value)}
+        <select data-theme="dark-select" value={section} onChange={e => setSection(e.target.value)}
           className="rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
           <option value="">All sections</option>
           {SECTIONS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -213,7 +213,7 @@ export default function AssessmentEntryPage() {
                               onChange={e => updateSubjectValue(row.studentId, sub.subjectId, e.target.value)}
                               className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-sm text-white outline-none" />
                           ) : (
-                            <select value={row.subjectRatings[sub.subjectId] ?? ""}
+                            <select data-theme="dark-select" value={row.subjectRatings[sub.subjectId] ?? ""}
                               onChange={e => updateSubjectValue(row.studentId, sub.subjectId, e.target.value)}
                               className="w-full rounded-lg border border-white/10 bg-brand-black px-2.5 py-2 text-xs text-white outline-none">
                               <option value="">-</option>
@@ -229,7 +229,7 @@ export default function AssessmentEntryPage() {
                       {BEHAVIOUR_FIELDS.map(f => (
                         <div key={f.key}>
                           <label className="mb-1 block text-[11px] text-white/60">{f.label}</label>
-                          <select value={(row as unknown as Record<string, number | undefined>)[f.key] ?? ""}
+                          <select data-theme="dark-select" value={(row as unknown as Record<string, number | undefined>)[f.key] ?? ""}
                             onChange={e => updateRow(row.studentId, { [f.key]: Number(e.target.value) })}
                             className="w-full rounded-lg border border-white/10 bg-brand-black px-2 py-2 text-xs text-white outline-none">
                             <option value="">-</option>

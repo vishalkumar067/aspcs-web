@@ -76,14 +76,14 @@ function TeacherModal({ teacher, onClose, onSaved }: { teacher?: Teacher|null; o
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Designation</label>
-              <select value={form.designation} onChange={e=>setForm({...form,designation:e.target.value})}
+              <select data-theme="dark-select" value={form.designation} onChange={e=>setForm({...form,designation:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 {DESIGNATIONS.map(d=><option key={d} value={d}>{d}</option>)}
               </select>
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Department</label>
-              <select value={form.department} onChange={e=>setForm({...form,department:e.target.value})}
+              <select data-theme="dark-select" value={form.department} onChange={e=>setForm({...form,department:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 <option value="">Select...</option>
                 {DEPARTMENTS.map(d=><option key={d} value={d}>{d}</option>)}
@@ -169,7 +169,7 @@ export default function AdminTeachersPage() {
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by name or ID..."
             className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/25 outline-none focus:border-brand-crimson/50"/>
         </div>
-        <select value={dept} onChange={e=>setDept(e.target.value)}
+        <select data-theme="dark-select" value={dept} onChange={e=>setDept(e.target.value)}
           className="rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
           <option value="">All Departments</option>
           {DEPARTMENTS.map(d=><option key={d} value={d}>{d}</option>)}

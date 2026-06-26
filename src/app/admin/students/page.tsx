@@ -71,7 +71,7 @@ function StudentModal({ student, onClose, onSaved }: { student?: Student|null; o
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Class <span className="text-brand-gold">*</span></label>
-              <select value={form.currentClass} onChange={e=>setForm({...form,currentClass:e.target.value})}
+              <select data-theme="dark-select" value={form.currentClass} onChange={e=>setForm({...form,currentClass:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 <option value="">Select</option>
                 {CLASSES.map(c=><option key={c} value={c}>{c}</option>)}
@@ -79,14 +79,14 @@ function StudentModal({ student, onClose, onSaved }: { student?: Student|null; o
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Section</label>
-              <select value={form.section} onChange={e=>setForm({...form,section:e.target.value})}
+              <select data-theme="dark-select" value={form.section} onChange={e=>setForm({...form,section:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 {SECTIONS.map(s=><option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Gender</label>
-              <select value={form.gender} onChange={e=>setForm({...form,gender:e.target.value})}
+              <select data-theme="dark-select" value={form.gender} onChange={e=>setForm({...form,gender:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 {GENDERS.map(g=><option key={g} value={g}>{g}</option>)}
               </select>
@@ -107,7 +107,7 @@ function StudentModal({ student, onClose, onSaved }: { student?: Student|null; o
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-white/70">Category</label>
-              <select value={form.category} onChange={e=>setForm({...form,category:e.target.value})}
+              <select data-theme="dark-select" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}
                 className="w-full rounded-xl border border-white/10 bg-brand-black px-3 py-2.5 text-sm text-white outline-none">
                 {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
               </select>
@@ -182,7 +182,7 @@ export default function AdminStudentsPage() {
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by name or admission no..."
             className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/25 outline-none focus:border-brand-crimson/50"/>
         </div>
-        <select value={cls} onChange={e=>setCls(e.target.value)}
+        <select data-theme="dark-select" value={cls} onChange={e=>setCls(e.target.value)}
           className="rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
           <option value="">All Classes</option>
           {CLASSES.map(c=><option key={c} value={c}>{c}</option>)}

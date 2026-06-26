@@ -94,6 +94,7 @@ function DetailModal({ inquiry, onClose, onUpdateStatus }: {
             <div className="relative">
               <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brand-slate" />
               <select
+                data-theme="dark-select"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as Status)}
                 className="w-full appearance-none rounded-xl border border-white/10 bg-brand-black px-4 py-3 text-sm text-white outline-none focus:border-brand-crimson/50"

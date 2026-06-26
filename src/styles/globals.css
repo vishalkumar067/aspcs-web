@@ -86,11 +86,18 @@
      (dark system text on a dark background) is what made every dropdown
      on the admin dark theme unreadable once opened. Explicit color +
      background-color here is required; @apply text-white on the <option>
-     itself does not reliably work. Scoped to .bg-brand-black selects only
-     (the admin dark theme) so the public site's light-themed selects,
-     which use a different class, are unaffected. */
-  select.bg-brand-black option {
-    background-color: var(--brand-black, #0D0608);
+     itself does not reliably work.
+
+     Deliberately NOT scoped via the .bg-brand-black class: that exact
+     class string is also used elsewhere in the app as dark:bg-brand-black,
+     and the production minifier (cssnano, via `next build`) was fusing
+     this rule with that unrelated utility into one malformed selector
+     (`.dark\:bg-brand-black:is(.dark *)select option`), breaking the
+     build. A dedicated data-attribute can't collide with any Tailwind-
+     generated class name, so it's used instead — add
+     data-theme="dark-select" to any admin <select> that needs this. */
+  select[data-theme="dark-select"] option {
+    background-color: #0D0608;
     color: #FFFFFF;
   }
 }

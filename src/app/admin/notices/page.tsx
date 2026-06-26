@@ -119,7 +119,7 @@ function NoticeModal({ notice, onClose, onSaved }: {
 
           <div>
             <label className="mb-1 block text-xs font-medium text-white/70">Category</label>
-            <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
+            <select data-theme="dark-select" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
               className="w-full rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
