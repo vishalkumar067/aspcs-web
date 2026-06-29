@@ -66,8 +66,8 @@ export default function ReportGenerationPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Report Generation</h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">Generate PDF reports and notify parents for a whole class in one step.</p>
+        <h1 className="font-display text-2xl font-bold text-white">Report Generation</h1>
+        <p className="mt-1 text-sm text-brand-slate">Generate PDF reports and notify parents for a whole class in one step.</p>
       </div>
 
       <div className="rounded-2xl border border-white/8 bg-white/3 p-5">
@@ -125,7 +125,7 @@ export default function ReportGenerationPage() {
             <tbody>
               {results.map(r => (
                 <tr key={r.studentId} className="border-b border-white/5">
-                  <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{r.studentName}</td>
+                  <td className="px-4 py-3 font-medium text-white">{r.studentName}</td>
                   <td className="px-4 py-3">{r.pdfGenerated ? <CheckCircle2 size={15} className="text-emerald-400" /> : <XCircle size={15} className="text-red-400" />}</td>
                   <td className="px-4 py-3">
                     {r.pdfGenerated && r.reportId ? (

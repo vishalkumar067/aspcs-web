@@ -113,8 +113,8 @@ export default function ReportingCyclesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Reporting Cycles</h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">{cycles.filter(c => c.status === "OPEN").length} open · {cycles.length} total</p>
+          <h1 className="font-display text-2xl font-bold text-white">Reporting Cycles</h1>
+          <p className="mt-1 text-sm text-brand-slate">{cycles.filter(c => c.status === "OPEN").length} open · {cycles.length} total</p>
         </div>
         <button onClick={() => { setEdit(null); setModal(true); }} className="btn-primary py-2.5 text-sm">
           <Plus size={16} /> Create Cycle
@@ -124,7 +124,7 @@ export default function ReportingCyclesPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20"><Loader2 size={24} className="animate-spin text-brand-crimson" /></div>
       ) : cycles.length === 0 ? (
-        <div className="rounded-2xl border border-white/8 py-16 text-center text-[var(--text-muted)]">
+        <div className="rounded-2xl border border-white/8 py-16 text-center text-brand-slate">
           <CalendarDays size={28} className="mx-auto mb-3 opacity-40" />
           No reporting cycles yet. Create one to start collecting assessments.
         </div>
@@ -138,8 +138,8 @@ export default function ReportingCyclesPage() {
                   <CalendarDays size={18} />
                 </div>
                 <div>
-                  <p className="font-semibold text-[var(--text-primary)]">{c.name}</p>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p className="font-semibold text-white">{c.name}</p>
+                  <p className="text-xs text-brand-slate">
                     {new Date(c.startDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                     {" – "}
                     {new Date(c.endDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}

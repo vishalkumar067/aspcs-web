@@ -49,8 +49,8 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Analytics</h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">Progress report completion and parent communication overview.</p>
+          <h1 className="font-display text-2xl font-bold text-white">Analytics</h1>
+          <p className="mt-1 text-sm text-brand-slate">Progress report completion and parent communication overview.</p>
         </div>
         <select data-theme="dark-select" value={cycleId} onChange={e => setCycleId(e.target.value)}
           className="rounded-xl border border-white/10 bg-brand-black px-4 py-2.5 text-sm text-white outline-none">
@@ -79,17 +79,17 @@ export default function AnalyticsPage() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/8 bg-white/3 p-5">
                 <div className="mb-2 flex items-center gap-2 text-brand-slate"><Mail size={15} /> <span className="text-sm">Email</span></div>
-                <p className="font-display text-3xl font-bold text-[var(--text-primary)]">
+                <p className="font-display text-3xl font-bold text-white">
                   {successRate(commStats?.emailSent ?? 0, commStats?.emailTotal ?? 0)}
                 </p>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">{commStats?.emailSent ?? 0} sent · {commStats?.emailFailed ?? 0} failed</p>
+                <p className="mt-1 text-xs text-brand-slate">{commStats?.emailSent ?? 0} sent · {commStats?.emailFailed ?? 0} failed</p>
               </div>
               <div className="rounded-2xl border border-white/8 bg-white/3 p-5">
                 <div className="mb-2 flex items-center gap-2 text-brand-slate"><MessageCircle size={15} /> <span className="text-sm">WhatsApp</span></div>
-                <p className="font-display text-3xl font-bold text-[var(--text-primary)]">
+                <p className="font-display text-3xl font-bold text-white">
                   {successRate(commStats?.whatsappSent ?? 0, commStats?.whatsappTotal ?? 0)}
                 </p>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">{commStats?.whatsappSent ?? 0} sent · {commStats?.whatsappFailed ?? 0} failed</p>
+                <p className="mt-1 text-xs text-brand-slate">{commStats?.whatsappSent ?? 0} sent · {commStats?.whatsappFailed ?? 0} failed</p>
               </div>
             </div>
           </div>
@@ -113,8 +113,8 @@ function StatCard({ icon: Icon, label, value, warn }: { icon: typeof FileCheck2;
   return (
     <div className={`rounded-xl border p-4 ${warn && value > 0 ? "border-amber-400/30 bg-amber-400/5" : "border-white/8 bg-white/3"}`}>
       <Icon size={14} className={`mb-2 ${warn && value > 0 ? "text-amber-400" : "text-brand-slate"}`} />
-      <p className="font-display text-xl font-bold text-[var(--text-primary)]">{value}</p>
-      <p className="text-xs text-[var(--text-muted)]">{label}</p>
+      <p className="font-display text-xl font-bold text-white">{value}</p>
+      <p className="text-xs text-brand-slate">{label}</p>
     </div>
   );
 }

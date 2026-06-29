@@ -73,8 +73,8 @@ export default function StudentImportPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Import Students</h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
+          <h1 className="font-display text-2xl font-bold text-white">Import Students</h1>
+          <p className="mt-1 text-sm text-brand-slate">
             Upload a CSV or Excel file to add or update students in bulk. Existing admission numbers are updated, new ones are created.
           </p>
         </div>
@@ -103,10 +103,10 @@ export default function StudentImportPage() {
           <UploadCloud size={32} className="text-brand-slate" />
         )}
         <div>
-          <p className="font-medium text-[var(--text-primary)]">
+          <p className="font-medium text-white">
             {uploading ? "Processing your file..." : "Drag & drop a file, or click to browse"}
           </p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">.csv, .xlsx, or .xls — max 5MB</p>
+          <p className="mt-1 text-xs text-brand-slate">.csv, .xlsx, or .xls — max 5MB</p>
         </div>
       </div>
 
@@ -136,8 +136,8 @@ export default function StudentImportPage() {
                 <tbody>
                   {summary.rows.filter(r => r.outcome === "FAILED").map(r => (
                     <tr key={r.rowNumber} className="border-b border-white/5">
-                      <td className="px-4 py-2 text-[var(--text-muted)]">{r.rowNumber}</td>
-                      <td className="px-4 py-2 font-mono text-xs text-[var(--text-muted)]">{r.admissionNo || "-"}</td>
+                      <td className="px-4 py-2 text-brand-slate">{r.rowNumber}</td>
+                      <td className="px-4 py-2 font-mono text-xs text-brand-slate">{r.admissionNo || "-"}</td>
                       <td className="px-4 py-2 text-red-400">{r.errorMessage}</td>
                     </tr>
                   ))}
@@ -167,8 +167,8 @@ function SummaryCard({ icon: Icon, label, value, tone }: {
   return (
     <div className="rounded-xl border border-white/8 bg-white/3 p-4">
       <Icon size={14} className={`mb-2 ${toneClass}`} />
-      <p className="font-display text-xl font-bold text-[var(--text-primary)]">{value}</p>
-      <p className="text-xs text-[var(--text-muted)]">{label}</p>
+      <p className="font-display text-xl font-bold text-white">{value}</p>
+      <p className="text-xs text-brand-slate">{label}</p>
     </div>
   );
 }

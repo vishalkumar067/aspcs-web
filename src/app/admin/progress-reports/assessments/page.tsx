@@ -111,8 +111,8 @@ export default function AssessmentEntryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Student Assessments</h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">Enter attendance, academic performance, and behaviour for a class.</p>
+        <h1 className="font-display text-2xl font-bold text-white">Student Assessments</h1>
+        <p className="mt-1 text-sm text-brand-slate">Enter attendance, academic performance, and behaviour for a class.</p>
       </div>
 
       {/* Selectors */}
@@ -163,8 +163,8 @@ export default function AssessmentEntryPage() {
               <div key={row.studentId} className={`rounded-2xl border p-4 ${row.status === "LOCKED" ? "border-white/5 bg-white/2 opacity-60" : "border-white/8 bg-white/3"}`}>
                 <div className="mb-3 flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-[var(--text-primary)]">{row.fullName}</p>
-                    <p className="text-xs text-[var(--text-muted)]">Roll No: {row.rollNo ?? "-"}</p>
+                    <p className="font-semibold text-white">{row.fullName}</p>
+                    <p className="text-xs text-brand-slate">Roll No: {row.rollNo ?? "-"}</p>
                   </div>
                   {row.status && (
                     <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${
@@ -177,7 +177,7 @@ export default function AssessmentEntryPage() {
                 </div>
 
                 {row.status === "LOCKED" ? (
-                  <p className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                  <p className="flex items-center gap-2 text-xs text-brand-slate">
                     <AlertTriangle size={12} /> Locked — this report has already been generated.
                   </p>
                 ) : (
@@ -251,7 +251,7 @@ export default function AssessmentEntryPage() {
               </div>
             ))}
             {filteredRows.length === 0 && (
-              <div className="rounded-2xl border border-white/8 py-12 text-center text-[var(--text-muted)]">
+              <div className="rounded-2xl border border-white/8 py-12 text-center text-brand-slate">
                 No students match your search.
               </div>
             )}

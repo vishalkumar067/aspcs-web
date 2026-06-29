@@ -43,8 +43,8 @@ export default function ChangePasswordPage() {
   return (
     <div className="mx-auto max-w-md space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Change Password</h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">Update your account password.</p>
+        <h1 className="font-display text-2xl font-bold text-white">Change Password</h1>
+        <p className="mt-1 text-sm text-brand-slate">Update your account password.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-white/8 bg-white/3 p-6">

@@ -21,8 +21,8 @@ export default function ProgressReportsLandingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Progress Reports</h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
+        <h1 className="font-display text-2xl font-bold text-white">Progress Reports</h1>
+        <p className="mt-1 text-sm text-brand-slate">
           {role === "TEACHER"
             ? "Enter assessments and generate reports for your assigned classes."
             : "Manage reporting cycles, assessments, and parent communication."}
@@ -36,8 +36,8 @@ export default function ProgressReportsLandingPage() {
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-crimson/15 text-brand-crimson group-hover:bg-brand-crimson group-hover:text-white transition-all">
               <l.icon size={18} />
             </div>
-            <p className="font-semibold text-[var(--text-primary)]">{l.label}</p>
-            <p className="mt-1 text-xs text-[var(--text-muted)]">{l.desc}</p>
+            <p className="font-semibold text-white">{l.label}</p>
+            <p className="mt-1 text-xs text-brand-slate">{l.desc}</p>
           </Link>
         ))}
       </div>
