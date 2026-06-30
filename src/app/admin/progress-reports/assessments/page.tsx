@@ -246,7 +246,7 @@ export default function AssessmentEntryPage() {
                             placeholder="Remarks..."
                             value={row.subjectRemarks[sub.subjectId] ?? ""}
                             onChange={e => updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-white placeholder:text-white/25 outline-none focus:border-brand-gold/30" />
+                            className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-black placeholder:text-white/25 outline-none focus:border-brand-gold/30" />
                         </div>
                       ))}
                     </div>
