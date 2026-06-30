@@ -225,31 +225,54 @@ export default function AssessmentEntryPage() {
                     </div>
 
                     {/* Subjects */}
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                      {grid.subjectColumns.map(sub => (
-                        <div key={sub.subjectId}>
-                          <label className="mb-1 block text-[11px] text-white/60">{sub.subjectName}</label>
-                          {grid.performanceMode === "MARKS" ? (
-                            <input type="number" min={0} max={100}
-                              value={row.subjectMarks[sub.subjectId] ?? ""}
-                              onChange={e => updateSubjectValue(row.studentId, sub.subjectId, e.target.value)}
-                              className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-sm text-white outline-none" />
-                          ) : (
-                            <select data-theme="dark-select" value={row.subjectRatings[sub.subjectId] ?? ""}
-                              onChange={e => updateSubjectValue(row.studentId, sub.subjectId, e.target.value)}
-                              className="w-full rounded-lg border border-white/10 bg-brand-black px-2.5 py-2 text-xs text-white outline-none">
-                              <option value="">-</option>
-                              {RATINGS.map(r => <option key={r} value={r}>{r.replace("_", " ")}</option>)}
-                            </select>
-                          )}
-                          <input type="text"
-                            placeholder="Remarks..."
-                            value={row.subjectRemarks[sub.subjectId] ?? ""}
-                            onChange={e => updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-black placeholder:text-white/25 outline-none focus:border-brand-gold/30" />
-                        </div>
-                      ))}
-                    </div>
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+  {grid.subjectColumns.map(sub => (
+    <div key={sub.subjectId}>
+      <label className="mb-1 block text-[11px] text-white/60">
+        {sub.subjectName}
+      </label>
+
+      {grid.performanceMode === "MARKS" ? (
+        <input
+          type="number"
+          min={0}
+          max={100}
+          value={row.subjectMarks[sub.subjectId] ?? ""}
+          onChange={e =>
+            updateSubjectValue(row.studentId, sub.subjectId, e.target.value)
+          }
+          className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
+        />
+      ) : (
+        <select
+          data-theme="dark-select"
+          value={row.subjectRatings[sub.subjectId] ?? ""}
+          onChange={e =>
+            updateSubjectValue(row.studentId, sub.subjectId, e.target.value)
+          }
+          className="w-full rounded-lg border border-white/10 bg-brand-black px-2.5 py-2 text-xs text-white outline-none transition focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
+        >
+          <option value="">-</option>
+          {RATINGS.map(r => (
+            <option key={r} value={r}>
+              {r.replace("_", " ")}
+            </option>
+          ))}
+        </select>
+      )}
+
+      <input
+        type="text"
+        placeholder="Remarks..."
+        value={row.subjectRemarks[sub.subjectId] ?? ""}
+        onChange={e =>
+          updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)
+        }
+        className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-white placeholder:text-white/40 outline-none transition focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
+      />
+    </div>
+  ))}
+</div>
 
                     {/* Behaviour */}
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
