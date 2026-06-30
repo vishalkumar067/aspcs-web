@@ -54,7 +54,16 @@ export default function AssessmentEntryPage() {
       const q = new URLSearchParams({ cycleId, className });
       if (section) q.set("section", section);
       const res = await api.get(`/progress-reports/assessments/grid?${q}`);
-      setGrid(unwrapData<GridResponse>(res));
+      const data = unwrapData<GridResponse>(res);
+      // Ensure subjectRemarks is always an object, never null/undefined —
+      // V14 added this field, so existing rows may not have it in the response.
+      if (data) {
+        data.rows = data.rows.map(r => ({
+          ...r,
+          subjectRemarks: r.subjectRemarks ?? {},
+        }));
+      }
+      setGrid(data);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to load grid");
       setGrid(null);
@@ -235,9 +244,9 @@ export default function AssessmentEntryPage() {
                           )}
                           <input type="text"
                             placeholder="Remarks..."
-                            value={row.subjectRemarks?.[sub.subjectId] ?? ""}
+                            value={row.subjectRemarks[sub.subjectId] ?? ""}
                             onChange={e => updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-white/5 bg-white/3 px-2 py-1.5 text-[11px] text-white/70 placeholder:text-white/25 outline-none focus:border-brand-gold/30" />
+                            className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-white placeholder:text-white/25 outline-none focus:border-brand-gold/30" />
                         </div>
                       ))}
                     </div>
