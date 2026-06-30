@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
-import { Loader2, Save, Send, Search, AlertTriangle } from "lucide-react";
+import { Loader2, Save, Send, Search, AlertTriangle, Sparkles } from "lucide-react";
 import { api, unwrapData } from "@/lib/api";
 import toast from "react-hot-toast";
 
@@ -130,6 +130,71 @@ export default function AssessmentEntryPage() {
     } finally { setSaving(false); }
   };
 
+  const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const handleSubmitSingle = async (row: GridRow) => {
+    if (!grid) return;
+    if (!confirm(`Submit assessment for ${row.fullName}? This locks it for editing once a report is generated.`)) return;
+    setSubmittingId(row.studentId);
+    try {
+      const payload = {
+        studentId: row.studentId,
+        workingDays: row.workingDays, presentDays: row.presentDays,
+        disciplineScore: row.disciplineScore, homeworkScore: row.homeworkScore,
+        participationScore: row.participationScore, punctualityScore: row.punctualityScore,
+        communicationScore: row.communicationScore, teamworkScore: row.teamworkScore,
+        teacherRemarks: row.teacherRemarks,
+        subjectMarks: row.subjectMarks, subjectRatings: row.subjectRatings,
+        subjectRemarks: row.subjectRemarks,
+      };
+      await api.post("/progress-reports/assessments/bulk-save", { cycleId, className, section, rows: [payload], submit: true });
+      toast.success(`${row.fullName} submitted!`);
+      loadGrid();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Submit failed");
+    } finally { setSubmittingId(null); }
+  };
+
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const handleGenerateRemarks = async (row: GridRow) => {
+    if (!grid) return;
+    setGeneratingId(row.studentId);
+    try {
+      // Build per-subject performance map: subject name -> rating or marks string
+      const subjectPerformance: Record<string, string> = {};
+      for (const sub of grid.subjectColumns) {
+        const rating = row.subjectRatings?.[sub.subjectId];
+        const marks = row.subjectMarks?.[sub.subjectId];
+        if (rating) subjectPerformance[sub.subjectName] = rating;
+        else if (marks !== undefined && marks !== null) subjectPerformance[sub.subjectName] = String(marks);
+      }
+
+      const firstName = row.fullName.split(" ")[0];
+      const attendancePct = row.workingDays && row.presentDays
+        ? Math.round((row.presentDays / row.workingDays) * 100)
+        : null;
+      const behaviourScores = [row.disciplineScore, row.homeworkScore, row.participationScore,
+        row.punctualityScore, row.communicationScore, row.teamworkScore].filter(Boolean);
+      const behaviourOverall = behaviourScores.length > 0
+        ? +(behaviourScores.reduce((a, b) => a! + b!, 0)! / behaviourScores.length).toFixed(2)
+        : null;
+
+      const res = await api.post("/progress-reports/ai-remarks/generate", {
+        studentFirstName: firstName,
+        attendancePct,
+        behaviourOverall,
+        overallPerformance: null, // let the backend infer from scores
+        subjectPerformance,
+      });
+      const data = unwrapData<{ remarks: string }>(res);
+      if (data?.remarks) {
+        updateRow(row.studentId, { teacherRemarks: data.remarks });
+        toast.success("Remarks generated!");
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Generation failed");
+    } finally { setGeneratingId(null); }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -225,54 +290,31 @@ export default function AssessmentEntryPage() {
                     </div>
 
                     {/* Subjects */}
-<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-  {grid.subjectColumns.map(sub => (
-    <div key={sub.subjectId}>
-      <label className="mb-1 block text-[11px] text-white/60">
-        {sub.subjectName}
-      </label>
-
-      {grid.performanceMode === "MARKS" ? (
-        <input
-          type="number"
-          min={0}
-          max={100}
-          value={row.subjectMarks[sub.subjectId] ?? ""}
-          onChange={e =>
-            updateSubjectValue(row.studentId, sub.subjectId, e.target.value)
-          }
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
-        />
-      ) : (
-        <select
-          data-theme="dark-select"
-          value={row.subjectRatings[sub.subjectId] ?? ""}
-          onChange={e =>
-            updateSubjectValue(row.studentId, sub.subjectId, e.target.value)
-          }
-          className="w-full rounded-lg border border-white/10 bg-brand-black px-2.5 py-2 text-xs text-white outline-none transition focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
-        >
-          <option value="">-</option>
-          {RATINGS.map(r => (
-            <option key={r} value={r}>
-              {r.replace("_", " ")}
-            </option>
-          ))}
-        </select>
-      )}
-
-      <input
-        type="text"
-        placeholder="Remarks..."
-        value={row.subjectRemarks[sub.subjectId] ?? ""}
-        onChange={e =>
-          updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)
-        }
-        className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-white placeholder:text-white/40 outline-none transition focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
-      />
-    </div>
-  ))}
-</div>
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {grid.subjectColumns.map(sub => (
+                        <div key={sub.subjectId}>
+                          <label className="mb-1 block text-[11px] text-white/60">{sub.subjectName}</label>
+                          {grid.performanceMode === "MARKS" ? (
+                            <input type="number" min={0} max={100}
+                              value={row.subjectMarks[sub.subjectId] ?? ""}
+                              onChange={e => updateSubjectValue(row.studentId, sub.subjectId, e.target.value)}
+                              className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-sm text-white outline-none" />
+                          ) : (
+                            <select data-theme="dark-select" value={row.subjectRatings[sub.subjectId] ?? ""}
+                              onChange={e => updateSubjectValue(row.studentId, sub.subjectId, e.target.value)}
+                              className="w-full rounded-lg border border-white/10 bg-brand-black px-2.5 py-2 text-xs text-white outline-none">
+                              <option value="">-</option>
+                              {RATINGS.map(r => <option key={r} value={r}>{r.replace("_", " ")}</option>)}
+                            </select>
+                          )}
+                          <input type="text"
+                            placeholder="Remarks..."
+                            value={row.subjectRemarks[sub.subjectId] ?? ""}
+                            onChange={e => updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)}
+                            className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-black placeholder:text-white/25 outline-none focus:border-brand-gold/30" />
+                        </div>
+                      ))}
+                    </div>
 
                     {/* Behaviour */}
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
@@ -291,11 +333,31 @@ export default function AssessmentEntryPage() {
 
                     {/* Remarks */}
                     <div>
-                      <label className="mb-1 block text-[11px] text-white/60">Teacher Remarks</label>
+                      <div className="mb-1 flex items-center justify-between">
+                        <label className="text-[11px] text-white/60">Teacher Remarks</label>
+                        {row.status !== "SUBMITTED" && row.status !== "LOCKED" && (
+                          <button onClick={() => handleGenerateRemarks(row)} disabled={generatingId === row.studentId}
+                            className="flex items-center gap-1 rounded-md bg-brand-gold/15 px-2 py-0.5 text-[10px] font-medium text-brand-gold hover:bg-brand-gold/25 disabled:opacity-50">
+                            {generatingId === row.studentId ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                            AI Generate
+                          </button>
+                        )}
+                      </div>
                       <textarea value={row.teacherRemarks ?? ""} onChange={e => updateRow(row.studentId, { teacherRemarks: e.target.value })}
                         rows={2} placeholder="Add remarks, or generate with AI on the Report Generation page..."
                         className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-sm text-white placeholder:text-white/25 outline-none" />
                     </div>
+
+                    {/* Per-student Submit */}
+                    {row.status !== "SUBMITTED" && row.status !== "LOCKED" && (
+                      <div className="flex justify-end pt-1">
+                        <button onClick={() => handleSubmitSingle(row)} disabled={submittingId === row.studentId}
+                          className="flex items-center gap-1.5 rounded-lg bg-brand-crimson/80 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-crimson disabled:opacity-50">
+                          {submittingId === row.studentId ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                          Submit
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
