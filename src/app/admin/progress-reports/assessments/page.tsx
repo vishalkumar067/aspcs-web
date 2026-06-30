@@ -27,6 +27,7 @@ interface GridRow {
   teacherRemarks?: string;
   subjectMarks: Record<string, number>;
   subjectRatings: Record<string, string>;
+  subjectRemarks: Record<string, string>;
 }
 interface GridResponse { subjectColumns: SubjectColumn[]; rows: GridRow[]; performanceMode: "MARKS" | "RATING"; }
 
@@ -79,6 +80,17 @@ export default function AssessmentEntryPage() {
     });
   };
 
+  const updateSubjectRemarks = (studentId: string, subjectId: string, value: string) => {
+    if (!grid) return;
+    setGrid({
+      ...grid,
+      rows: grid.rows.map(r => {
+        if (r.studentId !== studentId) return r;
+        return { ...r, subjectRemarks: { ...r.subjectRemarks, [subjectId]: value } };
+      })
+    });
+  };
+
   const filteredRows = useMemo(() => {
     if (!grid) return [];
     if (!search.trim()) return grid.rows;
@@ -99,6 +111,7 @@ export default function AssessmentEntryPage() {
         communicationScore: r.communicationScore, teamworkScore: r.teamworkScore,
         teacherRemarks: r.teacherRemarks,
         subjectMarks: r.subjectMarks, subjectRatings: r.subjectRatings,
+        subjectRemarks: r.subjectRemarks,
       }));
       await api.post("/progress-reports/assessments/bulk-save", { cycleId, className, section, rows, submit });
       toast.success(submit ? "Assessments submitted!" : "Draft saved");
@@ -220,6 +233,11 @@ export default function AssessmentEntryPage() {
                               {RATINGS.map(r => <option key={r} value={r}>{r.replace("_", " ")}</option>)}
                             </select>
                           )}
+                          <input type="text"
+                            placeholder="Remarks..."
+                            value={row.subjectRemarks?.[sub.subjectId] ?? ""}
+                            onChange={e => updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)}
+                            className="mt-1 w-full rounded-lg border border-white/5 bg-white/3 px-2 py-1.5 text-[11px] text-white/70 placeholder:text-white/25 outline-none focus:border-brand-gold/30" />
                         </div>
                       ))}
                     </div>
