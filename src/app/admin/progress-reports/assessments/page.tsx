@@ -153,47 +153,115 @@ export default function AssessmentEntryPage() {
       toast.error(err instanceof Error ? err.message : "Submit failed");
     } finally { setSubmittingId(null); }
   };
+const [generatingId, setGeneratingId] = useState<string | null>(null);
 
-  const [generatingId, setGeneratingId] = useState<string | null>(null);
-  const handleGenerateRemarks = async (row: GridRow) => {
-    if (!grid) return;
-    setGeneratingId(row.studentId);
-    try {
-      // Build per-subject performance map: subject name -> rating or marks string
-      const subjectPerformance: Record<string, string> = {};
-      for (const sub of grid.subjectColumns) {
-        const rating = row.subjectRatings?.[sub.subjectId];
-        const marks = row.subjectMarks?.[sub.subjectId];
-        if (rating) subjectPerformance[sub.subjectName] = rating;
-        else if (marks !== undefined && marks !== null) subjectPerformance[sub.subjectName] = String(marks);
+const handleGenerateRemarks = async (row: GridRow) => {
+  if (!grid) return;
+
+  setGeneratingId(row.studentId);
+
+  try {
+    // Subject performance
+    const subjectPerformance: Record<string, string> = {};
+
+    for (const sub of grid.subjectColumns) {
+      const rating = row.subjectRatings?.[sub.subjectId];
+      const marks = row.subjectMarks?.[sub.subjectId];
+
+      if (rating) {
+        subjectPerformance[sub.subjectName] = rating;
+      } else if (marks !== undefined && marks !== null) {
+        subjectPerformance[sub.subjectName] = String(marks);
       }
+    }
 
-      const firstName = row.fullName.split(" ")[0];
-      const attendancePct = row.workingDays && row.presentDays
+    // First name
+    const firstName = row.fullName.trim().split(" ")[0];
+
+    // Attendance
+    const attendancePct =
+      row.workingDays && row.presentDays
         ? Math.round((row.presentDays / row.workingDays) * 100)
         : null;
-      const behaviourScores = [row.disciplineScore, row.homeworkScore, row.participationScore,
-        row.punctualityScore, row.communicationScore, row.teamworkScore].filter(Boolean);
-      const behaviourOverall = behaviourScores.length > 0
-        ? +(behaviourScores.reduce((a, b) => a! + b!, 0)! / behaviourScores.length).toFixed(2)
+
+    // Average Marks
+    const marks = Object.values(row.subjectMarks).filter(
+      (m): m is number => typeof m === "number" && !isNaN(m)
+    );
+
+    const averageMarks =
+      marks.length > 0
+        ? +(marks.reduce((a, b) => a + b, 0) / marks.length).toFixed(1)
         : null;
 
-      const res = await api.post("/progress-reports/ai-remarks/generate", {
-        studentFirstName: firstName,
-        attendancePct,
-        behaviourOverall,
-        overallPerformance: null, // let the backend infer from scores
-        subjectPerformance,
+    // Overall Performance
+    let overallPerformance = "Average";
+
+    if (averageMarks !== null) {
+      if (averageMarks >= 90) overallPerformance = "Outstanding";
+      else if (averageMarks >= 75) overallPerformance = "Excellent";
+      else if (averageMarks >= 60) overallPerformance = "Good";
+      else if (averageMarks >= 40) overallPerformance = "Average";
+      else overallPerformance = "Needs Improvement";
+    }
+
+    // Different writing style every time
+    const writingStyles = [
+      "warm",
+      "professional",
+      "teacher-like",
+      "encouraging",
+      "motivational",
+      "friendly",
+      "positive",
+      "academic",
+    ];
+
+    const writingStyle =
+      writingStyles[Math.floor(Math.random() * writingStyles.length)];
+
+    const res = await api.post("/progress-reports/ai-remarks/generate", {
+      studentName: row.fullName,
+      studentFirstName: firstName,
+
+      className,
+      section,
+
+      attendancePct,
+      averageMarks,
+      overallPerformance,
+
+      behaviour: {
+        discipline: row.disciplineScore,
+        homework: row.homeworkScore,
+        participation: row.participationScore,
+        punctuality: row.punctualityScore,
+        communication: row.communicationScore,
+        teamwork: row.teamworkScore,
+      },
+
+      subjectPerformance,
+
+      writingStyle,
+    });
+
+    const data = unwrapData<{ remarks: string }>(res);
+
+    if (data?.remarks) {
+      updateRow(row.studentId, {
+        teacherRemarks: data.remarks,
       });
-      const data = unwrapData<{ remarks: string }>(res);
-      if (data?.remarks) {
-        updateRow(row.studentId, { teacherRemarks: data.remarks });
-        toast.success("Remarks generated!");
-      }
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Generation failed");
-    } finally { setGeneratingId(null); }
-  };
+
+      toast.success("Remarks generated!");
+    }
+  } catch (err: unknown) {
+    toast.error(
+      err instanceof Error ? err.message : "Generation failed"
+    );
+  } finally {
+    setGeneratingId(null);
+  }
+};
 
   return (
     <div className="space-y-6">
@@ -291,30 +359,53 @@ export default function AssessmentEntryPage() {
 
                     {/* Subjects */}
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                      {grid.subjectColumns.map(sub => (
-                        <div key={sub.subjectId}>
-                          <label className="mb-1 block text-[11px] text-white/60">{sub.subjectName}</label>
-                          {grid.performanceMode === "MARKS" ? (
-                            <input type="number" min={0} max={100}
-                              value={row.subjectMarks[sub.subjectId] ?? ""}
-                              onChange={e => updateSubjectValue(row.studentId, sub.subjectId, e.target.value)}
-                              className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-sm text-white outline-none" />
-                          ) : (
-                            <select data-theme="dark-select" value={row.subjectRatings[sub.subjectId] ?? ""}
-                              onChange={e => updateSubjectValue(row.studentId, sub.subjectId, e.target.value)}
-                              className="w-full rounded-lg border border-white/10 bg-brand-black px-2.5 py-2 text-xs text-white outline-none">
-                              <option value="">-</option>
-                              {RATINGS.map(r => <option key={r} value={r}>{r.replace("_", " ")}</option>)}
-                            </select>
-                          )}
-                          <input type="text"
-                            placeholder="Remarks..."
-                            value={row.subjectRemarks[sub.subjectId] ?? ""}
-                            onChange={e => updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-black placeholder:text-white/25 outline-none focus:border-brand-gold/30" />
-                        </div>
-                      ))}
-                    </div>
+  {grid.subjectColumns.map(sub => (
+    <div key={sub.subjectId}>
+      <label className="mb-1 block text-[11px] text-white/60">
+        {sub.subjectName}
+      </label>
+
+      {grid.performanceMode === "MARKS" ? (
+        <input
+          type="number"
+          min={0}
+          max={100}
+          value={row.subjectMarks[sub.subjectId] ?? ""}
+          onChange={e =>
+            updateSubjectValue(row.studentId, sub.subjectId, e.target.value)
+          }
+          className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-sm text-white placeholder:text-white/40 outline-none transition-colors focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
+        />
+      ) : (
+        <select
+          data-theme="dark-select"
+          value={row.subjectRatings[sub.subjectId] ?? ""}
+          onChange={e =>
+            updateSubjectValue(row.studentId, sub.subjectId, e.target.value)
+          }
+          className="w-full rounded-lg border border-white/10 bg-brand-black px-2.5 py-2 text-xs text-white outline-none transition-colors focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
+        >
+          <option value="">-</option>
+          {RATINGS.map(r => (
+            <option key={r} value={r}>
+              {r.replace("_", " ")}
+            </option>
+          ))}
+        </select>
+      )}
+
+      <input
+        type="text"
+        placeholder="Remarks..."
+        value={row.subjectRemarks[sub.subjectId] ?? ""}
+        onChange={e =>
+          updateSubjectRemarks(row.studentId, sub.subjectId, e.target.value)
+        }
+        className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-[11px] text-white placeholder:text-white/40 outline-none transition-colors focus:border-brand-gold/50 focus:ring-2 focus:ring-brand-gold/20"
+      />
+    </div>
+  ))}
+</div>
 
                     {/* Behaviour */}
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">

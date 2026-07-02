@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { FaWhatsapp } from "react-icons/fa";
+import ChatBot from "@/components/ChatBot";
 import "@/styles/globals.css";
 
 // ─── Font Definitions ──────────────────────────────────────────────────────
@@ -129,6 +130,9 @@ export default function RootLayout({
         >
           <FaWhatsapp size={32} />
         </a>
+
+        {/* ─── AI Chatbot ──────────────────────────────────────────── */}
+        <ChatBot />
 
         {/* ─── Toast Notifications ───────────────────────────────── */}
         <Toaster
