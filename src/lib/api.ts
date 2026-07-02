@@ -47,10 +47,9 @@ export const api = {
   upload: <T>(path: string, formData: FormData) => request<T>(path, { method: "POST", body: formData }),
   // For binary responses (file downloads) — request() always calls res.json(),
   // which would throw on an .xlsx/.pdf byte stream, so this bypasses that.
-  // `fallbackFilename` is only used if the server's Content-Disposition
-  // header is missing for some reason; the server-set name (e.g.
-  // "Rahul_Kumar_Test_Cycle.pdf") is always preferred when present, since
-  // that's the one the backend deliberately built from real student/cycle data.
+  // Uses the server's Content-Disposition filename when available (preferred),
+  // falls back to the provided default only when the header is missing or
+  // unparseable.
   downloadFile: async (path: string, fallbackFilename: string): Promise<void> => {
     const token = getToken();
     const headers: Record<string, string> = {};
@@ -61,15 +60,28 @@ export const api = {
     let filename = fallbackFilename;
     const disposition = res.headers.get("Content-Disposition");
     if (disposition) {
-      const match = disposition.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
-      if (match?.[1]) filename = decodeURIComponent(match[1].replace(/"/g, ""));
+      // Try filename*=UTF-8'' first (RFC 5987, percent-encoded, most reliable)
+      const rfc5987 = disposition.match(/filename\*=UTF-8''([^;\s]+)/i);
+      if (rfc5987?.[1]) {
+        filename = decodeURIComponent(rfc5987[1]);
+      } else {
+        // Fall back to filename="..." (quoted) or filename=... (unquoted)
+        const basic = disposition.match(/filename="([^"]+)"/i)
+                   || disposition.match(/filename=([^;\s]+)/i);
+        if (basic?.[1]) {
+          filename = basic[1];
+        }
+      }
     }
 
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click(); a.remove();
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
     URL.revokeObjectURL(url);
   },
 };
