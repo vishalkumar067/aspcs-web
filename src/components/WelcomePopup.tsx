@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, GraduationCap } from "lucide-react";
 import Image from "next/image";
 
-import WelcomeBanner from "@/public/images/welcome-banner.webp";
+
 
 export default function WelcomePopup() {
   const [open, setOpen] = useState(false);
@@ -66,15 +66,14 @@ export default function WelcomePopup() {
 
             {/* Banner */}
             <div className="relative h-64 md:h-72 w-full overflow-hidden bg-gradient-to-br from-brand-maroon to-brand-black">
-              <Image
-                src={WelcomeBanner}
-                alt="Patna Central School"
-                fill
-                quality={85}
-                placeholder="blur"
-                sizes="(max-width: 768px) 100vw, 512px"
-                className="object-cover opacity-80"
-              />
+      <Image
+  src="/images/welcome-banner.webp"
+  alt="Patna Central School"
+  fill
+  quality={85}
+  sizes="(max-width: 768px) 100vw, 512px"
+  className="object-cover opacity-80"
+/>
 
               <div className="absolute inset-0 bg-gradient-to-t from-brand-black via-brand-black/30 to-transparent" />
 
