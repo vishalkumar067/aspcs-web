@@ -5,27 +5,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, GraduationCap } from "lucide-react";
 import Image from "next/image";
 
-// Static import enables automatic blur placeholder
 import WelcomeBanner from "@/public/images/welcome-banner.webp";
 
 export default function WelcomePopup() {
   const [open, setOpen] = useState(false);
 
+  // Show popup every time the page loads
   useEffect(() => {
-    const seen = sessionStorage.getItem("aspcs-welcome-seen");
+    const timer = setTimeout(() => {
+      setOpen(true);
+    }, 800);
 
-    if (!seen) {
-      const timer = setTimeout(() => {
-        setOpen(true);
-      }, 800);
-
-      return () => clearTimeout(timer);
-    }
+    return () => clearTimeout(timer);
   }, []);
 
   const close = () => {
     setOpen(false);
-    sessionStorage.setItem("aspcs-welcome-seen", "1");
   };
 
   const whatsappMessage = encodeURIComponent(
@@ -124,8 +119,9 @@ export default function WelcomePopup() {
                 </span>
               </h2>
 
+              {/* Admissions Text */}
               <p className="mb-2 text-sm font-semibold text-white">
-                🌟 Admissions Open for XI
+                🌟 Admissions Open for Class XI
               </p>
 
               <p className="mb-5 text-sm font-medium leading-relaxed text-white/65">
