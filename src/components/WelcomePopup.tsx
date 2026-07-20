@@ -26,7 +26,7 @@ export default function WelcomePopup() {
   };
 
   const whatsappMessage = encodeURIComponent(
-    "Thank you for your interest in Patna Central School's Day Boarding Programme. Please share your child's name, class, and contact number. Our admissions team will assist you shortly."
+    "Hello! I am interested in Class XI admission at Patna Central School. Thank you for providing this opportunity. Kindly share the admission process, fee structure, available streams, and any other relevant details. Looking forward to your response."
   );
 
   const whatsappUrl = `https://wa.me/919102997549?text=${whatsappMessage}`;
@@ -83,7 +83,7 @@ export default function WelcomePopup() {
                 <span className="h-2 w-2 animate-pulse rounded-full bg-brand-gold" />
 
                 <span className="text-[11px] font-bold uppercase tracking-widest text-brand-gold">
-                  Day Boarding Admissions Open
+                  Class XI Admissions Open
                 </span>
               </div>
             </div>
