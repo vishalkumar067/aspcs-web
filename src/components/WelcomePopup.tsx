@@ -121,14 +121,11 @@ export default function WelcomePopup() {
 
               {/* Admissions Text */}
               <p className="mb-2 text-sm font-semibold text-white">
-                🌟 Admissions Open for Day Boarding Programme-Class I to IX and XI
+                🌟 Admissions Open for XI
               </p>
 
               <p className="mb-5 text-sm font-medium leading-relaxed text-white/65">
-                Give your child the advantage of structured learning,
-                supervised study hours, nutritious meals, co-curricular
-                activities, and holistic development in a safe and nurturing
-                environment.
+               Excel in CBSE academics with FREE after-school JEE & NEET preparation, access to world-class STEAM, Robotics & AI Labs, experienced faculty, and a future-focused learning environment that nurtures innovation, leadership, and academic excellence.
               </p>
 
               {/* Stats */}
