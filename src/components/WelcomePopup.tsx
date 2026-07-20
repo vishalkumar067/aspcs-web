@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, GraduationCap } from "lucide-react";
 import Image from "next/image";
 
+// Static import enables automatic blur placeholder
+import WelcomeBanner from "@/public/images/welcome-banner.webp";
+
 export default function WelcomePopup() {
   const [open, setOpen] = useState(false);
 
@@ -67,12 +70,14 @@ export default function WelcomePopup() {
             </button>
 
             {/* Banner */}
-            <div className="relative h-56 w-full overflow-hidden bg-gradient-to-br from-brand-maroon to-brand-black">
+            <div className="relative h-64 md:h-72 w-full overflow-hidden bg-gradient-to-br from-brand-maroon to-brand-black">
               <Image
-                src="/images/welcome-banner.jpg"
+                src={WelcomeBanner}
                 alt="Patna Central School"
                 fill
-                priority
+                quality={85}
+                placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 512px"
                 className="object-cover opacity-80"
               />
 
@@ -119,13 +124,15 @@ export default function WelcomePopup() {
                 </span>
               </h2>
 
-              {/* Admissions Text */}
               <p className="mb-2 text-sm font-semibold text-white">
                 🌟 Admissions Open for XI
               </p>
 
               <p className="mb-5 text-sm font-medium leading-relaxed text-white/65">
-               Excel in CBSE academics with FREE after-school JEE & NEET preparation, access to world-class STEAM, Robotics & AI Labs, experienced faculty, and a future-focused learning environment that nurtures innovation, leadership, and academic excellence.
+                Excel in CBSE academics with FREE after-school JEE & NEET
+                preparation, access to world-class STEAM, Robotics & AI Labs,
+                experienced faculty, and a future-focused learning environment
+                that nurtures innovation, leadership, and academic excellence.
               </p>
 
               {/* Stats */}
