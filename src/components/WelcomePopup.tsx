@@ -164,7 +164,7 @@ export default function WelcomePopup() {
               {/* Buttons */}
               <div className="flex gap-3">
                 <a
-                  href={whatsappUrl}
+                  href="https://sweedu.in/inq_r.php?fsrc=YzNkbFpXUjFiR2x6ZEdOaGJYQm5iZz09&cid=T1RJPQ==&org_main=YzJObw=="
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={close}
