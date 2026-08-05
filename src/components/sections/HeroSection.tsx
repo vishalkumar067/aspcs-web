@@ -87,7 +87,7 @@ export default function HeroSection() {
           </motion.p>
 
           <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-center gap-4">
-            <Link href="/admissions" className="btn-primary px-8 py-4 text-base shadow-glow-crimson">
+            <Link href="https://sweedu.in/inq_r.php?fsrc=YzNkbFpXUjFiR2x6ZEdOaGJYQm5iZz09&cid=T1RJPQ==&org_main=YzJObw==" className="btn-primary px-8 py-4 text-base shadow-glow-crimson">
               Begin Your Journey <ArrowRight size={16} />
             </Link>
             <button className="btn-outline-gold px-8 py-4 text-base">

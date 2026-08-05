@@ -47,7 +47,7 @@ export default function AdmissionsHero() {
 
           {/* Quick contact */}
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <a href="tel:+91XXXXXXXXXX" className="btn-primary">
+            <a href="tel:+919102997549" className="btn-primary">
               <Phone size={15} /> Call Admissions Office
             </a>
             <a href="mailto:admissions@aspcs.edu.in" className="btn-outline">
