@@ -24,6 +24,7 @@ export default function HomePage() {
       <AboutSection />
       <ProgramsSection />
       <NoticesSection />
+      <VideosSection />
       <GallerySection />
       <CareersSection />
       <TCVerificationSection />
