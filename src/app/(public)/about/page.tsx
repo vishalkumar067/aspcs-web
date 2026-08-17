@@ -56,7 +56,7 @@ export default function AboutPage() {
               blending academic rigour with creative exploration to unlock every child&apos;s extraordinary potential.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/admissions" className="btn-primary">
+              <Link href="https://sweedu.in/inq_r.php?fsrc=YzNkbFpXUjFiR2x6ZEdOaGJYQm5iZz09&cid=T1RJPQ==&org_main=YzJObw==" className="btn-primary">
                 Apply Now <ArrowRight size={15} />
               </Link>
               <Link href="/contact" className="btn-outline">
