@@ -199,8 +199,9 @@ export default function MandatoryDisclosurePage() {
                     </thead>
                     <tbody>
                       {[
-                        ["1", "2019", "345", "344", "99.71", "—"],
-                        ["2", "2020", "301", "290", "96.35", "—"],
+                        ["1", "2024", "221", "220", "99.55", "—"],
+                        ["2", "2025", "194", "187", "96.89", "—"],
+             ["3", "2026", "221", "211", "96.79", "—"],
                       ].map((row, i) => (
                         <tr key={i} className={`border-b border-[var(--surface-border)] ${i % 2 === 0 ? "" : "bg-[var(--surface-bg)]"}`}>
                           {row.map((cell, j) => (
