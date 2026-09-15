@@ -8,7 +8,7 @@ import { FileText, Download, ExternalLink } from "lucide-react";
 const DOCS = {
   affiliation:  "/images/School Affiliation Letter New- 2021-27.pdf",
   society:      "/images/Society.jpeg",
-  noc:          "/images/NOC.pdf",
+  noc:          "/images/NOC.PDF",
   recognition:  "/images/Recongnition Certificate -2026.pdf",
   building:     "/images/Building Safety Certificate -2026.pdf",
   fire:         "/images/Fire Safety Certificate -2026.pdf",
