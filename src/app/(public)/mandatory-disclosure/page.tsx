@@ -6,20 +6,22 @@ import { FileText, Download, ExternalLink } from "lucide-react";
 // ─── PDF Document Links ───────────────────────────────────────────────────────
 // Replace these URLs with your actual uploaded PDF paths under /public/docs/
 const DOCS = {
-  affiliation:   "https://aspcspatna.ac.in/Mandatorydoc/Affiliation%20Letter%20-1-converted.pdf",
-  society:       "https://aspcspatna.ac.in/Mandatorydoc/Society Registration-converted.pdf",
-  noc:           "https://aspcspatna.ac.in/Mandatorydoc/NOC.pdf",
-  recognition:   "https://aspcspatna.ac.in/Mandatorydoc/Recoginition Certificate.pdf",
-  building:      "https://aspcspatna.ac.in/Mandatorydoc/Building-Safety- Certificate-converted.pdf",
-  fire:          "https://aspcspatna.ac.in/Mandatorydoc/Fire Safety Certificate-converted.pdf",
-  deo:           "https://aspcspatna.ac.in/Mandatorydoc/DEO.pdf",
-  water:         "https://aspcspatna.ac.in/Mandatorydoc/Drinking Water Certificate-converted.pdf",
-  feeStructure:  "https://aspcspatna.ac.in/Mandatorydoc/fee-structure.pdf",
-  calendar:      "https://aspcspatna.ac.in/Mandatorydoc/ACADEMIC CALENDAR.pdf",
-  smc:           "https://aspcspatna.ac.in/Mandatorydoc/SMC- Infromation.pdf",
-  pta:           "https://aspcspatna.ac.in/Mandatorydoc/PTA.pdf",
-  result:        "https://aspcspatna.ac.in/Mandatorydoc/RESULT.pdf",
-  youtubeVideo:  "https://youtu.be/6etdsU3EYRI",
+  affiliation:  "/images/School Affiliation Letter New- 2021-27.pdf",
+  society:      "/images/Society.jpeg",
+  noc:          "/images/NOC.pdf",
+  recognition:  "/images/Recongnition Certificate -2026.pdf",
+  building:     "/images/Building Safety Certificate -2026.pdf",
+  fire:         "/images/Fire Safety Certificate -2026.pdf",
+  deo:          "/images/YOUR_DEO_FILE_NAME.pdf",
+  water:        "/images/Safe drinking Water and Sanitary Certificate -2026.pdf",
+
+  feeStructure: "/images/Fee_Structure.jpeg",
+  calendar:     "/images/YOUR_ACADEMIC_CALENDAR_FILE_NAME.pdf",
+  smc:          "/images/YOUR_SMC_FILE_NAME.pdf",
+  pta:          "/images/YOUR_PTA_FILE_NAME.pdf",
+  result:       "/images/YOUR_RESULT_FILE_NAME.pdf",
+
+  youtubeVideo: "https://youtu.be/6etdsU3EYRI",
 };
 
 function ViewLink({ href }: { href: string }) {
