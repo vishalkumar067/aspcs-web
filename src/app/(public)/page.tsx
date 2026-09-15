@@ -9,7 +9,7 @@ import CareersSection        from "@/components/sections/CareersSection";
 import TCVerificationSection from "@/components/sections/TCVerificationSection";
 import TestimonialsSection   from "@/components/sections/TestimonialsSection";
 import CTASection            from "@/components/sections/CTASection";
-import VideosSection         from "@/components/sections/VideoSection";
+
 
 export const metadata: Metadata = {
   title: "Acharya Shree Sudarshan Patna Central School — Session 2026–27",
