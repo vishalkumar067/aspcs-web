@@ -257,11 +257,11 @@ export default function MandatoryDisclosurePage() {
                 </thead>
                 <tbody>
                   {[
-                    ["1",  "PRINCIPAL",                                  "1"],
-                    ["2",  "TOTAL NO. OF TEACHERS",                      "91"],
-                    ["3",   "• PGT",                                      "19"],
-                    ["4",   "• TGT",                                      "47"],
-                    ["5",   "• PRT",                                      "25"],
+                    ["1",  "PRINCIPAL",                                  "01"],
+                    ["2",  "TOTAL NO. OF TEACHERS",                      "78"],
+                    ["3",   "• PGT",                                      "16"],
+                    ["4",   "• TGT",                                      "33"],
+                    ["5",   "• PRT",                                      "28"],
                     ["6",  "TEACHERS SECTION RATIO",                     "1:5"],
                     ["7",  "DETAILS OF SPECIAL EDUCATOR",                "1"],
                     ["8",  "DETAILS OF COUNSELLOR AND WELLNESS TEACHER", "1"],
