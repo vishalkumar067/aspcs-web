@@ -68,17 +68,17 @@ export default function HeroSection() {
           </motion.div>
 
           <motion.h1 variants={fadeUp} className="mb-6 font-display text-display-md font-black leading-[1.05] text-white lg:text-display-xl">
-            Where{" "}
+            Acharya Shri{" "}
             <span className="relative inline-block">
-              <span className="text-gold-shimmer">Excellence</span>
+              <span className="text-gold-shimmer">Sudarshan</span>
               <motion.span
                 initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
                 transition={{ delay: 0.9, duration: 0.6, ease: "easeOut" }}
                 className="absolute -bottom-1 left-0 h-0.5 w-full origin-left rounded-full bg-gradient-to-r from-brand-gold to-brand-gold-light"
               />
             </span>{" "}
-            Meets{" "}
-            <span className="text-brand-crimson">Creativity</span>
+            Patna{" "}
+            <span className="text-brand-crimson">Central School</span>
           </motion.h1>
 
           <motion.p variants={fadeUp} className="mx-auto mb-10 max-w-2xl text-lg font-semibold leading-relaxed text-white/80 lg:text-xl">
