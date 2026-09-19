@@ -192,16 +192,16 @@ export default function MandatoryDisclosurePage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-[var(--surface-border)] bg-brand-crimson/8">
-                        {["S.NO.", "YEAR", "REGISTERED", "PASSED", "PASS %", "REMARKS"].map((h) => (
+                        {["S.NO.", "YEAR", "REGISTERED", "PASSED", "PASS %"].map((h) => (
                           <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-[var(--text-primary)]">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {[
-                        ["1", "2024", "221", "220", "99.55", "—"],
-                        ["2", "2025", "194", "187", "96.89", "—"],
-             ["3", "2026", "221", "211", "96.79", "—"],
+                        ["1", "2024", "221", "220", "99.55"],
+                        ["2", "2025", "194", "187", "96.89" ],
+             ["3", "2026", "221", "211", "96.79"],
                       ].map((row, i) => (
                         <tr key={i} className={`border-b border-[var(--surface-border)] ${i % 2 === 0 ? "" : "bg-[var(--surface-bg)]"}`}>
                           {row.map((cell, j) => (
@@ -221,16 +221,16 @@ export default function MandatoryDisclosurePage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-[var(--surface-border)] bg-brand-crimson/8">
-                        {["S.NO.", "YEAR", "REGISTERED", "PASSED", "PASS %", "REMARKS"].map((h) => (
+                        {["S.NO.", "YEAR", "REGISTERED", "PASSED", "PASS %"].map((h) => (
                           <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-[var(--text-primary)]">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {[
-                        ["1", "2024", "90", "81", "90.00", "—"],
-                        ["2", "2025", "55", "46", "85.19", "—"],
-                        ["3", "2026", "56", "50", "89.29", "—"],
+                        ["1", "2024", "90", "81", "90.00", ],
+                        ["2", "2025", "55", "46", "85.19", ],
+                        ["3", "2026", "56", "50", "89.29", ],
                       ].map((row, i) => (
                         <tr key={i} className={`border-b border-[var(--surface-border)] ${i % 2 === 0 ? "" : "bg-[var(--surface-bg)]"}`}>
                           {row.map((cell, j) => (
