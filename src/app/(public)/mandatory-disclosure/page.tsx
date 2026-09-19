@@ -17,9 +17,9 @@ const DOCS = {
 
   feeStructure: "/images/Fee_Structure.jpeg",
   calendar:     "/images/YOUR_ACADEMIC_CALENDAR_FILE_NAME.pdf",
-  smc:          "/images/YOUR_SMC_FILE_NAME.pdf",
-  pta:          "/images/YOUR_PTA_FILE_NAME.pdf",
-  result:       "/images/YOUR_RESULT_FILE_NAME.pdf",
+  smc:          "/images/SMC details Affidavit -2026.pdf",
+  pta:          "/images/Parents Teachers Asociation (PTA).pdf",
+  result:       "/images/Activity Calender-2026-27.pdf",
 
   youtubeVideo: "https://youtu.be/6etdsU3EYRI",
 };
