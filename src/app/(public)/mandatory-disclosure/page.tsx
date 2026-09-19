@@ -16,10 +16,10 @@ const DOCS = {
   water:        "/images/Safe drinking Water and Sanitary Certificate -2026.pdf",
 
   feeStructure: "/images/Fee_Structure.jpeg",
-  calendar:     "/images/YOUR_ACADEMIC_CALENDAR_FILE_NAME.pdf",
+  calendar:     "/images/Activity Calender-2026-27.pdf",
   smc:          "/images/SMC details Affidavit -2026.pdf",
   pta:          "/images/Parents Teachers Asociation (PTA).pdf",
-  result:       "/images/Activity Calender-2026-27.pdf",
+  result:       "/images/Last Three years result.pdf",
 
   youtubeVideo: "https://youtu.be/6etdsU3EYRI",
 };
