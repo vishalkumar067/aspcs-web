@@ -12,7 +12,7 @@ const DOCS = {
   recognition:  "/images/Recongnition Certificate -2026.pdf",
   building:     "/images/Building Safety Certificate -2026.pdf",
   fire:         "/images/Fire Safety Certificate -2026.pdf",
-  deo:          "/images/YOUR_DEO_FILE_NAME.pdf",
+  deo:          "/images/Self Certificate.pdf",
   water:        "/images/Safe drinking Water and Sanitary Certificate -2026.pdf",
 
   feeStructure: "/images/Fee_Structure.jpeg",
