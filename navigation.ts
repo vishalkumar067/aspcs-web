@@ -52,6 +52,7 @@ export const FOOTER_LINKS = {
     { label: "Primary (I-V)",    href: "/academics#programs" },
     { label: "Middle (VI-VIII)", href: "/academics#programs" },
     { label: "Secondary (IX-X)", href: "/academics#programs" },
+    { label: "Senior Secondary (XI-XII)", href: "/academics#programs" },
   ],
   policies: [
     { label: "Mandatory Disclosure", href: "/mandatory-disclosure" },
