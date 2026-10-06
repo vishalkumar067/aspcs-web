@@ -30,7 +30,9 @@
     "sharp": "^0.33.5",
     "tailwind-merge": "^2.6.0",
     "zod": "^3.24.1",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@photo-sphere-viewer/core": "5.15.1",
+    "@photo-sphere-viewer/markers-plugin": "5.15.1"
   },
   "devDependencies": {
     "@types/node": "^20",
