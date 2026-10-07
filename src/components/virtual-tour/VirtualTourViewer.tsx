@@ -263,6 +263,11 @@ export default function VirtualTourViewer({
     </div>
   </div>
 )}
+       </div>
+    );
+}
+
+
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => {
