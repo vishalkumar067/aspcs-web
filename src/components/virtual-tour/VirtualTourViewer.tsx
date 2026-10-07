@@ -240,7 +240,7 @@ export default function VirtualTourViewer({
   <div className="absolute bottom-24 left-4 z-30 max-w-sm rounded-2xl border border-brand-gold/20 bg-black/90 p-5 shadow-2xl backdrop-blur-xl sm:left-6">
     <div className="flex items-start justify-between gap-5">
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-gold">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white">
           Explore
         </p>
 
