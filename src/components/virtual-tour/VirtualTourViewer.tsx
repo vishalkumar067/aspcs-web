@@ -139,7 +139,7 @@ export default function VirtualTourViewer({
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-gold">Panorama coming soon</p>
             <h2 className="mt-3 font-display text-2xl font-bold">This location is ready for its 360° photograph.</h2>
             <p className="mt-3 text-sm leading-6 text-white/50">
-              Add the real equirectangular panorama to the configured public/virtual-tour/panoramas folder to activate this scene.
+              
             </p>
           </div>
         </div>
@@ -236,23 +236,33 @@ export default function VirtualTourViewer({
         </div>
       )}
 
-      {info && (
-        <div className="absolute bottom-24 left-4 z-30 max-w-sm rounded-2xl border border-brand-gold/20 bg-black/90 p-5 shadow-2xl backdrop-blur-xl sm:left-6">
-          <div className="flex items-start justify-between gap-5">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-gold">Explore</p>
-              <h3 className="mt-1 font-display text-lg font-bold">{info.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-white/55">{info.description}</p>
-            </div>
-            <button type="button" onClick={() => setInfo(null)} aria-label="Close information">
-              <X size={16} className="text-white/45" />
-            </button>
-          </div>
-        </div>
-      )}
+    {info && (
+  <div className="absolute bottom-24 left-4 z-30 max-w-sm rounded-2xl border border-brand-gold/20 bg-black/90 p-5 shadow-2xl backdrop-blur-xl sm:left-6">
+    <div className="flex items-start justify-between gap-5">
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-gold">
+          Explore
+        </p>
+
+        <h3 className="mt-1 font-display text-lg font-bold text-white">
+          {info.title}
+        </h3>
+
+        <p className="mt-2 text-sm leading-6 text-white">
+          {info.description}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setInfo(null)}
+        aria-label="Close information"
+      >
+        <X size={16} className="text-white/70 hover:text-white" />
+      </button>
     </div>
-  );
-}
+  </div>
+)}
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => {
