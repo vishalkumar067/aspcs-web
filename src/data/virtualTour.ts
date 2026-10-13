@@ -31,8 +31,8 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Main Gate",
     description: "Begin your virtual journey through the ASPCS campus.",
     category: "Campus",
-    panoramaUrl: "/virtual-tour/panoramas/main-gate.jpg",
-    thumbnailUrl: "/virtual-tour/thumbnails/main-gate.jpg",
+    panoramaUrl: "images/reception.jpg",,
+    thumbnailUrl: "images/reception.jpg",,
     hotspots: [],
   },
   {
@@ -40,8 +40,8 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Reception",
     description: "Explore the welcoming entrance to our school campus.",
     category: "Campus",
-    panoramaUrl: "/virtual-tour/panoramas/reception.jpg",
-    thumbnailUrl: "/virtual-tour/thumbnails/reception.jpg",
+    panoramaUrl: "images/reception.jpg",
+    thumbnailUrl:"images/reception.jpg",,
     hotspots: [],
   },
   {
