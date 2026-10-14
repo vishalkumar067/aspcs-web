@@ -145,16 +145,24 @@ export default function VirtualTourViewer({
         </div>
       )}
 
+<<<<<<< HEAD
       <div className="pointer-events-auto max-w-[75%] rounded-xl border border-white/20 bg-[#09070b]/95 px-4 py-3 text-white shadow-xl">
         <div className="pointer-events-auto max-w-[70%] rounded-2xl border border-white/10 bg-black/55 px-4 py-3 backdrop-blur-xl">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">{activeScene?.category}</p>
-          <h2 className="mt-1 font-display text-lg font-bold sm:text-xl" !text-white >{activeScene?.title}</h2>
+          <h2 className="mt-1 font-display text-lg font-bold !text-white sm:text-xl "  >{activeScene?.title}</h2>
+=======
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-4 sm:p-6">
+        <div className="pointer-events-auto max-w-[75%] rounded-xl border border-white/20 bg-[#09070b]/95 px-4 py-3 text-white shadow-xl">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">{activeScene?.category}</p>
+         <h2 className="mt-1 font-display text-lg font-bold !text-white sm:text-xl">
+  {activeScene?.title}
+</h2>
+>>>>>>> dabe721 (Font)
         </div>
         <button
           type="button"
           onClick={fullscreen}
-          className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-black/55 text-white backdrop-blur-xl transition hover:border-brand-gold/40"
-          aria-label="Enter fullscreen"
+		  className="pointer-events-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-[#09070b]/95 text-white shadow-lg transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400" aria-label="Enter fullscreen"
         >
           <Maximize2 size={17} />
         </button>
@@ -237,7 +245,7 @@ export default function VirtualTourViewer({
       )}
 
     {info && (
-  <div className="absolute bottom-24 left-4 z-30 max-w-sm rounded-2xl border border-brand-gold/20 bg-black/90 p-5 shadow-2xl backdrop-blur-xl sm:left-6">
+  <div className="absolute bottom-28 left-4 right-4 z-30 max-h-[40%] overflow-y-auto rounded-2xl border border-amber-400/40 bg-[#09070b] p-5 text-white shadow-2xl sm:left-6 sm:right-auto sm:max-w-sm">
     <div className="flex items-start justify-between gap-5">
       <div>
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white">
