@@ -120,7 +120,7 @@ export default function VirtualTourViewer({
   };
 
   return (
-    <div className="relative bg-[#09070b]">
+    <div className="relative isolate overflow-hidden bg-[#09070b] text-white">
       <div ref={containerRef} className="relative h-[62vh] min-h-[460px] w-full sm:h-[680px] lg:h-[720px]" />
 
       {loading && !error && (
@@ -145,10 +145,10 @@ export default function VirtualTourViewer({
         </div>
       )}
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-4 sm:p-6">
+      <div className="pointer-events-auto max-w-[75%] rounded-xl border border-white/20 bg-[#09070b]/95 px-4 py-3 text-white shadow-xl">
         <div className="pointer-events-auto max-w-[70%] rounded-2xl border border-white/10 bg-black/55 px-4 py-3 backdrop-blur-xl">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">{activeScene?.category}</p>
-          <h2 className="mt-1 font-display text-lg font-bold sm:text-xl">{activeScene?.title}</h2>
+          <h2 className="mt-1 font-display text-lg font-bold sm:text-xl" !text-white >{activeScene?.title}</h2>
         </div>
         <button
           type="button"
