@@ -31,8 +31,8 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Main Gate",
     description: "Begin your virtual journey through the ASPCS campus.",
     category: "Campus",
-    panoramaUrl: "images/reception.jpg.jpeg",
-    thumbnailUrl: "images/reception.jpg.jpeg",
+    panoramaUrl: "/images/reception.jpg.jpeg",
+    thumbnailUrl: "/images/reception.jpg.jpeg",
     hotspots: [],
   },
   {
@@ -41,7 +41,7 @@ export const TOUR_SCENES: TourScene[] = [
     description: "Explore the welcoming entrance to our school campus.",
     category: "Campus",
     panoramaUrl: "/images/reception.jpg.jpeg",
-thumbnailUrl: "/images/reception.jpg.jpeg",
+    thumbnailUrl: "/images/reception.jpg.jpeg",
     hotspots: [],
   },
   {
@@ -87,7 +87,19 @@ thumbnailUrl: "/images/reception.jpg.jpeg",
     category: "Innovation",
     panoramaUrl: "/virtual-tour/panoramas/steam-lab.jpg",
     thumbnailUrl: "/virtual-tour/thumbnails/steam-lab.jpg",
-    hotspots: [],
+    hotspots: [
+      {
+        // The viewer opens the Cloudinary video for any hotspot whose
+        // id/label/description mentions "robotics lab".
+        id: "ai-robotics-lab",
+        type: "info",
+        label: "AI & Robotics Lab",
+        description: "Watch our AI & Robotics Lab in action.",
+        // Placeholder position: calibrate with the click logger, then update.
+        yaw: 1.2,
+        pitch: 0.05,
+      },
+    ],
   },
   {
     id: "sports",
