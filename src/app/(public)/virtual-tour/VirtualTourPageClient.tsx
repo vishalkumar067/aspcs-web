@@ -76,15 +76,24 @@ export default function VirtualTourPageClient() {
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-white/[0.025] py-20">
-        <div className="container-aspcs">
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-gold">Discover ASPCS</p>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">More than a campus. A place to grow.</h2>
-            <p className="mt-4 leading-7 text-white/60">
-              Explore the spaces that shape everyday learning, creativity, technology, sports and student life.
-            </p>
-          </div>
+     <section className="border-y border-white/10 bg-white/[0.025] py-20">
+  <div className="container-aspcs">
+    <div className="max-w-2xl">
+      <p className="text-xs font-bold uppercase tracking-[0.2em] !text-amber-400">
+        Discover ASPCS
+      </p>
+
+      <h2 className="mt-3 font-display text-3xl font-bold !text-white sm:text-4xl">
+        More than a campus. A place to grow.
+      </h2>
+
+      <p className="mt-4 leading-7 !text-slate-300">
+        Explore the spaces that shape everyday learning, creativity,
+        technology, sports and student life.
+      </p>
+    </div>
+  </div>
+</section>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {scenes.slice(0, 6).map((scene) => (
