@@ -7,6 +7,8 @@ import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/core/index.css";
 import "@photo-sphere-viewer/markers-plugin/index.css";
 import type { TourScene } from "@/data/virtualTour";
+import RoboticsLabVideo from "@/components/virtual-tour/RoboticsLabVideo"; // adjust to where you saved the file
+
 
 type Props = {
   scenes: TourScene[];

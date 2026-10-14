@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import VirtualTourViewer from "@/components/virtual-tour/VirtualTourViewer";
+import RoboticsLabVideo from "@/components/virtual-tour/RoboticsLabVideo";
 import {
   getGuidedTourScenes,
   getTourScenes,
@@ -113,6 +114,9 @@ export default function VirtualTourPageClient() {
         </div>
       </section>
 
+      {/* AI & Robotics Lab video */}
+      <RoboticsLabVideo />
+
       {/* Discover ASPCS and campus locations */}
       <section className="border-y border-white/10 bg-white/[0.025] py-20">
         <div className="container-aspcs">
@@ -133,7 +137,7 @@ export default function VirtualTourPageClient() {
 
           {/* Selectable campus scenes */}
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {scenes.slice(0, 6).map((scene) => (
+            {scenes.map((scene) => (
               <button
                 key={scene.id}
                 type="button"
