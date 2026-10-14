@@ -32,6 +32,7 @@ export default function VirtualTourViewer({
   const [error, setError] = useState(false);
   const [info, setInfo] = useState<{ title: string; description: string } | null>(null);
   const [locationOpen, setLocationOpen] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current || !activeScene) return;
@@ -76,7 +77,16 @@ export default function VirtualTourViewer({
 
         if (!hotspot) return;
 
-        if (hotspot.type === "scene" && hotspot.targetSceneId) {
+        // Open the Robotics Lab video for matching hotspot IDs/labels.
+        const hotspotName = `${hotspot.id} ${hotspot.label} ${hotspot.description ?? ""}`;
+        const isRoboticsLab = /ai[\s&-]*robotics[\s-]*lab|robotics[\s-]*lab/i.test(
+          hotspotName,
+        );
+
+        if (isRoboticsLab) {
+          setInfo(null);
+          setVideoOpen(true);
+        } else if (hotspot.type === "scene" && hotspot.targetSceneId) {
           onSceneChange(hotspot.targetSceneId);
         } else if (hotspot.description) {
           setInfo({
@@ -101,7 +111,7 @@ export default function VirtualTourViewer({
 
   useEffect(() => {
     if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
-    if (!guided || guidedScenes.length === 0 || !activeScene) return;
+    if (videoOpen || !guided || guidedScenes.length === 0 || !activeScene) return;
 
     const currentIndex = guidedScenes.findIndex(
       (scene) => scene.id === activeScene.id,
@@ -119,7 +129,7 @@ export default function VirtualTourViewer({
     return () => {
       if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
     };
-  }, [activeScene, guided, guidedScenes, onGuidedChange, onSceneChange]);
+  }, [activeScene, guided, guidedScenes, onGuidedChange, onSceneChange, videoOpen]);
 
   const resetView = () => {
     viewerRef.current?.resetZoom();
@@ -281,6 +291,57 @@ export default function VirtualTourViewer({
                 {scene.title}
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI & Robotics Lab video popup */}
+      {videoOpen && (
+        <div
+          className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-3 backdrop-blur-sm sm:p-6"
+          onClick={() => setVideoOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="AI and Robotics Lab video"
+        >
+          <div
+            className="relative w-full max-w-5xl overflow-hidden rounded-2xl border border-amber-400/40 bg-[#09070b] shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:px-6">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
+                  Explore Our Innovation
+                </p>
+                <h3 className="mt-1 text-base font-bold text-white sm:text-xl">
+                  AI & Robotics Lab
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setVideoOpen(false)}
+                aria-label="Close video"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 text-white transition hover:border-amber-400 hover:text-amber-400"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="relative aspect-video w-full bg-black">
+              <iframe
+                key="robotics-lab-video"
+                src="https://player.cloudinary.com/embed/?cloud_name=dug0g6tli&public_id=robotics_lab_acharya_shri_sudarshan_patna_central_school_1_zid2b0"
+                title="AI & Robotics Lab - Acharya Shree Sudarshan Patna Central School"
+                className="absolute inset-0 h-full w-full"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+
+            <div className="px-4 py-3 text-center text-xs text-slate-400 sm:text-sm">
+              Acharya Shree Sudarshan Patna Central School
+            </div>
           </div>
         </div>
       )}
