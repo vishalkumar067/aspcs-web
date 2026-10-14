@@ -145,19 +145,25 @@ export default function VirtualTourViewer({
         </div>
       )}
 
-<<<<<<< HEAD
-      <div className="pointer-events-auto max-w-[75%] rounded-xl border border-white/20 bg-[#09070b]/95 px-4 py-3 text-white shadow-xl">
-        <div className="pointer-events-auto max-w-[70%] rounded-2xl border border-white/10 bg-black/55 px-4 py-3 backdrop-blur-xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">{activeScene?.category}</p>
-          <h2 className="mt-1 font-display text-lg font-bold !text-white sm:text-xl "  >{activeScene?.title}</h2>
-=======
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-4 sm:p-6">
-        <div className="pointer-events-auto max-w-[75%] rounded-xl border border-white/20 bg-[#09070b]/95 px-4 py-3 text-white shadow-xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">{activeScene?.category}</p>
-         <h2 className="mt-1 font-display text-lg font-bold !text-white sm:text-xl">
-  {activeScene?.title}
-</h2>
->>>>>>> dabe721 (Font)
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-3 p-4 sm:p-6">
+        <div className="pointer-events-auto min-w-0 max-w-[75%] rounded-xl border border-white/20 bg-[#09070b]/95 px-4 py-3 text-white shadow-xl">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
+            {activeScene?.category}
+          </p>
+          <h2 className="mt-1 font-display text-lg font-bold !text-white sm:text-xl">
+            {activeScene?.title}
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          onClick={fullscreen}
+          className="pointer-events-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-[#09070b]/95 text-white shadow-lg transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+          aria-label="Enter fullscreen"
+        >
+          <Maximize2 size={17} />
+        </button>
+      </div>
         </div>
         <button
           type="button"
@@ -168,7 +174,7 @@ export default function VirtualTourViewer({
         </button>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/90 via-black/55 to-transparent px-4 pb-4 pt-16 sm:px-6 sm:pb-6">
+      <div className="absolute inset-x-0 bottom-0 z-10 border-t border-white/15 bg-[#09070b]/95 px-4 pb-4 pt-5 text-white sm:px-6 sm:pb-6">
         <div className="flex items-end justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2">
             <button
@@ -208,8 +214,8 @@ export default function VirtualTourViewer({
               onClick={() => onSceneChange(scene.id)}
               className={`shrink-0 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
                 scene.id === activeScene?.id
-                  ? "border-brand-gold/50 bg-brand-gold/15 text-brand-gold"
-                  : "border-white/10 bg-black/35 text-white/60 hover:border-white/20 hover:text-white"
+                  ? "border-amber-400 bg-amber-400 text-[#09070b]"
+                  : "border-white/20 bg-[#18151c] text-white hover:border-amber-400"
               }`}
             >
               {scene.title}
@@ -219,11 +225,11 @@ export default function VirtualTourViewer({
       </div>
 
       {locationOpen && (
-        <div className="absolute inset-x-4 bottom-20 z-30 rounded-2xl border border-white/10 bg-black/90 p-3 shadow-2xl backdrop-blur-xl sm:hidden">
+        <div className="absolute inset-x-4 bottom-20 z-30 rounded-2xl border border-white/20 bg-[#09070b] p-3 text-white shadow-2xl sm:hidden">
           <div className="mb-2 flex items-center justify-between px-2">
-            <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">Explore Campus</span>
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-white">Explore Campus</span>
             <button type="button" onClick={() => setLocationOpen(false)} aria-label="Close locations">
-              <X size={16} className="text-white/50" />
+              <X size={16} className="text-white/80 hover:text-white" />
             </button>
           </div>
           <div className="grid max-h-60 gap-1 overflow-y-auto">
@@ -235,7 +241,7 @@ export default function VirtualTourViewer({
                   onSceneChange(scene.id);
                   setLocationOpen(false);
                 }}
-                className={`rounded-xl px-3 py-3 text-left text-sm font-semibold ${scene.id === activeScene?.id ? "bg-brand-gold/10 text-brand-gold" : "text-white/70"}`}
+                className={`rounded-xl px-3 py-3 text-left text-sm font-semibold ${scene.id === activeScene?.id ? "bg-amber-400 text-[#09070b]" : "text-white hover:bg-white/10"}`}
               >
                 {scene.title}
               </button>
@@ -252,11 +258,11 @@ export default function VirtualTourViewer({
           Explore
         </p>
 
-        <h3 className="mt-1 font-display text-lg font-bold text-white">
+        <h3 className="mt-1 font-display text-lg font-bold !text-white">
           {info.title}
         </h3>
 
-        <p className="mt-2 text-sm leading-6 text-white">
+        <p className="mt-2 text-sm leading-6 !text-white">
           {info.description}
         </p>
       </div>
@@ -265,8 +271,9 @@ export default function VirtualTourViewer({
         type="button"
         onClick={() => setInfo(null)}
         aria-label="Close information"
+        className="shrink-0 rounded-lg p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
       >
-        <X size={16} className="text-white/70 hover:text-white" />
+        <X size={16} />
       </button>
     </div>
   </div>
