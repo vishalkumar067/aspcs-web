@@ -56,6 +56,7 @@ export default function VirtualTourViewer({
     const markersPlugin = viewer.getPlugin(MarkersPlugin);
     if (markersPlugin) {
       markersPlugin.clearMarkers();
+
       activeScene.hotspots.forEach((hotspot) => {
         markersPlugin.addMarker({
           id: hotspot.id,
@@ -69,12 +70,19 @@ export default function VirtualTourViewer({
 
       markersPlugin.addEventListener("select-marker", (event) => {
         const marker = event.marker;
-        const hotspot = marker.config.data as typeof activeScene.hotspots[number] | undefined;
+        const hotspot = marker.config.data as
+          | (typeof activeScene.hotspots)[number]
+          | undefined;
+
         if (!hotspot) return;
+
         if (hotspot.type === "scene" && hotspot.targetSceneId) {
           onSceneChange(hotspot.targetSceneId);
         } else if (hotspot.description) {
-          setInfo({ title: hotspot.label, description: hotspot.description });
+          setInfo({
+            title: hotspot.label,
+            description: hotspot.description,
+          });
         }
       });
     }
@@ -95,7 +103,10 @@ export default function VirtualTourViewer({
     if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
     if (!guided || guidedScenes.length === 0 || !activeScene) return;
 
-    const currentIndex = guidedScenes.findIndex((scene) => scene.id === activeScene.id);
+    const currentIndex = guidedScenes.findIndex(
+      (scene) => scene.id === activeScene.id,
+    );
+
     if (currentIndex < 0 || currentIndex >= guidedScenes.length - 1) {
       if (currentIndex === guidedScenes.length - 1) onGuidedChange(false);
       return;
@@ -112,7 +123,10 @@ export default function VirtualTourViewer({
 
   const resetView = () => {
     viewerRef.current?.resetZoom();
-    viewerRef.current?.rotate({ yaw: activeScene?.initialYaw ?? 0, pitch: activeScene?.initialPitch ?? 0 });
+    viewerRef.current?.rotate({
+      yaw: activeScene?.initialYaw ?? 0,
+      pitch: activeScene?.initialPitch ?? 0,
+    });
   };
 
   const fullscreen = () => {
@@ -121,14 +135,21 @@ export default function VirtualTourViewer({
 
   return (
     <div className="relative isolate overflow-hidden bg-[#09070b] text-white">
-      <div ref={containerRef} className="relative h-[62vh] min-h-[460px] w-full sm:h-[680px] lg:h-[720px]" />
+      <div
+        ref={containerRef}
+        className="relative h-[62vh] min-h-[460px] w-full sm:h-[680px] lg:h-[720px]"
+      />
 
       {loading && !error && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#09070b]">
           <div className="text-center">
             <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-brand-gold" />
-            <p className="mt-4 text-sm font-semibold text-white/70">Preparing your virtual tour…</p>
-            <p className="mt-1 text-xs text-white/35">Loading the 360° panorama</p>
+            <p className="mt-4 text-sm font-semibold text-white/80">
+              Preparing your virtual tour…
+            </p>
+            <p className="mt-1 text-xs text-white/60">
+              Loading the 360° panorama
+            </p>
           </div>
         </div>
       )}
@@ -136,15 +157,20 @@ export default function VirtualTourViewer({
       {error && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#09070b] p-6 text-center">
           <div className="max-w-md">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-gold">Panorama coming soon</p>
-            <h2 className="mt-3 font-display text-2xl font-bold">This location is ready for its 360° photograph.</h2>
-            <p className="mt-3 text-sm leading-6 text-white/50">
-              
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">
+              Panorama coming soon
+            </p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-white">
+              This location is ready for its 360° photograph.
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              Please check back soon to explore this location.
             </p>
           </div>
         </div>
       )}
 
+      {/* Scene title and fullscreen control */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-3 p-4 sm:p-6">
         <div className="pointer-events-auto min-w-0 max-w-[75%] rounded-xl border border-white/20 bg-[#09070b]/95 px-4 py-3 text-white shadow-xl">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
@@ -164,43 +190,39 @@ export default function VirtualTourViewer({
           <Maximize2 size={17} />
         </button>
       </div>
-        </div>
-        <button
-          type="button"
-          onClick={fullscreen}
-		  className="pointer-events-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-[#09070b]/95 text-white shadow-lg transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400" aria-label="Enter fullscreen"
-        >
-          <Maximize2 size={17} />
-        </button>
-      </div>
 
+      {/* Bottom controls */}
       <div className="absolute inset-x-0 bottom-0 z-10 border-t border-white/15 bg-[#09070b]/95 px-4 pb-4 pt-5 text-white sm:px-6 sm:pb-6">
         <div className="flex items-end justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2">
             <button
               type="button"
               onClick={() => onGuidedChange(!guided)}
-              className="flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-3 text-xs font-bold backdrop-blur-xl transition hover:border-brand-gold/40"
+              className="flex h-10 items-center gap-2 rounded-xl border border-white/20 bg-[#18151c] px-3 text-xs font-bold text-white transition hover:border-amber-400"
             >
               {guided ? <Pause size={14} /> : <Play size={14} fill="currentColor" />}
               {guided ? "Pause Tour" : "Guided Tour"}
             </button>
+
             <button
               type="button"
               onClick={resetView}
-              className="hidden h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-3 text-xs font-bold backdrop-blur-xl transition hover:border-brand-gold/40 sm:flex"
+              className="hidden h-10 items-center gap-2 rounded-xl border border-white/20 bg-[#18151c] px-3 text-xs font-bold text-white transition hover:border-amber-400 sm:flex"
             >
-              <RotateCcw size={14} /> Reset View
+              <RotateCcw size={14} />
+              Reset View
             </button>
-            <span className="hidden items-center gap-2 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/50 sm:flex">
-              <VolumeX size={14} /> No audio
+
+            <span className="hidden items-center gap-2 rounded-xl border border-white/15 bg-black/50 px-3 py-2 text-xs text-slate-300 sm:flex">
+              <VolumeX size={14} />
+              No audio
             </span>
           </div>
 
           <button
             type="button"
             onClick={() => setLocationOpen((value) => !value)}
-            className="flex h-10 items-center gap-2 rounded-xl border border-brand-gold/25 bg-brand-gold/10 px-3 text-xs font-bold text-brand-gold backdrop-blur-xl sm:hidden"
+            className="flex h-10 items-center gap-2 rounded-xl border border-amber-400/40 bg-[#18151c] px-3 text-xs font-bold text-amber-400 sm:hidden"
           >
             Explore Locations
           </button>
@@ -224,14 +246,23 @@ export default function VirtualTourViewer({
         </div>
       </div>
 
+      {/* Mobile location menu */}
       {locationOpen && (
         <div className="absolute inset-x-4 bottom-20 z-30 rounded-2xl border border-white/20 bg-[#09070b] p-3 text-white shadow-2xl sm:hidden">
           <div className="mb-2 flex items-center justify-between px-2">
-            <span className="text-xs font-bold uppercase tracking-[0.16em] text-white">Explore Campus</span>
-            <button type="button" onClick={() => setLocationOpen(false)} aria-label="Close locations">
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-white">
+              Explore Campus
+            </span>
+            <button
+              type="button"
+              onClick={() => setLocationOpen(false)}
+              aria-label="Close locations"
+              className="rounded-lg p-1"
+            >
               <X size={16} className="text-white/80 hover:text-white" />
             </button>
           </div>
+
           <div className="grid max-h-60 gap-1 overflow-y-auto">
             {scenes.map((scene) => (
               <button
@@ -241,7 +272,11 @@ export default function VirtualTourViewer({
                   onSceneChange(scene.id);
                   setLocationOpen(false);
                 }}
-                className={`rounded-xl px-3 py-3 text-left text-sm font-semibold ${scene.id === activeScene?.id ? "bg-amber-400 text-[#09070b]" : "text-white hover:bg-white/10"}`}
+                className={`rounded-xl px-3 py-3 text-left text-sm font-semibold ${
+                  scene.id === activeScene?.id
+                    ? "bg-amber-400 text-[#09070b]"
+                    : "text-white hover:bg-white/10"
+                }`}
               >
                 {scene.title}
               </button>
@@ -250,39 +285,36 @@ export default function VirtualTourViewer({
         </div>
       )}
 
-    {info && (
-  <div className="absolute bottom-28 left-4 right-4 z-30 max-h-[40%] overflow-y-auto rounded-2xl border border-amber-400/40 bg-[#09070b] p-5 text-white shadow-2xl sm:left-6 sm:right-auto sm:max-w-sm">
-    <div className="flex items-start justify-between gap-5">
-      <div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white">
-          Explore
-        </p>
+      {/* Hotspot information popup */}
+      {info && (
+        <div className="absolute bottom-28 left-4 right-4 z-30 max-h-[40%] overflow-y-auto rounded-2xl border border-amber-400/40 bg-[#09070b] p-5 text-white shadow-2xl sm:left-6 sm:right-auto sm:max-w-sm">
+          <div className="flex items-start justify-between gap-5">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-400">
+                Explore
+              </p>
+              <h3 className="mt-1 font-display text-lg font-bold !text-white">
+                {info.title}
+              </h3>
+              <p className="mt-2 text-sm leading-6 !text-slate-200">
+                {info.description}
+              </p>
+            </div>
 
-        <h3 className="mt-1 font-display text-lg font-bold !text-white">
-          {info.title}
-        </h3>
-
-        <p className="mt-2 text-sm leading-6 !text-white">
-          {info.description}
-        </p>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => setInfo(null)}
-        aria-label="Close information"
-        className="shrink-0 rounded-lg p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
-      >
-        <X size={16} />
-      </button>
+            <button
+              type="button"
+              onClick={() => setInfo(null)}
+              aria-label="Close information"
+              className="shrink-0 rounded-lg p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-)}
-       </div>
-    );
+  );
 }
-
-
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => {
@@ -293,6 +325,7 @@ function escapeHtml(value: string) {
       "'": "&#39;",
       '"': "&quot;",
     };
+
     return entities[character] ?? character;
   });
 }
