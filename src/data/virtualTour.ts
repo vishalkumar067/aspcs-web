@@ -40,8 +40,8 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Reception",
     description: "Explore the welcoming entrance to our school campus.",
     category: "Campus",
-    panoramaUrl: "images/reception.jpg.jpeg",
-    thumbnailUrl:"images/reception.jpg.jpeg",,
+    panoramaUrl: "/images/reception.jpg.jpeg",
+thumbnailUrl: "/images/reception.jpg.jpeg",
     hotspots: [],
   },
   {
