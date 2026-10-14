@@ -17,6 +17,15 @@ type Props = {
   onGuidedChange: (value: boolean) => void;
 };
 
+// Optional extra field a hotspot can carry to open a video instead of info/scene.
+type TourHotspot = TourScene["hotspots"][number] & { videoUrl?: string };
+
+const ROBOTICS_VIDEO_URL =
+  "https://player.cloudinary.com/embed/?cloud_name=dug0g6tli&public_id=robotics_lab_acharya_shri_sudarshan_patna_central_school_1_zid2b0&fluid=true&controls=true";
+
+// Matches "AI & Robotics Lab", "ai-robotics-lab", "ai_robotics_lab", "robotics lab", etc.
+const ROBOTICS_REGEX = /robotics[\s_&-]*lab/i;
+
 export default function VirtualTourViewer({
   scenes,
   activeScene,
@@ -25,20 +34,36 @@ export default function VirtualTourViewer({
   guidedScenes,
   onGuidedChange,
 }: Props) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Viewer | null>(null);
   const guidedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Keep latest callbacks in refs so the viewer isn't rebuilt when the parent re-renders.
+  const onSceneChangeRef = useRef(onSceneChange);
+  const onGuidedChangeRef = useRef(onGuidedChange);
+  useEffect(() => {
+    onSceneChangeRef.current = onSceneChange;
+    onGuidedChangeRef.current = onGuidedChange;
+  }, [onSceneChange, onGuidedChange]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [info, setInfo] = useState<{ title: string; description: string } | null>(null);
   const [locationOpen, setLocationOpen] = useState(false);
-  const [videoOpen, setVideoOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoTitle, setVideoTitle] = useState("AI & Robotics Lab");
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const videoOpen = videoUrl !== null;
+
+  // Build the viewer for the active scene
   useEffect(() => {
     if (!containerRef.current || !activeScene) return;
 
     setLoading(true);
     setError(false);
+    setInfo(null);
 
     const viewer = new Viewer({
       container: containerRef.current,
@@ -54,7 +79,7 @@ export default function VirtualTourViewer({
 
     viewerRef.current = viewer;
 
-    const markersPlugin = viewer.getPlugin(MarkersPlugin);
+    const markersPlugin = viewer.getPlugin(MarkersPlugin) as MarkersPlugin | null;
     if (markersPlugin) {
       markersPlugin.clearMarkers();
 
@@ -62,7 +87,9 @@ export default function VirtualTourViewer({
         markersPlugin.addMarker({
           id: hotspot.id,
           position: { yaw: hotspot.yaw, pitch: hotspot.pitch },
-          html: `<button type="button" aria-label="${escapeHtml(hotspot.label)}" class="aspcs-tour-hotspot"><span></span></button>`,
+          html: `<button type="button" aria-label="${escapeHtml(
+            hotspot.label,
+          )}" class="aspcs-tour-hotspot"><span></span></button>`,
           tooltip: hotspot.label,
           data: hotspot,
           anchor: "center center",
@@ -70,24 +97,23 @@ export default function VirtualTourViewer({
       });
 
       markersPlugin.addEventListener("select-marker", (event) => {
-        const marker = event.marker;
-        const hotspot = marker.config.data as
-          | (typeof activeScene.hotspots)[number]
-          | undefined;
-
+        const hotspot = event.marker.config.data as TourHotspot | undefined;
         if (!hotspot) return;
 
-        // Open the Robotics Lab video for matching hotspot IDs/labels.
         const hotspotName = `${hotspot.id} ${hotspot.label} ${hotspot.description ?? ""}`;
-        const isRoboticsLab = /ai[\s&-]*robotics[\s-]*lab|robotics[\s-]*lab/i.test(
-          hotspotName,
-        );
 
-        if (isRoboticsLab) {
+        if (hotspot.videoUrl) {
+          // Explicit video hotspot
           setInfo(null);
-          setVideoOpen(true);
+          setVideoTitle(hotspot.label);
+          setVideoUrl(hotspot.videoUrl);
+        } else if (ROBOTICS_REGEX.test(hotspotName)) {
+          // Robotics Lab hotspot
+          setInfo(null);
+          setVideoTitle("AI & Robotics Lab");
+          setVideoUrl(ROBOTICS_VIDEO_URL);
         } else if (hotspot.type === "scene" && hotspot.targetSceneId) {
-          onSceneChange(hotspot.targetSceneId);
+          onSceneChangeRef.current(hotspot.targetSceneId);
         } else if (hotspot.description) {
           setInfo({
             title: hotspot.label,
@@ -107,47 +133,86 @@ export default function VirtualTourViewer({
       viewer.destroy();
       viewerRef.current = null;
     };
-  }, [activeScene, onSceneChange]);
+  }, [activeScene]);
 
+  // Guided tour auto-advance (starts only after the panorama has loaded)
   useEffect(() => {
     if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
-    if (videoOpen || !guided || guidedScenes.length === 0 || !activeScene) return;
+    if (videoOpen || loading || error) return;
+    if (!guided || guidedScenes.length === 0 || !activeScene) return;
 
-    const currentIndex = guidedScenes.findIndex(
-      (scene) => scene.id === activeScene.id,
-    );
+    const currentIndex = guidedScenes.findIndex((scene) => scene.id === activeScene.id);
 
-    if (currentIndex < 0 || currentIndex >= guidedScenes.length - 1) {
-      if (currentIndex === guidedScenes.length - 1) onGuidedChange(false);
-      return;
+    if (currentIndex < 0) return;
+
+    if (currentIndex >= guidedScenes.length - 1) {
+      // Last scene: let it be viewed for a while, then end the tour
+      guidedTimerRef.current = setTimeout(() => {
+        onGuidedChangeRef.current(false);
+      }, 9000);
+    } else {
+      guidedTimerRef.current = setTimeout(() => {
+        onSceneChangeRef.current(guidedScenes[currentIndex + 1].id);
+      }, 9000);
     }
-
-    guidedTimerRef.current = setTimeout(() => {
-      onSceneChange(guidedScenes[currentIndex + 1].id);
-    }, 9000);
 
     return () => {
       if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
     };
-  }, [activeScene, guided, guidedScenes, onGuidedChange, onSceneChange, videoOpen]);
+  }, [activeScene, guided, guidedScenes, videoOpen, loading, error]);
+
+  // Track fullscreen state so the viewer can fill the screen
+  useEffect(() => {
+    const onChange = () => {
+      setIsFullscreen(document.fullscreenElement === wrapperRef.current);
+      // Let Photo Sphere Viewer recompute its size after the layout change
+      setTimeout(() => viewerRef.current?.resize({ width: "100%", height: "100%" } as never), 100);
+    };
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  // Close video with Escape
+  useEffect(() => {
+    if (!videoOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setVideoUrl(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [videoOpen]);
 
   const resetView = () => {
-    viewerRef.current?.resetZoom();
+    viewerRef.current?.zoom(activeScene?.initialZoom ?? 50);
     viewerRef.current?.rotate({
       yaw: activeScene?.initialYaw ?? 0,
       pitch: activeScene?.initialPitch ?? 0,
     });
   };
 
-  const fullscreen = () => {
-    containerRef.current?.requestFullscreen?.();
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.();
+    } else {
+      // Fullscreen the whole wrapper so overlays + video modal stay visible
+      wrapperRef.current?.requestFullscreen?.();
+    }
   };
 
   return (
-    <div className="relative isolate overflow-hidden bg-[#09070b] text-white">
+    <div
+      ref={wrapperRef}
+      className={`relative isolate overflow-hidden bg-[#09070b] text-white ${
+        isFullscreen ? "h-screen w-screen" : ""
+      }`}
+    >
       <div
         ref={containerRef}
-        className="relative h-[62vh] min-h-[460px] w-full sm:h-[680px] lg:h-[720px]"
+        className={`relative w-full ${
+          isFullscreen
+            ? "h-full"
+            : "h-[62vh] min-h-[460px] sm:h-[680px] lg:h-[720px]"
+        }`}
       />
 
       {loading && !error && (
@@ -157,9 +222,7 @@ export default function VirtualTourViewer({
             <p className="mt-4 text-sm font-semibold text-white/80">
               Preparing your virtual tour…
             </p>
-            <p className="mt-1 text-xs text-white/60">
-              Loading the 360° panorama
-            </p>
+            <p className="mt-1 text-xs text-white/60">Loading the 360° panorama</p>
           </div>
         </div>
       )}
@@ -193,9 +256,9 @@ export default function VirtualTourViewer({
 
         <button
           type="button"
-          onClick={fullscreen}
+          onClick={toggleFullscreen}
           className="pointer-events-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-[#09070b]/95 text-white shadow-lg transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-          aria-label="Enter fullscreen"
+          aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
         >
           <Maximize2 size={17} />
         </button>
@@ -295,14 +358,14 @@ export default function VirtualTourViewer({
         </div>
       )}
 
-      {/* AI & Robotics Lab video popup */}
-      {videoOpen && (
+      {/* Video popup */}
+      {videoUrl && (
         <div
           className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-3 backdrop-blur-sm sm:p-6"
-          onClick={() => setVideoOpen(false)}
+          onClick={() => setVideoUrl(null)}
           role="dialog"
           aria-modal="true"
-          aria-label="AI and Robotics Lab video"
+          aria-label={`${videoTitle} video`}
         >
           <div
             className="relative w-full max-w-5xl overflow-hidden rounded-2xl border border-amber-400/40 bg-[#09070b] shadow-2xl"
@@ -314,13 +377,13 @@ export default function VirtualTourViewer({
                   Explore Our Innovation
                 </p>
                 <h3 className="mt-1 text-base font-bold text-white sm:text-xl">
-                  AI & Robotics Lab
+                  {videoTitle}
                 </h3>
               </div>
 
               <button
                 type="button"
-                onClick={() => setVideoOpen(false)}
+                onClick={() => setVideoUrl(null)}
                 aria-label="Close video"
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 text-white transition hover:border-amber-400 hover:text-amber-400"
               >
@@ -330,17 +393,25 @@ export default function VirtualTourViewer({
 
             <div className="relative aspect-video w-full bg-black">
               <iframe
-                key="robotics-lab-video"
-                src="https://player.cloudinary.com/embed/?cloud_name=dug0g6tli&public_id=robotics_lab_acharya_shri_sudarshan_patna_central_school_1_zid2b0"
-                title="AI & Robotics Lab - Acharya Shree Sudarshan Patna Central School"
-                className="absolute inset-0 h-full w-full"
+                key={videoUrl}
+                src={videoUrl}
+                title={`${videoTitle} - Acharya Shree Sudarshan Patna Central School`}
+                className="absolute inset-0 h-full w-full border-0"
                 allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
                 allowFullScreen
               />
             </div>
 
-            <div className="px-4 py-3 text-center text-xs text-slate-400 sm:text-sm">
-              Acharya Shree Sudarshan Patna Central School
+            <div className="flex flex-col items-center justify-between gap-1 px-4 py-3 text-xs text-slate-400 sm:flex-row sm:text-sm">
+              <span>Acharya Shree Sudarshan Patna Central School</span>
+              <a
+                href={videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-amber-400 hover:underline"
+              >
+                Video not loading? Open in a new tab
+              </a>
             </div>
           </div>
         </div>
