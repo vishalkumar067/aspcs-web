@@ -31,8 +31,8 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Main Gate",
     description: "Begin your virtual journey through the ASPCS campus.",
     category: "Campus",
-    panoramaUrl: "/images/reception.jpg.jpeg",
-    thumbnailUrl: "/images/reception.jpg.jpeg",
+    panoramaUrl: "/images/MAINGATE.png",
+    thumbnailUrl: "/images/MAINGATE.png",
     hotspots: [],
   },
   {
@@ -85,8 +85,8 @@ export const TOUR_SCENES: TourScene[] = [
     title: "STEAM & Innovation",
     description: "A space for creativity, experimentation and problem-solving.",
     category: "Innovation",
-    panoramaUrl: "/virtual-tour/panoramas/steam-lab.jpg",
-    thumbnailUrl: "/virtual-tour/thumbnails/steam-lab.jpg",
+    panoramaUrl: "/images/STEAM.png",
+    thumbnailUrl: "/images/STEAM.png",
     hotspots: [
       {
         // The viewer opens the Cloudinary video for any hotspot whose
