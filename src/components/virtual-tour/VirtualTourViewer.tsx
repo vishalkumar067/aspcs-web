@@ -1,14 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Maximize2, Pause, Play, RotateCcw, VolumeX, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  AlertTriangle,
+  Maximize2,
+  Pause,
+  Play,
+  RefreshCw,
+  RotateCcw,
+  VolumeX,
+  X,
+} from "lucide-react";
 import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/core/index.css";
 import "@photo-sphere-viewer/markers-plugin/index.css";
-import type { TourScene } from "@/data/virtualTour";
-import RoboticsLabVideo from "@/components/virtual-tour/RoboticsLabVideo"; // adjust to where you saved the file
-
+import type { TourHotspot, TourScene } from "@/data/virtualTour";
 
 type Props = {
   scenes: TourScene[];
@@ -17,16 +24,29 @@ type Props = {
   guided: boolean;
   guidedScenes: TourScene[];
   onGuidedChange: (value: boolean) => void;
+  /** Reports whether a scene's panorama loaded ("ready") or failed ("error"). */
+  onSceneStatus?: (id: string, status: "ready" | "error") => void;
 };
 
-// Optional extra field a hotspot can carry to open a video instead of info/scene.
-type TourHotspot = TourScene["hotspots"][number] & { videoUrl?: string };
+type InfoCard = {
+  title: string;
+  category: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  videoUrl?: string;
+  actionLabel?: string;
+};
 
-const ROBOTICS_VIDEO_URL =
-  "https://player.cloudinary.com/embed/?cloud_name=dug0g6tli&public_id=robotics_lab_acharya_shri_sudarshan_patna_central_school_1_zid2b0&fluid=true&controls=true";
+type Status = "loading" | "ready" | "error";
+type VideoState = "loading" | "loaded" | "error";
+type Media = { url: string; title: string } | null;
 
-// Matches "AI & Robotics Lab", "ai-robotics-lab", "ai_robotics_lab", "robotics lab", etc.
-const ROBOTICS_REGEX = /robotics[\s_&-]*lab/i;
+const PANORAMA_TIMEOUT_MS = 25000; // stop spinning forever on a dead network
+const VIDEO_TIMEOUT_MS = 15000;
+const GUIDED_DWELL_MS = 9000; // time spent on a working scene
+const GUIDED_SKIP_MS = 2500; // time spent on a failed scene before skipping it
+const GUIDED_VIDEO_DWELL_MS = 30000; // video scenes need longer than a still panorama
 
 export default function VirtualTourViewer({
   scenes,
@@ -35,218 +55,409 @@ export default function VirtualTourViewer({
   guided,
   guidedScenes,
   onGuidedChange,
+  onSceneStatus,
 }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Viewer | null>(null);
   const guidedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeMediaRef = useRef<HTMLButtonElement>(null);
 
-  // Keep latest callbacks in refs so the viewer isn't rebuilt when the parent re-renders.
+  // Latest callbacks live in refs, so a parent re-render never rebuilds the viewer.
   const onSceneChangeRef = useRef(onSceneChange);
   const onGuidedChangeRef = useRef(onGuidedChange);
+  const onSceneStatusRef = useRef(onSceneStatus);
   useEffect(() => {
     onSceneChangeRef.current = onSceneChange;
     onGuidedChangeRef.current = onGuidedChange;
-  }, [onSceneChange, onGuidedChange]);
+    onSceneStatusRef.current = onSceneStatus;
+  }, [onSceneChange, onGuidedChange, onSceneStatus]);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [info, setInfo] = useState<{ title: string; description: string } | null>(null);
+  // Panorama state (owned by the viewer effect)
+  const [status, setStatus] = useState<Status>("loading");
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
+
+  // UI state (never touches the viewer lifecycle)
+  const [info, setInfo] = useState<InfoCard | null>(null);
   const [locationOpen, setLocationOpen] = useState(false);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [videoTitle, setVideoTitle] = useState("AI & Robotics Lab");
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const videoOpen = videoUrl !== null;
+  // Media preview state (independent from the viewer)
+  const [media, setMedia] = useState<Media>(null);
+  const [videoState, setVideoState] = useState<VideoState>("loading");
+  const [videoKey, setVideoKey] = useState(0);
+  const mediaUrl = media?.url ?? null;
+  const mediaOpen = media !== null;
 
-  // Build the viewer for the active scene
+  // Video scenes (a flat video shown in place of a 360° photo)
+  const [sceneVideoLoaded, setSceneVideoLoaded] = useState(false);
+  const activeSceneId = activeScene?.id;
   useEffect(() => {
-    if (!containerRef.current || !activeScene) return;
+    setSceneVideoLoaded(false);
+  }, [activeSceneId]);
 
-    setLoading(true);
-    setError(false);
+  // Ask Photo Sphere Viewer to re-measure its container (safe if the method is missing).
+  const refreshViewerSize = useCallback(() => {
+    const viewer = viewerRef.current as unknown as { autoSize?: () => void } | null;
+    try {
+      viewer?.autoSize?.();
+    } catch {
+      /* ignore: viewer may be mid-destroy */
+    }
+  }, []);
+
+  /* ------------------------------------------------------------------ */
+  /* Viewer lifecycle: one viewer per (scene, retry), destroyed once.    */
+  /* Depends ONLY on the scene and retry counter, never on media state.  */
+  /* ------------------------------------------------------------------ */
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !activeScene) return;
+    const scene = activeScene; // const keeps the narrowing inside callbacks
+
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let viewer: Viewer | null = null;
+
+    setStatus("loading");
+    setErrorDetail(null);
     setInfo(null);
 
-    const viewer = new Viewer({
-      container: containerRef.current,
-      panorama: activeScene.panoramaUrl,
-      navbar: false,
-      defaultYaw: activeScene.initialYaw ?? 0,
-      defaultPitch: activeScene.initialPitch ?? 0,
-      defaultZoomLvl: activeScene.initialZoom ?? 50,
-      touchmoveTwoFingers: false,
-      mousemove: true,
-      plugins: [[MarkersPlugin, { markers: [] }]],
-    });
+    const fail = (detail: string) => {
+      if (cancelled) return; // stale callback from a previous scene
+      if (timeoutId) clearTimeout(timeoutId);
+      setStatus("error");
+      setErrorDetail(detail);
+      onSceneStatusRef.current?.(scene.id, "error");
+    };
 
-    viewerRef.current = viewer;
-
-    const markersPlugin = viewer.getPlugin(MarkersPlugin) as MarkersPlugin | null;
-    if (markersPlugin) {
-      markersPlugin.clearMarkers();
-
-      activeScene.hotspots.forEach((hotspot) => {
-        markersPlugin.addMarker({
-          id: hotspot.id,
-          position: { yaw: hotspot.yaw, pitch: hotspot.pitch },
-          html: `<button type="button" aria-label="${escapeHtml(
-            hotspot.label,
-          )}" class="aspcs-tour-hotspot"><span></span></button>`,
-          tooltip: hotspot.label,
-          data: hotspot,
-          anchor: "center center",
-        });
-      });
-
-      markersPlugin.addEventListener("select-marker", (event) => {
-        const hotspot = event.marker.config.data as TourHotspot | undefined;
-        if (!hotspot) return;
-
-        const hotspotName = `${hotspot.id} ${hotspot.label} ${hotspot.description ?? ""}`;
-
-        if (hotspot.videoUrl) {
-          // Explicit video hotspot
-          setInfo(null);
-          setVideoTitle(hotspot.label);
-          setVideoUrl(hotspot.videoUrl);
-        } else if (ROBOTICS_REGEX.test(hotspotName)) {
-          // Robotics Lab hotspot
-          setInfo(null);
-          setVideoTitle("AI & Robotics Lab");
-          setVideoUrl(ROBOTICS_VIDEO_URL);
-        } else if (hotspot.type === "scene" && hotspot.targetSceneId) {
-          onSceneChangeRef.current(hotspot.targetSceneId);
-        } else if (hotspot.description) {
-          setInfo({
-            title: hotspot.label,
-            description: hotspot.description,
-          });
-        }
-      });
+    if (scene.videoUrl) {
+      // Video scene: Photo Sphere Viewer is not needed, the iframe below plays it.
+      setStatus("ready");
+      onSceneStatusRef.current?.(scene.id, "ready");
+      return () => {
+        cancelled = true;
+      };
     }
 
-    viewer.addEventListener("ready", () => setLoading(false));
-    viewer.addEventListener("panorama-error", () => {
-      setLoading(false);
-      setError(true);
-    });
+    const panorama = scene.panoramaUrl;
+    if (!panorama) {
+      fail("No panorama is configured for this location.");
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    try {
+      viewer = new Viewer({
+        container,
+        panorama,
+        navbar: false,
+        defaultYaw: activeScene.initialYaw ?? 0,
+        defaultPitch: activeScene.initialPitch ?? 0,
+        defaultZoomLvl: activeScene.initialZoom ?? 50,
+        touchmoveTwoFingers: false,
+        mousemove: true,
+        plugins: [[MarkersPlugin, { markers: [] }]],
+      });
+      viewerRef.current = viewer;
+
+      const markersPlugin = viewer.getPlugin(MarkersPlugin) as MarkersPlugin | null;
+      if (markersPlugin) {
+        markersPlugin.clearMarkers();
+
+        activeScene.hotspots.forEach((hotspot) => {
+          markersPlugin.addMarker({
+            id: hotspot.id,
+            position: { yaw: hotspot.yaw, pitch: hotspot.pitch },
+            html: `<button type="button" aria-label="${escapeHtml(
+              hotspot.label,
+            )}" class="aspcs-tour-hotspot"><span></span></button>`,
+            tooltip: hotspot.label,
+            data: hotspot,
+            anchor: "center center",
+          });
+        });
+
+        markersPlugin.addEventListener("select-marker", (event) => {
+          if (cancelled) return;
+          const hotspot = event.marker.config.data as TourHotspot | undefined;
+          if (!hotspot) return;
+
+          if (hotspot.type === "scene" && hotspot.targetSceneId) {
+            onSceneChangeRef.current(hotspot.targetSceneId);
+          } else if (hotspot.description || hotspot.image || hotspot.videoUrl) {
+            setInfo({
+              title: hotspot.label,
+              category: scene.category,
+              description: hotspot.description,
+              image: hotspot.image,
+              imageAlt: hotspot.imageAlt,
+              videoUrl: hotspot.videoUrl,
+              actionLabel: hotspot.actionLabel,
+            });
+          }
+        });
+      }
+
+      viewer.addEventListener("ready", () => {
+        if (cancelled) return;
+        if (timeoutId) clearTimeout(timeoutId);
+        setStatus("ready");
+        onSceneStatusRef.current?.(scene.id, "ready");
+      });
+
+      viewer.addEventListener("panorama-error", (event) => {
+        console.error(
+          `[VirtualTour] Failed to load panorama for "${scene.id}"`,
+          event,
+        );
+        fail(describeError(event));
+      });
+
+      timeoutId = setTimeout(
+        () => fail("Loading timed out. Please check your connection."),
+        PANORAMA_TIMEOUT_MS,
+      );
+    } catch (err) {
+      console.error(`[VirtualTour] Viewer failed to start for "${activeScene.id}"`, err);
+      fail(describeError(err));
+    }
 
     return () => {
-      viewer.destroy();
-      viewerRef.current = null;
+      cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      if (viewer) {
+        try {
+          viewer.destroy();
+        } catch (err) {
+          console.warn("[VirtualTour] Error while destroying viewer", err);
+        }
+      }
+      if (viewerRef.current === viewer) viewerRef.current = null;
     };
-  }, [activeScene]);
+  }, [activeScene, retryKey]);
 
-  // Guided tour auto-advance (starts only after the panorama has loaded)
+  /* ------------------------------------------------------------------ */
+  /* Guided tour: dwell on good scenes, skip failed ones, no retries.    */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
     if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
-    if (videoOpen || loading || error) return;
-    if (!guided || guidedScenes.length === 0 || !activeScene) return;
+    if (!guided || mediaOpen || status === "loading") return;
+    if (!activeScene || guidedScenes.length === 0) return;
 
-    const currentIndex = guidedScenes.findIndex((scene) => scene.id === activeScene.id);
+    const index = guidedScenes.findIndex((scene) => scene.id === activeScene.id);
+    if (index < 0) return;
 
-    if (currentIndex < 0) return;
+    const isLast = index >= guidedScenes.length - 1;
+    const delay =
+      status === "error"
+        ? GUIDED_SKIP_MS
+        : activeScene.videoUrl
+          ? GUIDED_VIDEO_DWELL_MS
+          : GUIDED_DWELL_MS;
 
-    if (currentIndex >= guidedScenes.length - 1) {
-      // Last scene: let it be viewed for a while, then end the tour
-      guidedTimerRef.current = setTimeout(() => {
+    guidedTimerRef.current = setTimeout(() => {
+      if (isLast) {
         onGuidedChangeRef.current(false);
-      }, 9000);
-    } else {
-      guidedTimerRef.current = setTimeout(() => {
-        onSceneChangeRef.current(guidedScenes[currentIndex + 1].id);
-      }, 9000);
-    }
+      } else {
+        onSceneChangeRef.current(guidedScenes[index + 1].id);
+      }
+    }, delay);
 
     return () => {
       if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
     };
-  }, [activeScene, guided, guidedScenes, videoOpen, loading, error]);
+  }, [activeScene, guided, guidedScenes, mediaOpen, status]);
 
-  // Track fullscreen state so the viewer can fill the screen
+  /* ------------------------------------------------------------------ */
+  /* Fullscreen                                                          */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
     const onChange = () => {
       setIsFullscreen(document.fullscreenElement === wrapperRef.current);
-      // Let Photo Sphere Viewer recompute its size after the layout change
-      setTimeout(() => viewerRef.current?.resize({ width: "100%", height: "100%" } as never), 100);
+      requestAnimationFrame(refreshViewerSize);
     };
     document.addEventListener("fullscreenchange", onChange);
     return () => document.removeEventListener("fullscreenchange", onChange);
-  }, []);
-
-  // Close video with Escape
-  useEffect(() => {
-    if (!videoOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setVideoUrl(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [videoOpen]);
-
-  const resetView = () => {
-    viewerRef.current?.zoom(activeScene?.initialZoom ?? 50);
-    viewerRef.current?.rotate({
-      yaw: activeScene?.initialYaw ?? 0,
-      pitch: activeScene?.initialPitch ?? 0,
-    });
-  };
+  }, [refreshViewerSize]);
 
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
       document.exitFullscreen?.();
     } else {
-      // Fullscreen the whole wrapper so overlays + video modal stay visible
+      // Fullscreen the whole wrapper so controls and the media preview stay visible.
       wrapperRef.current?.requestFullscreen?.();
     }
   };
 
+  /* ------------------------------------------------------------------ */
+  /* Media preview: focus handling, timeout, resize on close, Escape.    */
+  /* ------------------------------------------------------------------ */
+  useEffect(() => {
+    if (!mediaOpen) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeMediaRef.current?.focus();
+
+    return () => {
+      const target =
+        previouslyFocused && document.contains(previouslyFocused)
+          ? previouslyFocused
+          : wrapperRef.current;
+      target?.focus?.();
+      // The panorama must re-measure after the overlay goes away.
+      requestAnimationFrame(refreshViewerSize);
+    };
+  }, [mediaOpen, refreshViewerSize]);
+
+  useEffect(() => {
+    if (!mediaUrl) return;
+    setVideoState("loading");
+    const timer = setTimeout(
+      () => setVideoState((state) => (state === "loading" ? "error" : state)),
+      VIDEO_TIMEOUT_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [mediaUrl, videoKey]);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (media) setMedia(null);
+      else if (info) setInfo(null);
+      else if (locationOpen) setLocationOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [media, info, locationOpen]);
+
+  /* ------------------------------------------------------------------ */
+  /* Actions                                                             */
+  /* ------------------------------------------------------------------ */
+  const resetView = () => {
+    const viewer = viewerRef.current;
+    if (!viewer || status !== "ready") return;
+    viewer.zoom(activeScene?.initialZoom ?? 50);
+    viewer.rotate({
+      yaw: activeScene?.initialYaw ?? 0,
+      pitch: activeScene?.initialPitch ?? 0,
+    });
+  };
+
+  const retryPanorama = () => setRetryKey((value) => value + 1);
+
+  /* ------------------------------------------------------------------ */
+  /* Render. Stacking: viewer < overlays (z-20) < controls (z-30)        */
+  /* < popups (z-40) < media preview (z-50).                             */
+  /* ------------------------------------------------------------------ */
   return (
     <div
       ref={wrapperRef}
-      className={`relative isolate overflow-hidden bg-[#09070b] text-white ${
+      tabIndex={-1}
+      className={`relative isolate overflow-hidden bg-[#09070b] text-white outline-none ${
         isFullscreen ? "h-screen w-screen" : ""
       }`}
     >
       <div
         ref={containerRef}
-        className={`relative w-full ${
-          isFullscreen
-            ? "h-full"
-            : "h-[62vh] min-h-[460px] sm:h-[680px] lg:h-[720px]"
-        }`}
+        className={`relative w-full transition-opacity duration-500 motion-reduce:transition-none ${
+          status === "ready" ? "opacity-100" : "opacity-0"
+        } ${isFullscreen ? "h-full" : "h-[62vh] min-h-[460px] sm:h-[680px] lg:h-[720px]"}`}
       />
 
-      {loading && !error && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#09070b]">
-          <div className="text-center">
+      {/* Video scene: sits under the controls so navigation stays usable */}
+      {activeScene?.videoUrl && (
+        <div className="absolute inset-0 z-10 flex flex-col bg-black px-3 pb-24 pt-24 sm:px-6 sm:pb-40">
+          <div className="relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-amber-400/30 bg-black">
+            <iframe
+              key={activeScene.id}
+              src={activeScene.videoUrl}
+              title={`${activeScene.title} - Acharya Shree Sudarshan Patna Central School`}
+              className="absolute inset-0 h-full w-full border-0"
+              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+              allowFullScreen
+              onLoad={() => setSceneVideoLoaded(true)}
+            />
+            {!sceneVideoLoaded && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/70">
+                <div className="text-center" role="status" aria-live="polite">
+                  <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-brand-gold" />
+                  <p className="mt-3 text-xs font-semibold text-white/80">Loading video…</p>
+                </div>
+              </div>
+            )}
+          </div>
+          <a
+            href={activeScene.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 self-center text-xs font-semibold text-amber-400 hover:underline"
+          >
+            Video not loading? Open in a new tab
+          </a>
+        </div>
+      )}
+
+      {/* Loading overlay (sits UNDER the controls, so navigation stays usable) */}
+      {status === "loading" && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#09070b] px-6 pb-44 pt-24 sm:pb-40">
+          <div className="text-center" role="status" aria-live="polite">
             <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-brand-gold" />
             <p className="mt-4 text-sm font-semibold text-white/80">
-              Preparing your virtual tour…
+              Loading 360° panorama…
             </p>
-            <p className="mt-1 text-xs text-white/60">Loading the 360° panorama</p>
+            {activeScene && (
+              <p className="mt-1 text-xs text-white/60">{activeScene.title}</p>
+            )}
           </div>
         </div>
       )}
 
-      {error && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#09070b] p-6 text-center">
-          <div className="max-w-md">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">
-              Panorama coming soon
+      {/* Panorama unavailable overlay (also UNDER the controls) */}
+      {status === "error" && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#09070b] px-6 pb-44 pt-28 text-center sm:pb-40">
+          <div className="max-w-md" role="alert">
+            <AlertTriangle className="mx-auto text-amber-400" size={28} />
+            <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
+              {activeScene?.category}
             </p>
-            <h2 className="mt-3 font-display text-2xl font-bold text-white">
-              This location is ready for its 360° photograph.
+            <h2 className="mt-1 font-display text-2xl font-bold text-white">
+              {activeScene?.title}
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-300">
-              Please check back soon to explore this location.
+              This 360° panorama is temporarily unavailable. You can continue exploring
+              other campus locations.
             </p>
+            {errorDetail && (
+              <p className="mt-2 line-clamp-2 text-xs text-slate-500">
+                Details: {errorDetail}
+              </p>
+            )}
+            <div className="mt-5 flex flex-col items-center gap-2">
+              <button
+                type="button"
+                onClick={retryPanorama}
+                className="inline-flex h-10 items-center gap-2 rounded-xl border border-amber-400 bg-amber-400 px-4 text-xs font-bold text-[#09070b] transition hover:bg-amber-300"
+              >
+                <RefreshCw size={14} />
+                Retry
+              </button>
+              <p className="text-xs text-slate-400">
+                <span className="hidden sm:inline">
+                  Choose another location from the list below.
+                </span>
+                <span className="sm:hidden">
+                  Tap &ldquo;Explore Locations&rdquo; to choose another place.
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       )}
 
       {/* Scene title and fullscreen control */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-3 p-4 sm:p-6">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between gap-3 p-4 sm:p-6">
         <div className="pointer-events-auto min-w-0 max-w-[75%] rounded-xl border border-white/20 bg-[#09070b]/95 px-4 py-3 text-white shadow-xl">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
             {activeScene?.category}
@@ -266,8 +477,8 @@ export default function VirtualTourViewer({
         </button>
       </div>
 
-      {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-0 z-10 border-t border-white/15 bg-[#09070b]/95 px-4 pb-4 pt-5 text-white sm:px-6 sm:pb-6">
+      {/* Bottom controls: always above the loading/error overlays */}
+      <div className="absolute inset-x-0 bottom-0 z-30 border-t border-white/15 bg-[#09070b]/95 px-4 pb-4 pt-5 text-white sm:px-6 sm:pb-6">
         <div className="flex items-end justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2">
             <button
@@ -282,7 +493,8 @@ export default function VirtualTourViewer({
             <button
               type="button"
               onClick={resetView}
-              className="hidden h-10 items-center gap-2 rounded-xl border border-white/20 bg-[#18151c] px-3 text-xs font-bold text-white transition hover:border-amber-400 sm:flex"
+              disabled={status !== "ready" || Boolean(activeScene?.videoUrl)}
+              className="hidden h-10 items-center gap-2 rounded-xl border border-white/20 bg-[#18151c] px-3 text-xs font-bold text-white transition hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-40 sm:flex"
             >
               <RotateCcw size={14} />
               Reset View
@@ -323,7 +535,7 @@ export default function VirtualTourViewer({
 
       {/* Mobile location menu */}
       {locationOpen && (
-        <div className="absolute inset-x-4 bottom-20 z-30 rounded-2xl border border-white/20 bg-[#09070b] p-3 text-white shadow-2xl sm:hidden">
+        <div className="absolute inset-x-4 bottom-20 z-40 rounded-2xl border border-white/20 bg-[#09070b] p-3 text-white shadow-2xl sm:hidden">
           <div className="mb-2 flex items-center justify-between px-2">
             <span className="text-xs font-bold uppercase tracking-[0.16em] text-white">
               Explore Campus
@@ -360,14 +572,71 @@ export default function VirtualTourViewer({
         </div>
       )}
 
-      {/* Video popup */}
-      {videoUrl && (
+      {/* Hotspot information card */}
+      {info && (
+        <div
+          role="dialog"
+          aria-label={info.title}
+          className="absolute bottom-28 left-4 right-4 z-40 max-h-[45%] overflow-y-auto rounded-2xl border border-amber-400/40 bg-[#09070b] text-white shadow-2xl sm:left-6 sm:right-auto sm:max-w-sm"
+        >
+          {info.image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={info.image}
+              alt={info.imageAlt ?? info.title}
+              loading="lazy"
+              className="h-36 w-full rounded-t-2xl object-cover"
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+              }}
+            />
+          )}
+          <div className="flex items-start justify-between gap-4 p-5">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-400">
+                {info.category}
+              </p>
+              <h3 className="mt-1 font-display text-lg font-bold !text-white">
+                {info.title}
+              </h3>
+              {info.description && (
+                <p className="mt-2 text-sm leading-6 !text-slate-200">{info.description}</p>
+              )}
+              {info.videoUrl && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMedia({ url: info.videoUrl as string, title: info.title });
+                    setInfo(null);
+                  }}
+                  className="mt-4 inline-flex h-11 items-center gap-2 rounded-xl border border-amber-400 bg-amber-400 px-4 text-xs font-bold text-[#09070b] transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09070b]"
+                >
+                  <Play size={14} fill="currentColor" />
+                  {info.actionLabel ?? "Watch Video"}
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setInfo(null)}
+              aria-label="Close information"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Media preview: an overlay only. Opening/closing it never touches the viewer. */}
+      {media && (
         <div
           className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-3 backdrop-blur-sm sm:p-6"
-          onClick={() => setVideoUrl(null)}
+          onClick={() => setMedia(null)}
           role="dialog"
           aria-modal="true"
-          aria-label={`${videoTitle} video`}
+          aria-label={`${media.title} video`}
         >
           <div
             className="relative w-full max-w-5xl overflow-hidden rounded-2xl border border-amber-400/40 bg-[#09070b] shadow-2xl"
@@ -379,13 +648,14 @@ export default function VirtualTourViewer({
                   Explore Our Innovation
                 </p>
                 <h3 className="mt-1 text-base font-bold text-white sm:text-xl">
-                  {videoTitle}
+                  {media.title}
                 </h3>
               </div>
 
               <button
+                ref={closeMediaRef}
                 type="button"
-                onClick={() => setVideoUrl(null)}
+                onClick={() => setMedia(null)}
                 aria-label="Close video"
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 text-white transition hover:border-amber-400 hover:text-amber-400"
               >
@@ -395,19 +665,63 @@ export default function VirtualTourViewer({
 
             <div className="relative aspect-video w-full bg-black">
               <iframe
-                key={videoUrl}
-                src={videoUrl}
-                title={`${videoTitle} - Acharya Shree Sudarshan Patna Central School`}
+                key={`${media.url}-${videoKey}`}
+                src={media.url}
+                title={`${media.title} - Acharya Shree Sudarshan Patna Central School`}
                 className="absolute inset-0 h-full w-full border-0"
                 allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
                 allowFullScreen
+                onLoad={() => setVideoState("loaded")}
               />
+
+              {videoState === "loading" && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/70">
+                  <div className="text-center" role="status" aria-live="polite">
+                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-brand-gold" />
+                    <p className="mt-3 text-xs font-semibold text-white/80">
+                      Loading video…
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {videoState === "error" && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black p-4 text-center">
+                  <div role="alert" className="max-w-sm">
+                    <AlertTriangle className="mx-auto text-amber-400" size={24} />
+                    <p className="mt-3 text-sm font-semibold text-white">
+                      The video could not be loaded.
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      Check your connection and try again. The virtual tour is still
+                      available.
+                    </p>
+                    <div className="mt-4 flex flex-wrap justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setVideoKey((value) => value + 1)}
+                        className="inline-flex h-9 items-center gap-2 rounded-xl border border-amber-400 bg-amber-400 px-3 text-xs font-bold text-[#09070b]"
+                      >
+                        <RefreshCw size={13} />
+                        Retry
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMedia(null)}
+                        className="inline-flex h-9 items-center rounded-xl border border-white/20 px-3 text-xs font-bold text-white hover:border-amber-400"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col items-center justify-between gap-1 px-4 py-3 text-xs text-slate-400 sm:flex-row sm:text-sm">
               <span>Acharya Shree Sudarshan Patna Central School</span>
               <a
-                href={videoUrl}
+                href={media.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold text-amber-400 hover:underline"
@@ -418,36 +732,15 @@ export default function VirtualTourViewer({
           </div>
         </div>
       )}
-
-      {/* Hotspot information popup */}
-      {info && (
-        <div className="absolute bottom-28 left-4 right-4 z-30 max-h-[40%] overflow-y-auto rounded-2xl border border-amber-400/40 bg-[#09070b] p-5 text-white shadow-2xl sm:left-6 sm:right-auto sm:max-w-sm">
-          <div className="flex items-start justify-between gap-5">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-400">
-                Explore
-              </p>
-              <h3 className="mt-1 font-display text-lg font-bold !text-white">
-                {info.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 !text-slate-200">
-                {info.description}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setInfo(null)}
-              aria-label="Close information"
-              className="shrink-0 rounded-lg p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
+}
+
+function describeError(input: unknown): string {
+  const candidate = (input as { error?: unknown } | null)?.error ?? input;
+  if (candidate instanceof Error && candidate.message) return candidate.message;
+  if (typeof candidate === "string" && candidate) return candidate;
+  return "The image could not be loaded.";
 }
 
 function escapeHtml(value: string) {
