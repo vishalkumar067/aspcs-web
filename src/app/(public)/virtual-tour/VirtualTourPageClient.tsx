@@ -513,7 +513,7 @@ export default function VirtualTourPageClient() {
             <MapPin className="text-brand-gold" size={25} />
 
             <h2 className="mt-4 font-display text-3xl font-bold !text-white sm:text-4xl">
-              Come Experience ASPCS
+              Come...Experience ASPCS
             </h2>
 
             <div className="mt-6 flex flex-wrap gap-3">
