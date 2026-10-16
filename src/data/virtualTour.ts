@@ -40,7 +40,9 @@ const SCENE_VIDEO_PUBLIC_IDS: Record<string, string | undefined> = {
   "academic-block": undefined,
   "computer-lab": undefined,
   "science-labs": undefined,
-  library: undefined,
+  chemistry: "Department_of_Chemistry_eddzg8",
+  physics: "Department_Of_Physics_qeqt1q",
+  library: "Library_ddisu4",
   "steam-lab": undefined,
   sports: undefined,
   hostel: undefined,
@@ -139,6 +141,28 @@ export const TOUR_SCENES: TourScene[] = [
     hotspots: [],
   },
   {
+    id: "chemistry",
+    title: "Chemistry Department",
+    description: "Explore the chemistry laboratory and hands-on science learning spaces.",
+    category: "Science",
+    videoPublicId: SCENE_VIDEO_PUBLIC_IDS["chemistry"],
+    thumbnailUrl: SCENE_VIDEO_PUBLIC_IDS["chemistry"]
+      ? cloudinaryPosterUrl(SCENE_VIDEO_PUBLIC_IDS["chemistry"]!)
+      : undefined,
+    hotspots: [],
+  },
+  {
+    id: "physics",
+    title: "Physics Department",
+    description: "Discover the physics laboratory and practical learning environment.",
+    category: "Science",
+    videoPublicId: SCENE_VIDEO_PUBLIC_IDS["physics"],
+    thumbnailUrl: SCENE_VIDEO_PUBLIC_IDS["physics"]
+      ? cloudinaryPosterUrl(SCENE_VIDEO_PUBLIC_IDS["physics"]!)
+      : undefined,
+    hotspots: [],
+  },
+  {
     id: "library",
     title: "Library",
     description: "A quiet environment for reading, research and independent learning.",
@@ -207,6 +231,8 @@ export const GUIDED_TOUR_SEQUENCE = [
   "academic-block",
   "computer-lab",
   "science-labs",
+  "chemistry",
+  "physics",
   "library",
   "steam-lab",
   "ai-robotics-lab",
