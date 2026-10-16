@@ -31,7 +31,7 @@ export default function AdmissionsHero() {
         >
           <span className="section-eyebrow mb-6 inline-flex">
             <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-brand-gold" />
-            Admissions Open — Session 2026–27
+            Admissions Closed — Session 2026–27
           </span>
 
           <h1 className="mb-6 font-display text-display-md font-bold text-white lg:text-display-lg">
@@ -41,8 +41,7 @@ export default function AdmissionsHero() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-brand-slate">
-            Join a community of curious minds and dedicated educators. Applications
-            for session 2026-27 are now open across all grades — Nursery to Class IX and XI.
+            Admission Form For Session 2027-28 Coming Soon
           </p>
 
           {/* Quick contact */}
@@ -50,7 +49,7 @@ export default function AdmissionsHero() {
             <a href="tel:+919102997549" className="btn-primary">
               <Phone size={15} /> Call Admissions Office
             </a>
-            <a href="mailto:admissions@aspcs.edu.in" className="btn-outline">
+            <a href="mailto:info@aspcspatna.ac.in" className="btn-outline">
               <Mail size={15} /> Email Us
             </a>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   Maximize2,
@@ -8,14 +8,19 @@ import {
   Play,
   RefreshCw,
   RotateCcw,
-  VolumeX,
   X,
 } from "lucide-react";
 import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/core/index.css";
 import "@photo-sphere-viewer/markers-plugin/index.css";
-import type { TourHotspot, TourScene } from "@/data/virtualTour";
+import {
+  cloudinaryPosterUrl,
+  cloudinaryVideoSources,
+  type TourHotspot,
+  type TourScene,
+} from "@/data/virtualTour";
+import SceneVideoPlayer, { type PlayerStatus } from "./SceneVideoPlayer";
 
 type Props = {
   scenes: TourScene[];
@@ -24,7 +29,7 @@ type Props = {
   guided: boolean;
   guidedScenes: TourScene[];
   onGuidedChange: (value: boolean) => void;
-  /** Reports whether a scene's panorama loaded ("ready") or failed ("error"). */
+  /** Reports whether a scene loaded ("ready") or failed ("error"). */
   onSceneStatus?: (id: string, status: "ready" | "error") => void;
 };
 
@@ -34,19 +39,13 @@ type InfoCard = {
   description?: string;
   image?: string;
   imageAlt?: string;
-  videoUrl?: string;
-  actionLabel?: string;
 };
 
 type Status = "loading" | "ready" | "error";
-type VideoState = "loading" | "loaded" | "error";
-type Media = { url: string; title: string } | null;
 
 const PANORAMA_TIMEOUT_MS = 25000; // stop spinning forever on a dead network
-const VIDEO_TIMEOUT_MS = 15000;
-const GUIDED_DWELL_MS = 9000; // time spent on a working scene
+const GUIDED_DWELL_MS = 9000; // time spent on a panorama
 const GUIDED_SKIP_MS = 2500; // time spent on a failed scene before skipping it
-const GUIDED_VIDEO_DWELL_MS = 30000; // video scenes need longer than a still panorama
 
 export default function VirtualTourViewer({
   scenes,
@@ -61,7 +60,6 @@ export default function VirtualTourViewer({
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Viewer | null>(null);
   const guidedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const closeMediaRef = useRef<HTMLButtonElement>(null);
 
   // Latest callbacks live in refs, so a parent re-render never rebuilds the viewer.
   const onSceneChangeRef = useRef(onSceneChange);
@@ -73,29 +71,29 @@ export default function VirtualTourViewer({
     onSceneStatusRef.current = onSceneStatus;
   }, [onSceneChange, onGuidedChange, onSceneStatus]);
 
-  // Panorama state (owned by the viewer effect)
+  // Panorama state (only used by scenes that have no video)
   const [status, setStatus] = useState<Status>("loading");
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
 
-  // UI state (never touches the viewer lifecycle)
+  // Video state (reported by the shared player)
+  const [videoStatus, setVideoStatus] = useState<PlayerStatus>("loading");
+
+  // UI state: never touches the viewer or the video lifecycle
   const [info, setInfo] = useState<InfoCard | null>(null);
   const [locationOpen, setLocationOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Media preview state (independent from the viewer)
-  const [media, setMedia] = useState<Media>(null);
-  const [videoState, setVideoState] = useState<VideoState>("loading");
-  const [videoKey, setVideoKey] = useState(0);
-  const mediaUrl = media?.url ?? null;
-  const mediaOpen = media !== null;
-
-  // Video scenes (a flat video shown in place of a 360° photo)
-  const [sceneVideoLoaded, setSceneVideoLoaded] = useState(false);
-  const activeSceneId = activeScene?.id;
-  useEffect(() => {
-    setSceneVideoLoaded(false);
-  }, [activeSceneId]);
+  // Does the active scene play a video? Memoised so the player isn't handed new props needlessly.
+  const videoPublicId = activeScene?.videoPublicId;
+  const videoSources = useMemo(
+    () => (videoPublicId ? cloudinaryVideoSources(videoPublicId) : null),
+    [videoPublicId],
+  );
+  const videoPoster = useMemo(
+    () => (videoPublicId ? cloudinaryPosterUrl(videoPublicId) : undefined),
+    [videoPublicId],
+  );
 
   // Ask Photo Sphere Viewer to re-measure its container (safe if the method is missing).
   const refreshViewerSize = useCallback(() => {
@@ -107,9 +105,15 @@ export default function VirtualTourViewer({
     }
   }, []);
 
+  const handleVideoStatus = useCallback((id: string, next: PlayerStatus) => {
+    setVideoStatus(next);
+    if (next === "ready") onSceneStatusRef.current?.(id, "ready");
+    else if (next === "error") onSceneStatusRef.current?.(id, "error");
+  }, []);
+
   /* ------------------------------------------------------------------ */
-  /* Viewer lifecycle: one viewer per (scene, retry), destroyed once.    */
-  /* Depends ONLY on the scene and retry counter, never on media state.  */
+  /* Panorama lifecycle for scenes WITHOUT a video. Video scenes skip    */
+  /* Photo Sphere Viewer entirely. Depends only on scene + retry.        */
   /* ------------------------------------------------------------------ */
   useEffect(() => {
     const container = containerRef.current;
@@ -123,6 +127,7 @@ export default function VirtualTourViewer({
     setStatus("loading");
     setErrorDetail(null);
     setInfo(null);
+    setVideoStatus("loading");
 
     const fail = (detail: string) => {
       if (cancelled) return; // stale callback from a previous scene
@@ -132,10 +137,9 @@ export default function VirtualTourViewer({
       onSceneStatusRef.current?.(scene.id, "error");
     };
 
-    if (scene.videoUrl) {
-      // Video scene: Photo Sphere Viewer is not needed, the iframe below plays it.
+    if (scene.videoPublicId) {
+      // Video scene: the shared player (rendered below) takes over.
       setStatus("ready");
-      onSceneStatusRef.current?.(scene.id, "ready");
       return () => {
         cancelled = true;
       };
@@ -143,7 +147,7 @@ export default function VirtualTourViewer({
 
     const panorama = scene.panoramaUrl;
     if (!panorama) {
-      fail("No panorama is configured for this location.");
+      fail("No video or panorama is configured for this location.");
       return () => {
         cancelled = true;
       };
@@ -154,9 +158,9 @@ export default function VirtualTourViewer({
         container,
         panorama,
         navbar: false,
-        defaultYaw: activeScene.initialYaw ?? 0,
-        defaultPitch: activeScene.initialPitch ?? 0,
-        defaultZoomLvl: activeScene.initialZoom ?? 50,
+        defaultYaw: scene.initialYaw ?? 0,
+        defaultPitch: scene.initialPitch ?? 0,
+        defaultZoomLvl: scene.initialZoom ?? 50,
         touchmoveTwoFingers: false,
         mousemove: true,
         plugins: [[MarkersPlugin, { markers: [] }]],
@@ -167,7 +171,7 @@ export default function VirtualTourViewer({
       if (markersPlugin) {
         markersPlugin.clearMarkers();
 
-        activeScene.hotspots.forEach((hotspot) => {
+        scene.hotspots.forEach((hotspot) => {
           markersPlugin.addMarker({
             id: hotspot.id,
             position: { yaw: hotspot.yaw, pitch: hotspot.pitch },
@@ -187,15 +191,13 @@ export default function VirtualTourViewer({
 
           if (hotspot.type === "scene" && hotspot.targetSceneId) {
             onSceneChangeRef.current(hotspot.targetSceneId);
-          } else if (hotspot.description || hotspot.image || hotspot.videoUrl) {
+          } else if (hotspot.description || hotspot.image) {
             setInfo({
               title: hotspot.label,
               category: scene.category,
               description: hotspot.description,
               image: hotspot.image,
               imageAlt: hotspot.imageAlt,
-              videoUrl: hotspot.videoUrl,
-              actionLabel: hotspot.actionLabel,
             });
           }
         });
@@ -209,10 +211,7 @@ export default function VirtualTourViewer({
       });
 
       viewer.addEventListener("panorama-error", (event) => {
-        console.error(
-          `[VirtualTour] Failed to load panorama for "${scene.id}"`,
-          event,
-        );
+        console.error(`[VirtualTour] Failed to load panorama for "${scene.id}"`, event);
         fail(describeError(event));
       });
 
@@ -221,7 +220,7 @@ export default function VirtualTourViewer({
         PANORAMA_TIMEOUT_MS,
       );
     } catch (err) {
-      console.error(`[VirtualTour] Viewer failed to start for "${activeScene.id}"`, err);
+      console.error(`[VirtualTour] Viewer failed to start for "${scene.id}"`, err);
       fail(describeError(err));
     }
 
@@ -240,23 +239,26 @@ export default function VirtualTourViewer({
   }, [activeScene, retryKey]);
 
   /* ------------------------------------------------------------------ */
-  /* Guided tour: dwell on good scenes, skip failed ones, no retries.    */
+  /* Guided tour. Panoramas: dwell then advance. Videos: advance when    */
+  /* the video ends. Failed scenes are skipped. No automatic retries.    */
   /* ------------------------------------------------------------------ */
   useEffect(() => {
     if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
-    if (!guided || mediaOpen || status === "loading") return;
+    if (!guided || status === "loading") return;
     if (!activeScene || guidedScenes.length === 0) return;
 
     const index = guidedScenes.findIndex((scene) => scene.id === activeScene.id);
     if (index < 0) return;
 
     const isLast = index >= guidedScenes.length - 1;
-    const delay =
-      status === "error"
-        ? GUIDED_SKIP_MS
-        : activeScene.videoUrl
-          ? GUIDED_VIDEO_DWELL_MS
-          : GUIDED_DWELL_MS;
+    const isVideo = Boolean(activeScene.videoPublicId);
+
+    let delay: number | null;
+    if (status === "error") delay = GUIDED_SKIP_MS;
+    else if (isVideo) delay = videoStatus === "error" ? GUIDED_SKIP_MS : null; // ends via onEnded
+    else delay = GUIDED_DWELL_MS;
+
+    if (delay === null) return;
 
     guidedTimerRef.current = setTimeout(() => {
       if (isLast) {
@@ -269,10 +271,19 @@ export default function VirtualTourViewer({
     return () => {
       if (guidedTimerRef.current) clearTimeout(guidedTimerRef.current);
     };
-  }, [activeScene, guided, guidedScenes, mediaOpen, status]);
+  }, [activeScene, guided, guidedScenes, status, videoStatus]);
+
+  const handleVideoEnded = () => {
+    if (!guided || !activeScene) return;
+    const index = guidedScenes.findIndex((scene) => scene.id === activeScene.id);
+    if (index < 0) return;
+    if (index >= guidedScenes.length - 1) onGuidedChange(false);
+    else onSceneChange(guidedScenes[index + 1].id);
+  };
 
   /* ------------------------------------------------------------------ */
-  /* Fullscreen                                                          */
+  /* Fullscreen. The wrapper goes fullscreen; the player is never        */
+  /* remounted, so playback continues through enter/exit.                */
   /* ------------------------------------------------------------------ */
   useEffect(() => {
     const onChange = () => {
@@ -287,50 +298,19 @@ export default function VirtualTourViewer({
     if (document.fullscreenElement) {
       document.exitFullscreen?.();
     } else {
-      // Fullscreen the whole wrapper so controls and the media preview stay visible.
       wrapperRef.current?.requestFullscreen?.();
     }
   };
 
-  /* ------------------------------------------------------------------ */
-  /* Media preview: focus handling, timeout, resize on close, Escape.    */
-  /* ------------------------------------------------------------------ */
-  useEffect(() => {
-    if (!mediaOpen) return;
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    closeMediaRef.current?.focus();
-
-    return () => {
-      const target =
-        previouslyFocused && document.contains(previouslyFocused)
-          ? previouslyFocused
-          : wrapperRef.current;
-      target?.focus?.();
-      // The panorama must re-measure after the overlay goes away.
-      requestAnimationFrame(refreshViewerSize);
-    };
-  }, [mediaOpen, refreshViewerSize]);
-
-  useEffect(() => {
-    if (!mediaUrl) return;
-    setVideoState("loading");
-    const timer = setTimeout(
-      () => setVideoState((state) => (state === "loading" ? "error" : state)),
-      VIDEO_TIMEOUT_MS,
-    );
-    return () => clearTimeout(timer);
-  }, [mediaUrl, videoKey]);
-
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      if (media) setMedia(null);
-      else if (info) setInfo(null);
+      if (info) setInfo(null);
       else if (locationOpen) setLocationOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [media, info, locationOpen]);
+  }, [info, locationOpen]);
 
   /* ------------------------------------------------------------------ */
   /* Actions                                                             */
@@ -348,8 +328,8 @@ export default function VirtualTourViewer({
   const retryPanorama = () => setRetryKey((value) => value + 1);
 
   /* ------------------------------------------------------------------ */
-  /* Render. Stacking: viewer < overlays (z-20) < controls (z-30)        */
-  /* < popups (z-40) < media preview (z-50).                             */
+  /* Render. Stacking: viewer/video < overlays (z-20) < controls (z-30)  */
+  /* < popups (z-40).                                                    */
   /* ------------------------------------------------------------------ */
   return (
     <div
@@ -366,50 +346,29 @@ export default function VirtualTourViewer({
         } ${isFullscreen ? "h-full" : "h-[62vh] min-h-[460px] sm:h-[680px] lg:h-[720px]"}`}
       />
 
-      {/* Video scene: sits under the controls so navigation stays usable */}
-      {activeScene?.videoUrl && (
+      {/* The one shared video player. Keyed by scene: switching unmounts (and pauses) the old one. */}
+      {activeScene && videoSources && (
         <div className="absolute inset-0 z-10 flex flex-col bg-black px-3 pb-24 pt-24 sm:px-6 sm:pb-40">
-          <div className="relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-amber-400/30 bg-black">
-            <iframe
-              key={activeScene.id}
-              src={activeScene.videoUrl}
-              title={`${activeScene.title} - Acharya Shree Sudarshan Patna Central School`}
-              className="absolute inset-0 h-full w-full border-0"
-              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-              allowFullScreen
-              onLoad={() => setSceneVideoLoaded(true)}
-            />
-            {!sceneVideoLoaded && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/70">
-                <div className="text-center" role="status" aria-live="polite">
-                  <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-brand-gold" />
-                  <p className="mt-3 text-xs font-semibold text-white/80">Loading video…</p>
-                </div>
-              </div>
-            )}
-          </div>
-          <a
-            href={activeScene.videoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 self-center text-xs font-semibold text-amber-400 hover:underline"
-          >
-            Video not loading? Open in a new tab
-          </a>
+          <SceneVideoPlayer
+            key={activeScene.id}
+            sceneId={activeScene.id}
+            title={activeScene.title}
+            sources={videoSources}
+            poster={videoPoster}
+            loop={!guided}
+            onStatusChange={handleVideoStatus}
+            onEnded={handleVideoEnded}
+          />
         </div>
       )}
 
-      {/* Loading overlay (sits UNDER the controls, so navigation stays usable) */}
+      {/* Panorama loading overlay (sits UNDER the controls, so navigation stays usable) */}
       {status === "loading" && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#09070b] px-6 pb-44 pt-24 sm:pb-40">
           <div className="text-center" role="status" aria-live="polite">
             <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-brand-gold" />
-            <p className="mt-4 text-sm font-semibold text-white/80">
-              Loading 360° panorama…
-            </p>
-            {activeScene && (
-              <p className="mt-1 text-xs text-white/60">{activeScene.title}</p>
-            )}
+            <p className="mt-4 text-sm font-semibold text-white/80">Loading 360° panorama…</p>
+            {activeScene && <p className="mt-1 text-xs text-white/60">{activeScene.title}</p>}
           </div>
         </div>
       )}
@@ -426,19 +385,17 @@ export default function VirtualTourViewer({
               {activeScene?.title}
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-300">
-              This 360° panorama is temporarily unavailable. You can continue exploring
-              other campus locations.
+              This location is temporarily unavailable. You can continue exploring other
+              campus locations.
             </p>
             {errorDetail && (
-              <p className="mt-2 line-clamp-2 text-xs text-slate-500">
-                Details: {errorDetail}
-              </p>
+              <p className="mt-2 line-clamp-2 text-xs text-slate-500">Details: {errorDetail}</p>
             )}
             <div className="mt-5 flex flex-col items-center gap-2">
               <button
                 type="button"
                 onClick={retryPanorama}
-                className="inline-flex h-10 items-center gap-2 rounded-xl border border-amber-400 bg-amber-400 px-4 text-xs font-bold text-[#09070b] transition hover:bg-amber-300"
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-amber-400 bg-amber-400 px-4 text-xs font-bold text-[#09070b] transition hover:bg-amber-300"
               >
                 <RefreshCw size={14} />
                 Retry
@@ -477,7 +434,7 @@ export default function VirtualTourViewer({
         </button>
       </div>
 
-      {/* Bottom controls: always above the loading/error overlays */}
+      {/* Bottom controls: always above the loading/error overlays and the video */}
       <div className="absolute inset-x-0 bottom-0 z-30 border-t border-white/15 bg-[#09070b]/95 px-4 pb-4 pt-5 text-white sm:px-6 sm:pb-6">
         <div className="flex items-end justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2">
@@ -490,20 +447,18 @@ export default function VirtualTourViewer({
               {guided ? "Pause Tour" : "Guided Tour"}
             </button>
 
-            <button
-              type="button"
-              onClick={resetView}
-              disabled={status !== "ready" || Boolean(activeScene?.videoUrl)}
-              className="hidden h-10 items-center gap-2 rounded-xl border border-white/20 bg-[#18151c] px-3 text-xs font-bold text-white transition hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-40 sm:flex"
-            >
-              <RotateCcw size={14} />
-              Reset View
-            </button>
-
-            <span className="hidden items-center gap-2 rounded-xl border border-white/15 bg-black/50 px-3 py-2 text-xs text-slate-300 sm:flex">
-              <VolumeX size={14} />
-              No audio
-            </span>
+            {/* Only meaningful for 360° photos */}
+            {!videoSources && (
+              <button
+                type="button"
+                onClick={resetView}
+                disabled={status !== "ready"}
+                className="hidden h-10 items-center gap-2 rounded-xl border border-white/20 bg-[#18151c] px-3 text-xs font-bold text-white transition hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-40 sm:flex"
+              >
+                <RotateCcw size={14} />
+                Reset View
+              </button>
+            )}
           </div>
 
           <button
@@ -572,7 +527,7 @@ export default function VirtualTourViewer({
         </div>
       )}
 
-      {/* Hotspot information card */}
+      {/* Hotspot information card (panorama scenes) */}
       {info && (
         <div
           role="dialog"
@@ -596,24 +551,9 @@ export default function VirtualTourViewer({
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-400">
                 {info.category}
               </p>
-              <h3 className="mt-1 font-display text-lg font-bold !text-white">
-                {info.title}
-              </h3>
+              <h3 className="mt-1 font-display text-lg font-bold !text-white">{info.title}</h3>
               {info.description && (
                 <p className="mt-2 text-sm leading-6 !text-slate-200">{info.description}</p>
-              )}
-              {info.videoUrl && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMedia({ url: info.videoUrl as string, title: info.title });
-                    setInfo(null);
-                  }}
-                  className="mt-4 inline-flex h-11 items-center gap-2 rounded-xl border border-amber-400 bg-amber-400 px-4 text-xs font-bold text-[#09070b] transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09070b]"
-                >
-                  <Play size={14} fill="currentColor" />
-                  {info.actionLabel ?? "Watch Video"}
-                </button>
               )}
             </div>
 
@@ -625,110 +565,6 @@ export default function VirtualTourViewer({
             >
               <X size={16} />
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Media preview: an overlay only. Opening/closing it never touches the viewer. */}
-      {media && (
-        <div
-          className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-3 backdrop-blur-sm sm:p-6"
-          onClick={() => setMedia(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${media.title} video`}
-        >
-          <div
-            className="relative w-full max-w-5xl overflow-hidden rounded-2xl border border-amber-400/40 bg-[#09070b] shadow-2xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:px-6">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
-                  Explore Our Innovation
-                </p>
-                <h3 className="mt-1 text-base font-bold text-white sm:text-xl">
-                  {media.title}
-                </h3>
-              </div>
-
-              <button
-                ref={closeMediaRef}
-                type="button"
-                onClick={() => setMedia(null)}
-                aria-label="Close video"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 text-white transition hover:border-amber-400 hover:text-amber-400"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="relative aspect-video w-full bg-black">
-              <iframe
-                key={`${media.url}-${videoKey}`}
-                src={media.url}
-                title={`${media.title} - Acharya Shree Sudarshan Patna Central School`}
-                className="absolute inset-0 h-full w-full border-0"
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                allowFullScreen
-                onLoad={() => setVideoState("loaded")}
-              />
-
-              {videoState === "loading" && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/70">
-                  <div className="text-center" role="status" aria-live="polite">
-                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-brand-gold" />
-                    <p className="mt-3 text-xs font-semibold text-white/80">
-                      Loading video…
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {videoState === "error" && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black p-4 text-center">
-                  <div role="alert" className="max-w-sm">
-                    <AlertTriangle className="mx-auto text-amber-400" size={24} />
-                    <p className="mt-3 text-sm font-semibold text-white">
-                      The video could not be loaded.
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">
-                      Check your connection and try again. The virtual tour is still
-                      available.
-                    </p>
-                    <div className="mt-4 flex flex-wrap justify-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setVideoKey((value) => value + 1)}
-                        className="inline-flex h-9 items-center gap-2 rounded-xl border border-amber-400 bg-amber-400 px-3 text-xs font-bold text-[#09070b]"
-                      >
-                        <RefreshCw size={13} />
-                        Retry
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setMedia(null)}
-                        className="inline-flex h-9 items-center rounded-xl border border-white/20 px-3 text-xs font-bold text-white hover:border-amber-400"
-                      >
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col items-center justify-between gap-1 px-4 py-3 text-xs text-slate-400 sm:flex-row sm:text-sm">
-              <span>Acharya Shree Sudarshan Patna Central School</span>
-              <a
-                href={media.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-amber-400 hover:underline"
-              >
-                Video not loading? Open in a new tab
-              </a>
-            </div>
           </div>
         </div>
       )}

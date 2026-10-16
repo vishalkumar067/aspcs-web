@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Compass,
   Cpu,
+  ExternalLink,
   Hand,
   Home,
   MapPin,
@@ -21,8 +22,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import VirtualTourViewer from "@/components/virtual-tour/VirtualTourViewer";
-import RoboticsLabVideo from "@/components/virtual-tour/RoboticsLabVideo";
-import type { TourScene } from "@/data/virtualTour";
+import { cloudinaryPosterUrl, type TourScene } from "@/data/virtualTour";
 import {
   getGuidedTourScenes,
   getJourneys,
@@ -36,6 +36,9 @@ const JOURNEY_ICONS: Record<string, LucideIcon> = {
   sports: Trophy,
   life: Home,
 };
+
+/** Opens the school's location in Google Maps. */
+const CAMPUS_MAP_URL = "https://share.google/kMKOca1stF2YXjRoz";
 
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0810]";
@@ -57,15 +60,18 @@ function usePrefersReducedMotion() {
 /** Scene image with a branded gradient fallback if the file is missing. */
 function SceneThumb({ scene, className = "" }: { scene: TourScene; className?: string }) {
   const [failed, setFailed] = useState(false);
+  const imageSrc =
+    scene.thumbnailUrl ??
+    (scene.videoPublicId ? cloudinaryPosterUrl(scene.videoPublicId) : undefined);
 
   return (
     <div
       className={`relative overflow-hidden bg-gradient-to-br from-brand-crimson/50 via-[#18151c] to-[#09070b] ${className}`}
     >
-      {scene.thumbnailUrl && !failed && (
+      {imageSrc && !failed && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={scene.thumbnailUrl}
+          src={imageSrc}
           alt=""
           loading="lazy"
           onError={() => setFailed(true)}
@@ -458,9 +464,6 @@ export default function VirtualTourPageClient() {
         </section>
       )}
 
-      {/* AI & Robotics Lab video (poster-first, loads on tap) */}
-      <RoboticsLabVideo />
-
       {/* All locations as image tiles */}
       <section className="border-y border-white/10 bg-white/[0.025] py-14">
         <div className="container-aspcs">
@@ -484,7 +487,7 @@ export default function VirtualTourPageClient() {
                 <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] !text-amber-400">
                   {scene.category}
                 </span>
-                {scene.videoUrl && (
+                {scene.videoPublicId && (
                   <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-amber-400 text-[#09070b]">
                     <Play size={14} fill="currentColor" className="ml-0.5" />
                   </span>
@@ -513,7 +516,7 @@ export default function VirtualTourPageClient() {
             <MapPin className="text-brand-gold" size={25} />
 
             <h2 className="mt-4 font-display text-3xl font-bold !text-white sm:text-4xl">
-              Come...Experience ASPCS
+              Come Experience ASPCS
             </h2>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -534,6 +537,34 @@ export default function VirtualTourPageClient() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Location map: opens Google Maps in a new tab so the tour stays open */}
+      <section className="container-aspcs pb-16" aria-label="Campus location">
+        <a
+          href={CAMPUS_MAP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`group flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-brand-crimson/25 via-[#18151c] to-[#09070b] p-5 transition hover:-translate-y-1 hover:border-brand-gold/40 motion-reduce:transform-none motion-reduce:transition-none sm:p-6 ${FOCUS_RING}`}
+        >
+          <span className="flex min-w-0 items-center gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-amber-400 text-[#09070b]">
+              <MapPin size={26} />
+            </span>
+            <span className="min-w-0">
+              <span className="block font-display text-xl font-bold !text-white sm:text-2xl">
+                Location Map
+              </span>
+              <span className="mt-0.5 block text-xs font-semibold !text-slate-400 sm:text-sm">
+                Opens in Google Maps
+              </span>
+            </span>
+          </span>
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 !text-white transition group-hover:border-amber-400 group-hover:!text-amber-400 motion-reduce:transition-none">
+            <ExternalLink size={18} />
+            <span className="sr-only">Open location map in a new tab</span>
+          </span>
+        </a>
       </section>
 
       {/* Reset tour */}
