@@ -36,17 +36,17 @@ export function cloudinaryPosterUrl(publicId: string): string {
 const SCENE_VIDEO_PUBLIC_IDS: Record<string, string | undefined> = {
   "ai-robotics-lab":
     "robotics_lab_acharya_shri_sudarshan_patna_central_school_1_zid2b0",
-  "main-gate": undefined,
-  reception: undefined,
+  "main-gate": "School_Gate_hfgmmk",
+  reception: "Receiption_jbykrb",
   "academic-block": undefined,
   "computer-lab": undefined,
-  "science-labs": undefined,
   "chemistry-department": "Department_of_Chemistry_eddzg8",
   "physics-department": "Department_Of_Physics_qeqt1q",
   library: "Library_ddisu4",
-  "steam-lab": undefined,
+  "steam-lab": "STEAM_onajka",
+  "fine-arts": "Fine_Arts_ehodd4",
   sports: undefined,
-  hostel: undefined,
+  hostel: "Hostel_zq5l20",
 };
 
 export type TourHotspot = {
@@ -96,9 +96,11 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Main Gate",
     description: "Begin your virtual journey through the ASPCS campus.",
     category: "Campus",
-    panoramaUrl: "",
+    panoramaUrl: "/images/reception.jpg.jpeg",
     videoPublicId: SCENE_VIDEO_PUBLIC_IDS["main-gate"],
-    thumbnailUrl: "",
+    thumbnailUrl: SCENE_VIDEO_PUBLIC_IDS["main-gate"]
+      ? cloudinaryPosterUrl(SCENE_VIDEO_PUBLIC_IDS["main-gate"]!)
+      : "/images/reception.jpg.jpeg",
     hotspots: [],
   },
   {
@@ -106,9 +108,11 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Reception",
     description: "Explore the welcoming entrance to our school campus.",
     category: "Campus",
-    panoramaUrl: "",
+    panoramaUrl: "/images/reception.jpg.jpeg",
     videoPublicId: SCENE_VIDEO_PUBLIC_IDS["reception"],
-    thumbnailUrl: "",
+    thumbnailUrl: SCENE_VIDEO_PUBLIC_IDS["reception"]
+      ? cloudinaryPosterUrl(SCENE_VIDEO_PUBLIC_IDS["reception"]!)
+      : "/images/reception.jpg.jpeg",
     hotspots: [],
   },
   {
@@ -129,16 +133,6 @@ export const TOUR_SCENES: TourScene[] = [
     panoramaUrl: "/virtual-tour/panoramas/computer-lab.jpg",
     videoPublicId: SCENE_VIDEO_PUBLIC_IDS["computer-lab"],
     thumbnailUrl: "/virtual-tour/thumbnails/computer-lab.jpg",
-    hotspots: [],
-  },
-  {
-    id: "FineArts-labs",
-    title: "Fine Arts",
-    description: "Spaces designed to encourage observation, experimentation and discovery.",
-    category: "Arts",
-    panoramaUrl: "/virtual-tour/panoramas/science-labs.jpg",
-    videoPublicId: SCENE_VIDEO_PUBLIC_IDS["Fine_Arts"],
-    thumbnailUrl: "/virtual-tour/thumbnails/science-labs.jpg",
     hotspots: [],
   },
   {
@@ -199,6 +193,17 @@ export const TOUR_SCENES: TourScene[] = [
     hotspots: [],
   },
   {
+    id: "fine-arts",
+    title: "Fine Arts",
+    description: "Discover the creative spaces where students explore art and expression.",
+    category: "Arts & Culture",
+    videoPublicId: SCENE_VIDEO_PUBLIC_IDS["fine-arts"],
+    thumbnailUrl: SCENE_VIDEO_PUBLIC_IDS["fine-arts"]
+      ? cloudinaryPosterUrl(SCENE_VIDEO_PUBLIC_IDS["fine-arts"]!)
+      : undefined,
+    hotspots: [],
+  },
+  {
     id: "sports",
     title: "Sports Facilities",
     description: "Explore the spaces that support physical development and teamwork.",
@@ -215,7 +220,9 @@ export const TOUR_SCENES: TourScene[] = [
     category: "Boarding",
     panoramaUrl: "/virtual-tour/panoramas/hostel.jpg",
     videoPublicId: SCENE_VIDEO_PUBLIC_IDS["hostel"],
-    thumbnailUrl: "/virtual-tour/thumbnails/hostel.jpg",
+    thumbnailUrl: SCENE_VIDEO_PUBLIC_IDS["hostel"]
+      ? cloudinaryPosterUrl(SCENE_VIDEO_PUBLIC_IDS["hostel"]!)
+      : "/virtual-tour/thumbnails/hostel.jpg",
     hotspots: [],
   },
 ];
@@ -225,10 +232,10 @@ export const GUIDED_TOUR_SEQUENCE = [
   "reception",
   "academic-block",
   "computer-lab",
-  "science-labs",
   "library",
   "steam-lab",
   "ai-robotics-lab",
+  "fine-arts",
   "sports",
   "hostel",
 ];
@@ -239,14 +246,14 @@ export const TOUR_JOURNEYS: TourJourney[] = [
     title: "Future-Ready Learning",
     tagline: "Technology, STEAM and hands-on science",
     intro: "See where students get hands-on with technology, innovation and science.",
-    sceneIds: ["computer-lab", "steam-lab", "ai-robotics-lab", "science-labs"],
+    sceneIds: ["computer-lab", "steam-lab", "ai-robotics-lab"],
   },
   {
     id: "academic",
     title: "Academic Excellence",
     tagline: "Everyday learning spaces",
     intro: "Visit the spaces where everyday learning, reading and research happen.",
-    sceneIds: ["academic-block", "library", "science-labs"],
+    sceneIds: ["academic-block", "library"],
   },
   {
     id: "sports",
