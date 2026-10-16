@@ -258,7 +258,7 @@ export default function VirtualTourPageClient() {
           <div className="relative grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_240px]">
             <div className="min-w-0">
               <MapPin className="text-brand-gold" size={25} />
-              <h2 className="mt-4 font-display text-3xl font-bold text-white sm:text-4xl">Come Experience ASPCS</h2>
+              <h2 className="mt-4 font-display text-3xl font-bold text-white sm:text-4xl">Come, Experience ASPCS . . .</h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">See the campus online, then plan a visit to experience our facilities in person.</p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link href="/admissions" className={`btn-primary inline-flex min-h-[44px] items-center gap-2 ${FOCUS_RING}`}>Explore Admissions <ArrowRight size={16} /></Link>
