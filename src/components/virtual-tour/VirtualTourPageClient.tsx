@@ -7,7 +7,7 @@ import SceneVideoPlayer, { type PlayerStatus } from "@/components/virtual-tour/S
 import { cloudinaryPosterUrl, cloudinaryVideoSources, type TourScene } from "@/data/virtualTour";
 import { getTourScenes } from "@/services/virtualTourService";
 
-const CAMPUS_MAP_URL = "https://www.google.com/maps/search/?api=1&query=Acharya%20Shree%20Sudarshan%20Patna%20Central%20School%2C%20Sudarshan%20Vihar%2C%20New%20Bypass%20Road%2C%20Jaganpura%2C%20Patna%2C%20Bihar%20800027";
+const CAMPUS_MAP_URL = "https://share.google/kMKOca1stF2YXjRoz";
 const CAMPUS_MAP_EMBED_URL =
   "https://www.google.com/maps?output=embed&q=Acharya%20Shree%20Sudarshan%20Patna%20Central%20School%2C%20Sudarshan%20Vihar%2C%20New%20Bypass%20Road%2C%20Jaganpura%2C%20Patna%2C%20Bihar%20800027";
 const FOCUS_RING =
@@ -23,6 +23,7 @@ function ScenePreview({
   active: boolean;
 }) {
   const [showControls, setShowControls] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
   const sources = scene.videoPublicId ? cloudinaryVideoSources(scene.videoPublicId) : [];
   const poster = scene.videoPublicId
     ? cloudinaryPosterUrl(scene.videoPublicId)
@@ -30,12 +31,17 @@ function ScenePreview({
 
   return (
     <article
-      className={`group relative aspect-[4/3] overflow-hidden rounded-2xl border bg-[#15121a] transition hover:-translate-y-1 motion-reduce:transform-none ${active ? "border-amber-400 shadow-[0_0_0_2px_rgba(251,191,36,0.18)]" : "border-white/10 hover:border-amber-400/50"}`}
+      className={`group relative aspect-[4/3] overflow-hidden rounded-2xl border bg-[#15121a] transition hover:-translate-y-1 motion-reduce:transform-none ${
+        active
+          ? "border-amber-400 shadow-[0_0_0_2px_rgba(251,191,36,0.18)]"
+          : "border-white/10 hover:border-amber-400/50"
+      }`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
-      onFocus={() => setShowControls(true)}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setShowControls(false);
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setShowControls(false);
+        }
       }}
     >
       {sources.length > 0 ? (
@@ -52,33 +58,69 @@ function ScenePreview({
           aria-label={`${scene.title} video preview`}
           onError={(event) => {
             const video = event.currentTarget;
-            if (video.src !== sources[1] && sources[1]) video.src = sources[1];
+            const fallback = sources[1];
+            if (fallback && video.dataset.fallbackTried !== "true") {
+              video.dataset.fallbackTried = "true";
+              video.src = fallback;
+              video.load();
+            } else {
+              setVideoFailed(true);
+            }
           }}
         />
       ) : poster ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={poster} alt={`${scene.title} preview`} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={poster}
+          alt={`${scene.title} preview`}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-brand-crimson/50 via-[#18151c] to-[#09070b]" />
       )}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-      <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/65 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-400">
-        {scene.category}
-      </span>
+
+      {videoFailed && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#15121a]/95 p-4 text-center">
+          <div>
+            <p className="font-semibold text-white">{scene.title}</p>
+            <p className="mt-1 text-xs text-slate-300">Video temporarily unavailable.</p>
+          </div>
+        </div>
+      )}
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/90 via-black/35 to-transparent p-3 pt-10">
+        <p className="font-display text-base font-bold leading-tight text-white sm:text-xl">{scene.title}</p>
+        <p className="mt-1 text-xs text-slate-300">
+          {scene.videoPublicId ? "Live video preview" : "Video coming soon"}
+        </p>
+      </div>
+
       <button
         type="button"
         onClick={onSelect}
         aria-pressed={active}
-        className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-left ${FOCUS_RING}`}
+        aria-label={`Play ${scene.title} in the main video player`}
+        className={`absolute left-3 top-3 z-20 flex min-h-10 items-center gap-2 rounded-xl border border-white/20 bg-black/75 px-3 text-xs font-bold text-white transition hover:border-amber-400 ${FOCUS_RING}`}
       >
-        <span>
-          <span className="block font-display text-base font-bold leading-tight text-white sm:text-xl">{scene.title}</span>
-          <span className="mt-1 block text-xs text-slate-300">{scene.videoPublicId ? "Live video preview" : "Preview unavailable — video coming soon"}</span>
-        </span>
-        <span className="mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-400 text-[#09070b]">
-          <Play size={15} fill="currentColor" />
-        </span>
+        <Play size={13} fill="currentColor" />
+        Main player
       </button>
+
+      {sources.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowControls((visible) => !visible)}
+          aria-pressed={showControls}
+          aria-label={showControls ? `Hide ${scene.title} video controls` : `Show ${scene.title} video controls`}
+          className={`absolute right-3 top-3 z-20 flex min-h-10 items-center gap-2 rounded-xl border border-white/20 bg-black/75 px-3 text-xs font-bold text-white transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+            showControls ? "ring-1 ring-amber-400" : ""
+          }`}
+        >
+          {showControls ? "Hide controls" : "Video controls"}
+        </button>
+      )}
+
     </article>
   );
 }
@@ -86,7 +128,10 @@ function ScenePreview({
 export default function VirtualTourPageClient() {
   const scenes = useMemo(() => getTourScenes(), []);
   const [sceneId, setSceneId] = useState(
-    scenes.find((scene) => scene.videoPublicId)?.id ?? scenes[0]?.id ?? "",
+    scenes.find((scene) => scene.id === "library" && scene.videoPublicId)?.id ??
+      scenes.find((scene) => scene.videoPublicId)?.id ??
+      scenes[0]?.id ??
+      "",
   );
   const activeScene = scenes.find((scene) => scene.id === sceneId) ?? scenes[0];
   const [loadedScenes, setLoadedScenes] = useState<Set<string>>(() => new Set());

@@ -29,8 +29,9 @@ export function cloudinaryPosterUrl(publicId: string): string {
 /**
  * ONE place to map each location to its Cloudinary video.
  * Copy the "Public ID" from Cloudinary → Media Library → (open the video).
- * A location with a public ID plays that video; a location without one keeps
- * showing its existing 360° photo, so nothing breaks while you fill these in.
+ * The video-tour page uses a playable MP4 for configured IDs. Locations without
+ * an ID show a clear placeholder in the main player and their configured
+ * thumbnail (if any) in the preview grid; panorama URLs are legacy data only.
  */
 const SCENE_VIDEO_PUBLIC_IDS: Record<string, string | undefined> = {
   "ai-robotics-lab":
