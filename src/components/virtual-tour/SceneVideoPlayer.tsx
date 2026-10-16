@@ -115,7 +115,7 @@ export default function SceneVideoPlayer({
   };
 
   return (
-    <div className="relative h-full w-full min-h-0 flex-1 overflow-hidden rounded-2xl border border-amber-400/30 bg-black">
+    <div className="relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-amber-400/30 bg-black">
       <video
         key={attempt}
         ref={videoRef}
