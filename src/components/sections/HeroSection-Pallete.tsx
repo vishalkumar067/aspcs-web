@@ -59,7 +59,7 @@ export default function HeroSection() {
           <motion.div variants={fadeUp} className="mb-8 flex justify-center">
             <span className="section-eyebrow">
               <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-brand-teal" />
-              Admissions Open — Session 2025–26
+              Admissions Open — Session 2027–28
             </span>
           </motion.div>
 

@@ -6,9 +6,9 @@ import { CheckCircle2, Info } from "lucide-react";
 const grades = [
   { grade: "Nursery",        age: "3 – 4 years",  seats: "40" },
   { grade: "KG I & KG II",  age: "4 – 6 years",  seats: "40" },
-  { grade: "Grade I – V",   age: "6 – 11 years", seats: "35" },
-  { grade: "Grade VI – VIII",age: "11–14 years",  seats: "30" },
-  { grade: "Grade IX – X",  age: "14–16 years",  seats: "25" },
+  { grade: "Class I – V",   age: "6 – 11 years", seats: "35" },
+  { grade: "Class VI – VIII",age: "11–14 years",  seats: "30" },
+  { grade: "Class IX",  age: "As per applicable age criteria",  seats: "Limited" },
 ];
 
 const documents = [
@@ -65,7 +65,7 @@ export default function AdmissionsEligibility() {
               <h3 className="font-display text-lg font-bold text-[var(--text-primary)]">
                 Seats Available
               </h3>
-              <p className="mt-1 text-xs text-[var(--text-muted)]">Session 2025–26</p>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">Session 2027–28</p>
             </div>
             <div className="divide-y divide-[var(--surface-border)]">
               {grades.map((g) => (
@@ -114,7 +114,7 @@ export default function AdmissionsEligibility() {
                 Our admissions counsellors are available Mon–Sat, 9 AM to 4 PM.
               </p>
               <a
-                href="tel:+91XXXXXXXXXX"
+                href="tel:+919102997549"
                 className="mt-3 inline-flex text-sm font-semibold text-brand-gold hover:underline"
               >
                 +91-91029-97549

@@ -25,9 +25,9 @@ export default function Footer() {
       <div className="border-b border-brand-crimson/20 bg-brand-crimson/8">
         <div className="container-aspcs flex flex-col items-center justify-between gap-3 py-5 text-center sm:flex-row sm:text-left">
           <div>
-            <span className="text-xs font-black uppercase tracking-widest text-brand-gold">🎓 Admissions Open 2026–27</span>
+            <span className="text-xs font-black uppercase tracking-widest text-brand-gold">🎓 Admissions Open 2027–28</span>
             <p className="mt-0.5 text-sm font-semibold text-white">
-              Nursery · Primary · Secondary · <strong className="text-brand-gold">Senior Secondary (Class XI–XII)</strong>
+              Nursery to Class IX · <strong className="text-brand-gold">Day, Week & Term Boarding</strong>
             </p>
           </div>
           <Link href="/admissions" className="shrink-0 rounded-xl bg-brand-crimson px-5 py-2.5 text-sm font-black text-white transition-all hover:bg-brand-crimson/80">
@@ -139,13 +139,15 @@ export default function Footer() {
               ))}
             </ul>
 
-            {/* Class XI admission CTA */}
-            <div className="mt-8 rounded-2xl border border-brand-crimson/30 bg-brand-crimson/10 p-5">
-              <p className="text-xs font-black uppercase tracking-wider text-brand-gold">🎓 Class XI Open</p>
-              <p className="mb-1 mt-1 text-sm font-bold text-white">Senior Secondary</p>
-              <p className="mb-4 text-xs font-medium text-white/55">Science & Commerce — 2026–27</p>
-              <Link href="/admissions#class11" className="block w-full rounded-xl bg-brand-crimson py-2.5 text-center text-xs font-black text-white transition-all hover:bg-brand-crimson/80">
-                Apply for Class XI
+            {/* Boarding highlights */}
+            <div className="mt-8 rounded-2xl border border-brand-gold/25 bg-brand-gold/5 p-5">
+              <p className="text-xs font-black uppercase tracking-wider text-brand-gold">ASPCS Boarding</p>
+              <p className="mb-2 mt-1 text-sm font-bold text-white">Choose the right learning routine</p>
+              <ul className="mb-4 space-y-1 text-xs font-medium text-white/65">
+                <li>• Day Boarding</li><li>• Week Boarding</li><li>• Term Boarding</li>
+              </ul>
+              <Link href="/admissions" className="block w-full rounded-xl bg-brand-crimson py-2.5 text-center text-xs font-black text-white transition-all hover:bg-brand-crimson/80">
+                Explore Admissions
               </Link>
             </div>
           </div>
@@ -154,7 +156,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/8 pt-7 text-xs font-medium text-white/35 sm:flex-row">
           <p>© {new Date().getFullYear()} Acharya Shree Sudarshan Patna Central School. All rights reserved.</p>
-          <p>CBSE Affiliated · Patna, Bihar · Session 2026–27</p>
+          <p>CBSE Affiliated · Patna, Bihar · Session 2027–28</p>
         </div>
       </div>
     </footer>

@@ -49,7 +49,7 @@ export default function Navbar() {
         {/* ── Top info bar ─────────────────────────────────────────────────── */}
         <div className="hidden border-b border-brand-crimson/20 lg:block">
           <div className="container-aspcs flex h-9 items-center justify-between text-xs font-medium text-white">
-            <span>Excellence in Education Since 1980 · Session 2026–27 · CBSE Affiliated</span>
+            <span>Excellence in Education Since 1980 · Session 2027–28 · CBSE Affiliated</span>
             <div className="flex items-center gap-6">
               <a
                 href="tel:+919102997549"
@@ -293,7 +293,7 @@ export default function Navbar() {
                   className="btn-primary w-full justify-center py-3 text-sm"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Apply Now — Session 2026–27
+                  Apply Now — Session 2027–28
                 </Link>
               </div>
             </motion.div>

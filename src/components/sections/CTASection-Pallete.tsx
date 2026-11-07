@@ -36,7 +36,7 @@ export default function CTASection() {
         >
           <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
             <span className="animate-pulse inline-block h-1.5 w-1.5 rounded-full bg-brand-sage" />
-            Admissions Open — 2025–26
+            Admissions Open — 2027–28
           </span>
 
           <h2 className="mx-auto mb-6 max-w-3xl font-display text-display-md font-bold text-white lg:text-display-lg">

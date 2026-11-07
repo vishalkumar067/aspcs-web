@@ -12,9 +12,9 @@ import CTASection            from "@/components/sections/CTASection";
 
 
 export const metadata: Metadata = {
-  title: "Acharya Shree Sudarshan Patna Central School — Session 2026–27",
+  title: "Acharya Shree Sudarshan Patna Central School — Session 2027–28",
   description:
-    "ASPCS is a forward-thinking educational institution providing world-class education with a focus on creativity, technology, and holistic development. Admissions open for 2026–27.",
+    "ASPCS is a forward-thinking educational institution providing world-class education with a focus on creativity, technology, and holistic development. Admissions open for 2027–28; Nursery to Class IX, with Day, Week and Term Boarding.",
 };
 
 export default function HomePage() {

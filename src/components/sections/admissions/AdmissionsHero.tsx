@@ -31,7 +31,7 @@ export default function AdmissionsHero() {
         >
           <span className="section-eyebrow mb-6 inline-flex">
             <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-brand-gold" />
-            Admissions Closed — Session 2026–27
+            Admissions Open — Session 2027–28
           </span>
 
           <h1 className="mb-6 font-display text-display-md font-bold text-white lg:text-display-lg">
@@ -41,8 +41,21 @@ export default function AdmissionsHero() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-brand-slate">
-            Admission Form For Session 2027-28 Coming Soon
+            Admissions open for Nursery to Class IX. Discover a learning environment built around technology, creativity, values and holistic growth.
           </p>
+
+          <div className="mx-auto mb-9 grid max-w-3xl gap-3 sm:grid-cols-3">
+            {[
+              { title: "Day Boarding", detail: "A structured school day with guided learning and activities." },
+              { title: "Week Boarding", detail: "A supportive residential routine for weekdays." },
+              { title: "Term Boarding", detail: "A complete residential learning experience during the term." },
+            ].map((item) => (
+              <div key={item.title} className="rounded-2xl border border-brand-gold/30 bg-white/[0.06] p-4 text-left backdrop-blur-sm">
+                <p className="font-display text-lg font-bold text-brand-gold">{item.title}</p>
+                <p className="mt-1 text-xs leading-relaxed text-brand-slate">{item.detail}</p>
+              </div>
+            ))}
+          </div>
 
           {/* Quick contact */}
           <div className="flex flex-wrap items-center justify-center gap-4">

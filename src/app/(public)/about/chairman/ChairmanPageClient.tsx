@@ -23,7 +23,7 @@ const CHAIRMAN = {
 
     Today, as I look at our vibrant school community — our dedicated teachers, our curious students, and our supportive parent body — I feel an overwhelming sense of gratitude and optimism. We have built something truly special here: a place where academic rigour meets compassionate mentorship, where discipline is nurtured alongside creativity, and where every child is seen, valued, and encouraged to excel.
 
-    As we step into Session 2026–27, we reaffirm our commitment to providing education that goes beyond textbooks. We are expanding our facilities, strengthening our faculty, and embracing technology to ensure our students are prepared not just for examinations, but for life itself.
+    As we step into Session 2027–28, we reaffirm our commitment to providing education that goes beyond textbooks. We are expanding our facilities, strengthening our faculty, and embracing technology to ensure our students are prepared not just for examinations, but for life itself.
 
     I extend my heartfelt invitation to families seeking a school that truly cares about their child's holistic development. ASPCS is not just a school — it is a family, a community, and a promise of a brighter future.
 
@@ -481,7 +481,7 @@ export default function ChairmanPageClient() {
               Join the <span className="text-brand-gold">ASPCS Family</span>
             </h3>
             <p className="mb-7 text-sm font-medium text-white/60">
-              Admissions open for all classes including Senior Secondary (Class XI–XII) · Session 2026–27
+              Admissions open for Nursery to Class IX · Session 2027–28 · Day, Week & Term Boarding
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <a href="/admissions" className="btn-primary px-8 py-3">

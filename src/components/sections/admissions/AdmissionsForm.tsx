@@ -22,15 +22,16 @@ const admissionSchema = z.object({
   address:        z.string().optional(),
   previousSchool: z.string().optional(),
   message:        z.string().optional(),
+  boardingPreference: z.enum(["Day Boarding", "Week Boarding", "Term Boarding", "Not sure yet"]).optional(),
 });
 
 type AdmissionFormData = z.infer<typeof admissionSchema>;
 
 const grades = [
   "Nursery", "KG I", "KG II",
-  "Grade I", "Grade II", "Grade III", "Grade IV", "Grade V",
-  "Grade VI", "Grade VII", "Grade VIII",
-  "Grade IX", "Grade X",
+  "Class I", "Class II", "Class III", "Class IV", "Class V",
+  "Class VI", "Class VII", "Class VIII",
+  "Class IX",
 ];
 
 // ─── Field wrapper ────────────────────────────────────────────────────────────
@@ -174,6 +175,7 @@ export default function AdmissionsForm() {
 
               {/* ── Section: Student Details ── */}
               <div className="mb-8">
+                <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-brand-gold">Academic Session 2027–28 · Nursery to Class IX</p>
                 <div className="mb-5 flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold/15">
                     <User size={15} className="text-brand-gold" />
@@ -250,6 +252,16 @@ export default function AdmissionsForm() {
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Preferred Boarding Option">
+                    <select {...register("boardingPreference")} className="input-field bg-white/5 text-white">
+                      <option value="" className="bg-[#17131b]">Select boarding preference</option>
+                      <option value="Day Boarding" className="bg-[#17131b]">Day Boarding</option>
+                      <option value="Week Boarding" className="bg-[#17131b]">Week Boarding</option>
+                      <option value="Term Boarding" className="bg-[#17131b]">Term Boarding</option>
+                      <option value="Not sure yet" className="bg-[#17131b]">Not sure yet</option>
+                    </select>
+                  </Field>
+
                   <Field label="Parent / Guardian Name" error={errors.parentName?.message} required>
                     <input
                       {...register("parentName")}

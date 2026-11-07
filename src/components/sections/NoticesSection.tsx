@@ -161,10 +161,10 @@ export default function NoticesSection() {
 
               <div className="relative z-10">
                 <div className="mb-2 inline-flex rounded-full border border-brand-gold/40 bg-brand-gold/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-brand-gold">
-                  ● Admissions Open 2026–27
+                  ● Admissions Open 2027–28
                 </div>
                 <h3 className="mb-3 font-display text-2xl font-black text-white">
-                  Join ASPCS for<br />Session 2026–27
+                  Join ASPCS for<br />Session 2027–28
                 </h3>
                 <p className="mb-6 text-sm font-medium leading-relaxed text-brand-slate">
                   Limited seats available. Apply online now and secure your child's

@@ -20,7 +20,7 @@ const FALLBACK = [
   { id: "2", title: "Class X Board Examination Timetable Released",     category: "EXAM",     important: true,  publishedAt: "2025-05-08T09:00:00Z", pdfUrl: "#" },
   { id: "3", title: "Summer Holiday Dates Announcement",                category: "HOLIDAY",  important: false, publishedAt: "2025-05-06T08:30:00Z", pdfUrl: null },
   { id: "4", title: "Parent-Teacher Meeting — Grades VI to VIII",       category: "ACADEMIC", important: false, publishedAt: "2025-05-04T11:00:00Z", pdfUrl: null },
-  { id: "5", title: "Admissions Open for Session 2025-26",              category: "ADMISSION",important: true,  publishedAt: "2025-05-01T00:00:00Z", pdfUrl: "#" },
+  { id: "5", title: "Admissions Open for Session 2027-28",              category: "ADMISSION",important: true,  publishedAt: "2025-05-01T00:00:00Z", pdfUrl: "#" },
 ];
 
 function formatDate(iso: string) {
@@ -76,7 +76,7 @@ export default function NoticesSection() {
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-teal to-brand-teal-deep p-8 shadow-teal">
               <div className="relative z-10">
                 <div className="mb-2 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white">● Admissions Open</div>
-                <h3 className="mb-3 font-display text-2xl font-bold text-white">Join ASPCS for Session 2025-26</h3>
+                <h3 className="mb-3 font-display text-2xl font-bold text-white">Join ASPCS for Session 2027-28</h3>
                 <p className="mb-6 text-sm text-white/80">Limited seats available. Apply online and secure your child&apos;s future.</p>
                 <Link href="/admissions" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-brand-teal transition-all hover:-translate-y-0.5">
                   Start Application <ArrowRight size={15} />

@@ -26,7 +26,7 @@ export default function CTASection() {
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
           <span className="section-eyebrow mb-6 inline-flex">
             <span className="animate-pulse inline-block h-1.5 w-1.5 rounded-full bg-brand-gold" />
-            Admissions Open — 2026–27
+            Admissions Open — 2027–28
           </span>
 
           <h2 className="mx-auto mb-6 max-w-3xl font-display text-display-md font-black text-white lg:text-display-lg">
@@ -35,8 +35,7 @@ export default function CTASection() {
           </h2>
 
           <p className="mx-auto mb-10 max-w-xl text-lg font-semibold text-white/75">
-            Seats are limited for session 2026–27. Take the first step toward an extraordinary
-            educational journey at ASPCS — where every child thrives.
+            Admissions are open for Nursery to Class IX for session 2027–28. Explore Day Boarding, Week Boarding and Term Boarding at ASPCS. Take the first step toward an extraordinary educational journey at ASPCS — where every child thrives.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">

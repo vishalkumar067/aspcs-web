@@ -37,8 +37,7 @@ export const FOOTER_LINKS = {
   quickLinks: [
     { label: "Home",                        href: "/" },
     { label: "About ASPCS",                 href: "/about" },
-    { label: "Admissions 2026–27",          href: "/admissions" },
-    { label: "Class XI Admissions (New!)",  href: "/admissions#class11" },
+    { label: "Admissions 2027–28",          href: "/admissions" },
     { label: "Notice Board",                href: "/notices" },
     { label: "Events",                      href: "/events" },
     { label: "Careers",                     href: "/careers" },

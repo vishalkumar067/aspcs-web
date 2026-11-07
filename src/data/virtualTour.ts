@@ -45,6 +45,8 @@ const SCENE_VIDEO_PUBLIC_IDS: Record<string, string | undefined> = {
   library: "Library_ddisu4",
   "steam-lab": "STEAM_onajka",
   "fine-arts": "Fine_Arts_ehodd4",
+  music: undefined,
+  dance: undefined,
   sports: undefined,
   hostel: "Hostel_zq5l20",
 };
@@ -204,6 +206,24 @@ export const TOUR_SCENES: TourScene[] = [
     hotspots: [],
   },
   {
+    id: "music",
+    title: "Music Room",
+    description: "Discover music learning, instruments and opportunities for students to develop their musical talents.",
+    category: "Music",
+    videoPublicId: SCENE_VIDEO_PUBLIC_IDS.music,
+    thumbnailUrl: "/images/gallery/cultural-fest.jpg",
+    hotspots: [],
+  },
+  {
+    id: "dance",
+    title: "Dance Studio",
+    description: "Explore performing arts, movement and dance activities that build confidence and creative expression.",
+    category: "Dance",
+    videoPublicId: SCENE_VIDEO_PUBLIC_IDS.dance,
+    thumbnailUrl: "/images/gallery/cultural-fest.jpg",
+    hotspots: [],
+  },
+  {
     id: "sports",
     title: "Sports Facilities",
     description: "Explore the spaces that support physical development and teamwork.",
@@ -236,6 +256,8 @@ export const GUIDED_TOUR_SEQUENCE = [
   "steam-lab",
   "ai-robotics-lab",
   "fine-arts",
+  "music",
+  "dance",
   "sports",
   "hostel",
 ];
@@ -268,5 +290,49 @@ export const TOUR_JOURNEYS: TourJourney[] = [
     tagline: "Arrival, welcome and boarding",
     intro: "Walk in through the entrance and see what student life looks like.",
     sceneIds: ["main-gate", "reception", "hostel"],
+  },
+];
+
+
+/**
+ * Event galleries displayed on the Virtual Tour page.
+ * Add as many photos/videos as you need in the `media` arrays below.
+ * Photos: { type: "image", title: "Annual Day", src: "/images/gallery/photo.jpg" }
+ * Videos: { type: "video", title: "Annual Day Highlights", publicId: "cloudinary-folder/video_public_id" }
+ * For local files, place images/videos inside `public/images/gallery/` and use a path beginning with `/`.
+ */
+export type EventGalleryMedia =
+  | { type: "image"; title: string; src: string; alt?: string }
+  | { type: "video"; title: string; publicId: string; poster?: string };
+
+export type EventGallery = {
+  id: "aspcs-weekly" | "daily-events";
+  title: string;
+  subtitle: string;
+  description: string;
+  coverImage: string;
+  media: EventGalleryMedia[];
+};
+
+export const VIRTUAL_TOUR_EVENT_GALLERIES: EventGallery[] = [
+  {
+    id: "aspcs-weekly",
+    title: "ASPCS Weekly",
+    subtitle: "A week at ASPCS",
+    description: "Weekly highlights, classroom moments, achievements and activities from across our campus.",
+    coverImage: "/images/gallery/cultural-fest.jpg",
+    media: [
+      // Add weekly photos and videos here. See the examples in the comment above.
+    ],
+  },
+  {
+    id: "daily-events",
+    title: "Daily Events",
+    subtitle: "Every day, a new experience",
+    description: "Assemblies, celebrations, competitions, workshops and memorable everyday moments.",
+    coverImage: "/images/gallery/cultural-fest.jpg",
+    media: [
+      // Add event photos and videos here. See the examples in the comment above.
+    ],
   },
 ];

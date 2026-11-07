@@ -103,7 +103,7 @@ export default function Footer() {
 
             <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
               <p className="mb-1 text-sm font-semibold">Admissions Open</p>
-              <p className="mb-4 text-xs text-white/50">Session 2026–27</p>
+              <p className="mb-4 text-xs text-white/50">Session 2027–28</p>
               <Link href="/admissions" className="btn-primary w-full justify-center py-2.5 text-xs">Apply Now</Link>
             </div>
           </div>

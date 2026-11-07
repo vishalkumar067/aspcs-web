@@ -7,10 +7,10 @@ import AdmissionsFAQ         from "@/components/sections/admissions/AdmissionsFA
 import CTASection            from "@/components/sections/CTASection";
 
 export const metadata: Metadata = {
-  title: "Admissions 2025–26",
+  title: "Admissions 2027–28 | Nursery to Class IX",
   description:
-    "Apply for admission at ASPCS for session 2025–26. Simple 4-step process, limited seats available across Nursery to Class X. Apply online now.",
-  keywords: ["ASPCS admissions", "school admission 2025", "apply online", "school enrollment"],
+    "Admissions open at ASPCS for Academic Session 2027–28 from Nursery to Class IX. Explore Day Boarding, Week Boarding and Term Boarding.",
+  keywords: ["ASPCS admissions", "school admission 2027", "apply online", "school enrollment"],
 };
 
 export default function AdmissionsPage() {

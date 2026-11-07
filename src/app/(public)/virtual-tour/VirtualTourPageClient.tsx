@@ -2,9 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Compass, ExternalLink, MapPin, Play } from "lucide-react";
+import { ArrowRight, Camera, Compass, ExternalLink, Image as ImageIcon, MapPin, Play, Video, X } from "lucide-react";
 import SceneVideoPlayer, { type PlayerStatus } from "@/components/virtual-tour/SceneVideoPlayer";
-import { cloudinaryPosterUrl, cloudinaryVideoSources, type TourScene } from "@/data/virtualTour";
+import { cloudinaryPosterUrl, cloudinaryVideoSources, VIRTUAL_TOUR_EVENT_GALLERIES, type EventGallery, type EventGalleryMedia, type TourScene } from "@/data/virtualTour";
 import { getTourScenes } from "@/services/virtualTourService";
 
 const CAMPUS_MAP_URL = "https://share.google/kMKOca1stF2YXjRoz";
@@ -125,6 +125,97 @@ function ScenePreview({
   );
 }
 
+function EventGalleryCard({ gallery, onOpen }: { gallery: EventGallery; onOpen: () => void }) {
+  const photoCount = gallery.media.filter((item) => item.type === "image").length;
+  const videoCount = gallery.media.filter((item) => item.type === "video").length;
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className={`group overflow-hidden rounded-2xl border border-white/10 bg-[#15121a] text-left transition hover:-translate-y-1 hover:border-amber-400/60 hover:shadow-xl hover:shadow-black/30 ${FOCUS_RING}`}
+      aria-label={`Open ${gallery.title} photo and video gallery`}
+    >
+      <div className="relative aspect-[16/9] overflow-hidden bg-black">
+        <img src={gallery.coverImage} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+        <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full border border-white/20 bg-black/55 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">
+          <Camera size={14} className="text-amber-400" /> Photo & video gallery
+        </div>
+        <div className="absolute right-4 top-4 rounded-full bg-amber-400 p-2 text-black"><ArrowRight size={17} /></div>
+      </div>
+      <div className="p-5">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400">{gallery.subtitle}</p>
+        <h3 className="mt-2 font-display text-xl font-bold text-white">{gallery.title}</h3>
+        <p className="mt-2 min-h-[3rem] text-sm leading-6 text-slate-300">{gallery.description}</p>
+        <div className="mt-4 flex flex-wrap gap-3 text-xs font-medium text-slate-400">
+          <span className="inline-flex items-center gap-1.5"><ImageIcon size={14} /> {photoCount} photos</span>
+          <span className="inline-flex items-center gap-1.5"><Video size={14} /> {videoCount} videos</span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function EventGalleryModal({ gallery, onClose }: { gallery: EventGallery; onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-3 backdrop-blur-sm sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="event-gallery-title"
+      onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
+    >
+      <div className="flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#100d14] shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-b border-white/10 p-5 sm:p-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">{gallery.subtitle}</p>
+            <h2 id="event-gallery-title" className="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">{gallery.title}</h2>
+            <p className="mt-2 text-sm text-slate-300">{gallery.description}</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close gallery" className={`rounded-xl border border-white/15 p-2 text-white transition hover:border-amber-400 hover:text-amber-400 ${FOCUS_RING}`}><X size={20} /></button>
+        </div>
+        <div className="overflow-y-auto p-4 sm:p-6">
+          {gallery.media.length ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {gallery.media.map((item, index) => (
+                <EventMediaItem key={`${gallery.id}-${index}`} item={item} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-5 py-12 text-center">
+              <Camera size={32} className="mx-auto text-amber-400" />
+              <h3 className="mt-4 text-lg font-bold text-white">Gallery coming soon</h3>
+              <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-400">Add photos and videos to this gallery in <code className="text-amber-300">src/data/virtualTour.ts</code>. You can add as many media items as you like.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EventMediaItem({ item }: { item: EventGalleryMedia }) {
+  if (item.type === "image") {
+    return (
+      <figure className="overflow-hidden rounded-xl border border-white/10 bg-black">
+        <img src={item.src} alt={item.alt ?? item.title} className="aspect-[4/3] w-full object-cover" loading="lazy" />
+        <figcaption className="px-3 py-2.5 text-sm font-medium text-white">{item.title}</figcaption>
+      </figure>
+    );
+  }
+
+  const sources = cloudinaryVideoSources(item.publicId);
+  return (
+    <figure className="overflow-hidden rounded-xl border border-white/10 bg-black">
+      <video controls playsInline preload="metadata" poster={item.poster ?? cloudinaryPosterUrl(item.publicId)} className="aspect-[4/3] w-full object-contain">
+        {sources.map((source) => <source key={source} src={source} type="video/mp4" />)}
+      </video>
+      <figcaption className="px-3 py-2.5 text-sm font-medium text-white">{item.title}</figcaption>
+    </figure>
+  );
+}
+
 export default function VirtualTourPageClient() {
   const scenes = useMemo(() => getTourScenes(), []);
   const [sceneId, setSceneId] = useState(
@@ -135,6 +226,7 @@ export default function VirtualTourPageClient() {
   );
   const activeScene = scenes.find((scene) => scene.id === sceneId) ?? scenes[0];
   const [loadedScenes, setLoadedScenes] = useState<Set<string>>(() => new Set());
+  const [activeGallery, setActiveGallery] = useState<EventGallery | null>(null);
 
   const handleVideoStatus = useCallback((id: string, status: PlayerStatus) => {
     if (status === "ready") {
@@ -251,6 +343,23 @@ export default function VirtualTourPageClient() {
           </div>
         </div>
       </section>
+
+      <section className="border-y border-white/10 bg-white/[0.025] py-14" aria-label="ASPCS weekly and daily event galleries">
+        <div className="container-aspcs">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">Life beyond the classroom</p>
+            <h2 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">ASPCS in Moments</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">Stay connected with our weekly highlights and everyday campus celebrations through photo and video galleries.</p>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2">
+            {VIRTUAL_TOUR_EVENT_GALLERIES.map((gallery) => (
+              <EventGalleryCard key={gallery.id} gallery={gallery} onOpen={() => setActiveGallery(gallery)} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {activeGallery && <EventGalleryModal gallery={activeGallery} onClose={() => setActiveGallery(null)} />}
 
       <section className="container-aspcs py-14" aria-label="Visit ASPCS">
         <div className="relative overflow-hidden rounded-[2rem] border border-brand-gold/20 bg-gradient-to-br from-brand-crimson/30 via-brand-black to-brand-black p-6 sm:p-10 lg:p-12">

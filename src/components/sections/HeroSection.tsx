@@ -63,7 +63,7 @@ export default function HeroSection() {
           <motion.div variants={fadeUp} className="mb-8 flex justify-center">
             <span className="section-eyebrow">
               <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-brand-gold" />
-              Admissions Open — Session 2026–27
+              Admissions Open — Session 2027–28
             </span>
           </motion.div>
 
@@ -82,7 +82,7 @@ export default function HeroSection() {
           </motion.h1>
 
           <motion.p variants={fadeUp} className="mx-auto mb-10 max-w-2xl text-lg font-semibold leading-relaxed text-white/80 lg:text-xl">
-            ASPCS nurtures young minds with world-class education, innovative
+            ASPCS nurtures young minds with world-class education, Day Boarding, Week Boarding and Term Boarding, innovative
             pedagogy, and a holistic environment — shaping confident leaders for tomorrow's world.
           </motion.p>
 

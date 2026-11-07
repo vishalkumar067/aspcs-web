@@ -24,7 +24,7 @@ export default function WelcomePopup() {
   };
 
   const whatsappMessage = encodeURIComponent(
-    "Hello! I am interested in Class XI admission at Patna Central School. Thank you for providing this opportunity. Kindly share the admission process, fee structure, available streams, and any other relevant details. Looking forward to your response."
+    "Hello! I am interested in admission at Acharya Shree Sudarshan Patna Central School for Academic Session 2027–28, Nursery to Class IX. Please share the admission process, fee details and information about Day Boarding, Week Boarding and Term Boarding."
   );
 
   const whatsappUrl = `https://wa.me/919102997549?text=${whatsappMessage}`;
@@ -82,7 +82,7 @@ export default function WelcomePopup() {
                 <span className="h-2 w-2 animate-pulse rounded-full bg-brand-gold" />
 
                 <span className="text-[11px] font-bold uppercase tracking-widest text-brand-gold">
-                  Class XI Admissions Open
+                  Admissions Open · 2027–28
                 </span>
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function WelcomePopup() {
                   </p>
 
                   <p className="text-xs font-semibold text-white/70">
-                    Excellence in Education & Day Boarding
+                    Day · Week · Term Boarding
                   </p>
                 </div>
               </div>
@@ -120,14 +120,11 @@ export default function WelcomePopup() {
 
               {/* Admissions Text */}
               <p className="mb-2 text-sm font-semibold text-white">
-                🌟 Admissions Open for Class XI
+                🌟 Admissions Open for Nursery to Class IX
               </p>
 
               <p className="mb-5 text-sm font-medium leading-relaxed text-white/65">
-                Excel in CBSE academics with FREE after-school JEE & NEET
-                preparation, access to world-class STEAM, Robotics & AI Labs,
-                experienced faculty, and a future-focused learning environment
-                that nurtures innovation, leadership, and academic excellence.
+                Choose the boarding routine that works for your family: Day Boarding, Week Boarding or Term Boarding. Discover technology-rich learning through STEAM, Robotics and AI, supported by experienced teachers and a caring school environment.
               </p>
 
               {/* Stats */}

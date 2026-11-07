@@ -139,7 +139,7 @@ export default function CareersSection() {
             initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
             className="mt-8 text-center text-xs font-medium text-brand-slate"
           >
-            ASPCS is an equal-opportunity employer · Session 2026–27
+            ASPCS is an equal-opportunity employer · Session 2027–28
           </motion.p>
         )}
       </div>

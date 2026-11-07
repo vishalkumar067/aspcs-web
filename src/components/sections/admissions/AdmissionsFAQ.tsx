@@ -7,8 +7,12 @@ import { cn } from "@/lib/utils";
 
 const faqs = [
   {
-    q: "When do admissions open for session 2025–26?",
-    a: "Admissions for session 2025–26 are currently open. We recommend applying early as seats are limited and filled on a first-come, first-served basis.",
+    q: "Which classes are open for admission in 2027–28?",
+    a: "Admissions are open for Academic Session 2027–28 from Nursery to Class IX. Contact the admissions office for current seat availability and the application process.",
+  },
+  {
+    q: "What boarding options does ASPCS offer?",
+    a: "ASPCS offers three boarding options: Day Boarding, Week Boarding and Term Boarding. Please contact the school to understand the routine, facilities and availability for each option.",
   },
   {
     q: "Is there an entrance test for admission?",
@@ -16,7 +20,7 @@ const faqs = [
   },
   {
     q: "What is the fee structure?",
-    a: "Our fee structure varies by grade. Please contact our admissions office at +91-XXXX-XXXXXX or visit the school in person for a detailed fee breakdown. We also offer instalment payment options.",
+    a: "Our fee structure varies by grade. Please contact our admissions office at +91-91029-97549 or visit the school in person for a detailed fee breakdown. We also offer instalment payment options.",
   },
   {
     q: "Does ASPCS offer any scholarships?",
