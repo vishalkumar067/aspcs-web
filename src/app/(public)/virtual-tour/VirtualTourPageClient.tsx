@@ -137,7 +137,20 @@ function EventGalleryCard({ gallery, onOpen }: { gallery: EventGallery; onOpen: 
       aria-label={`Open ${gallery.title} photo and video gallery`}
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-black">
-        <img src={gallery.coverImage} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+        {gallery.coverVideo ? (
+          <video
+            src={gallery.coverVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <img src={gallery.coverImage} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
         <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full border border-white/20 bg-black/55 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">
           <Camera size={14} className="text-amber-400" /> Photo & video gallery

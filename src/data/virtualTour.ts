@@ -312,6 +312,8 @@ export type EventGallery = {
   subtitle: string;
   description: string;
   coverImage: string;
+  /** Optional local MP4 used as an autoplaying gallery-card cover. */
+  coverVideo?: string;
   media: EventGalleryMedia[];
 };
 
@@ -321,9 +323,15 @@ export const VIRTUAL_TOUR_EVENT_GALLERIES: EventGallery[] = [
     title: "ASPCS Weekly",
     subtitle: "A week at ASPCS",
     description: "Weekly highlights, classroom moments, achievements and activities from across our campus.",
+    // The local video is used as the animated cover and as the first gallery item.
     coverImage: "/images/gallery/cultural-fest.jpg",
+    coverVideo: "/images/gallery/News-01.mp4",
     media: [
-      // Add weekly photos and videos here. See the examples in the comment above.
+      {
+        type: "video",
+        title: "ASPCS Weekly Highlights",
+        src: "/images/gallery/News-01.mp4",
+      },
     ],
   },
   {
