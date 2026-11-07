@@ -205,10 +205,12 @@ function EventMediaItem({ item }: { item: EventGalleryMedia }) {
     );
   }
 
-  const sources = cloudinaryVideoSources(item.publicId);
+  const isLocalVideo = "src" in item;
+  const sources = isLocalVideo ? [item.src] : cloudinaryVideoSources(item.publicId);
+  const poster = item.poster ?? (isLocalVideo ? undefined : cloudinaryPosterUrl(item.publicId));
   return (
     <figure className="overflow-hidden rounded-xl border border-white/10 bg-black">
-      <video controls playsInline preload="metadata" poster={item.poster ?? cloudinaryPosterUrl(item.publicId)} className="aspect-[4/3] w-full object-contain">
+      <video controls playsInline preload="metadata" poster={poster} className="aspect-[4/3] w-full object-contain">
         {sources.map((source) => <source key={source} src={source} type="video/mp4" />)}
       </video>
       <figcaption className="px-3 py-2.5 text-sm font-medium text-white">{item.title}</figcaption>

@@ -303,7 +303,8 @@ export const TOUR_JOURNEYS: TourJourney[] = [
  */
 export type EventGalleryMedia =
   | { type: "image"; title: string; src: string; alt?: string }
-  | { type: "video"; title: string; publicId: string; poster?: string };
+  | { type: "video"; title: string; publicId: string; poster?: string }
+  | { type: "video"; title: string; src: string; poster?: string };
 
 export type EventGallery = {
   id: "aspcs-weekly" | "daily-events";
@@ -330,9 +331,38 @@ export const VIRTUAL_TOUR_EVENT_GALLERIES: EventGallery[] = [
     title: "Daily Events",
     subtitle: "Every day, a new experience",
     description: "Assemblies, celebrations, competitions, workshops and memorable everyday moments.",
-    coverImage: "/images/gallery/cultural-fest.jpg",
+    // Keep daily-event-01.jpeg as the gallery card cover image.
+    coverImage: "/images/gallery/daily-event-01.jpeg",
     media: [
-      // Add event photos and videos here. See the examples in the comment above.
+      {
+        type: "image",
+        title: "Daily Event 1",
+        src: "/images/gallery/daily-event-01.jpeg",
+        alt: "ASPCS daily school event",
+      },
+      {
+        type: "image",
+        title: "Daily Event 2",
+        src: "/images/gallery/daily-event-02.jpeg",
+        alt: "ASPCS daily school event",
+      },
+      {
+        type: "image",
+        title: "Daily Event 3",
+        src: "/images/gallery/daily-event-03.jpeg",
+        alt: "ASPCS daily school event",
+      },
+      {
+        type: "image",
+        title: "Daily Event 4",
+        src: "/images/gallery/daily-event-04.jpeg",
+        alt: "ASPCS daily school event",
+      },
+      {
+        type: "video",
+        title: "Daily Event 5",
+        src: "/images/gallery/daily-event-05.mp4",
+      },
     ],
   },
 ];
