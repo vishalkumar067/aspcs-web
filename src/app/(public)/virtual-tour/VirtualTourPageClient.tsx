@@ -24,7 +24,11 @@ function ScenePreview({
 }) {
   const [showControls, setShowControls] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
-  const sources = scene.videoPublicId ? cloudinaryVideoSources(scene.videoPublicId) : [];
+  const sources = scene.localVideoSources?.length
+    ? scene.localVideoSources
+    : scene.videoPublicId
+      ? cloudinaryVideoSources(scene.videoPublicId)
+      : [];
   const poster = scene.videoPublicId
     ? cloudinaryPosterUrl(scene.videoPublicId)
     : scene.thumbnailUrl;
@@ -36,6 +40,15 @@ function ScenePreview({
           ? "border-amber-400 shadow-[0_0_0_2px_rgba(251,191,36,0.18)]"
           : "border-white/10 hover:border-amber-400/50"
       }`}
+      role="button"
+      tabIndex={0}
+      onClick={onSelect}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
       onBlur={(event) => {
@@ -92,7 +105,7 @@ function ScenePreview({
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/90 via-black/35 to-transparent p-3 pt-10">
         <p className="font-display text-base font-bold leading-tight text-white sm:text-xl">{scene.title}</p>
         <p className="mt-1 text-xs text-slate-300">
-          {scene.videoPublicId ? "Live video preview" : "Video coming soon"}
+          {scene.videoPublicId || scene.localVideoSources?.length ? "Live video preview" : "Video coming soon"}
         </p>
       </div>
 
@@ -233,9 +246,10 @@ function EventMediaItem({ item }: { item: EventGalleryMedia }) {
 
 export default function VirtualTourPageClient() {
   const scenes = useMemo(() => getTourScenes(), []);
+  // Always open the Virtual Tour with the Reception video in the main player.
   const [sceneId, setSceneId] = useState(
-    scenes.find((scene) => scene.id === "library" && scene.videoPublicId)?.id ??
-      scenes.find((scene) => scene.videoPublicId)?.id ??
+    scenes.find((scene) => scene.id === "reception")?.id ??
+      scenes.find((scene) => scene.videoPublicId || scene.localVideoSources?.length)?.id ??
       scenes[0]?.id ??
       "",
   );
@@ -249,12 +263,20 @@ export default function VirtualTourPageClient() {
     }
   }, []);
 
-  const activeSources = activeScene?.videoPublicId
-    ? cloudinaryVideoSources(activeScene.videoPublicId)
-    : [];
+  const activeSources = activeScene?.localVideoSources?.length
+    ? activeScene.localVideoSources
+    : activeScene?.videoPublicId
+      ? cloudinaryVideoSources(activeScene.videoPublicId)
+      : [];
   const activePoster = activeScene?.videoPublicId
     ? cloudinaryPosterUrl(activeScene.videoPublicId)
     : activeScene?.thumbnailUrl;
+
+  const handleSceneSelect = useCallback((nextSceneId: string) => {
+    setSceneId(nextSceneId);
+    // Bring the visitor straight back to the main player after choosing a thumbnail.
+    document.getElementById("tour")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#0b0810] text-white">
@@ -326,14 +348,13 @@ export default function VirtualTourPageClient() {
               id="tour-location-select"
               value={sceneId}
               onChange={(event) => {
-                setSceneId(event.target.value);
-                document.getElementById("tour")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                handleSceneSelect(event.target.value);
               }}
               className={`min-h-12 w-full appearance-none rounded-xl border border-white/15 bg-[#15121a] px-4 pr-11 text-sm font-semibold text-white outline-none transition hover:border-amber-400/60 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 ${FOCUS_RING}`}
             >
               {scenes.map((scene) => (
                 <option key={scene.id} value={scene.id} className="bg-[#15121a] text-white">
-                  {scene.title}{scene.videoPublicId ? " · Video available" : " · Coming soon"}
+                  {scene.title}{scene.videoPublicId || scene.localVideoSources?.length ? " · Video available" : " · Coming soon"}
                 </option>
               ))}
             </select>
@@ -353,7 +374,7 @@ export default function VirtualTourPageClient() {
           </div>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {scenes.map((scene) => (
-              <ScenePreview key={scene.id} scene={scene} active={scene.id === activeScene?.id} onSelect={() => setSceneId(scene.id)} />
+              <ScenePreview key={scene.id} scene={scene} active={scene.id === activeScene?.id} onSelect={() => handleSceneSelect(scene.id)} />
             ))}
           </div>
         </div>

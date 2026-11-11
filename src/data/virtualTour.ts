@@ -73,6 +73,8 @@ export type TourScene = {
   panoramaUrl?: string;
   /** Cloudinary public ID. When set, the scene plays this video instead of a panorama. */
   videoPublicId?: string;
+  /** Local MP4 files in /public, tried in order. */
+  localVideoSources?: string[];
   thumbnailUrl?: string;
   initialYaw?: number;
   initialPitch?: number;
@@ -210,8 +212,11 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Music Room",
     description: "Discover music learning, instruments and opportunities for students to develop their musical talents.",
     category: "Music",
-    videoPublicId: SCENE_VIDEO_PUBLIC_IDS.music,
-    thumbnailUrl: "/images/gallery/cultural-fest.jpg",
+    localVideoSources: [
+      "/images/gallery/Music_Room1.mp4",
+      "/images/gallery/Music_Room2.mp4",
+    ],
+    thumbnailUrl: "/images/gallery/Music_Room1.mp4",
     hotspots: [],
   },
   {
@@ -219,8 +224,8 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Dance Studio",
     description: "Explore performing arts, movement and dance activities that build confidence and creative expression.",
     category: "Dance",
-    videoPublicId: SCENE_VIDEO_PUBLIC_IDS.dance,
-    thumbnailUrl: "/images/gallery/cultural-fest.jpg",
+    localVideoSources: ["/images/gallery/Dance_Studio.mp4"],
+    thumbnailUrl: "/images/gallery/Dance_Studio.mp4",
     hotspots: [],
   },
   {
