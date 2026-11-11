@@ -1,31 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { FaWhatsapp } from "react-icons/fa";
 import ChatBot from "@/components/ChatBot";
 import "@/styles/globals.css";
 
-// ─── Font Definitions ──────────────────────────────────────────────────────
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-  display: "swap",
-  weight: ["400", "500"],
-});
+// Fonts are loaded through the Google Fonts CSS import in src/styles/globals.css.
+// Keeping font setup in CSS avoids the Next.js/Turbopack next/font build-resolution error.
 
 // ─── Metadata ─────────────────────────────────────────────────────────────
 export const metadata: Metadata = {
@@ -113,11 +93,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${playfair.variable} ${dmSans.variable} ${jetbrains.variable}`}
-    >
+    <html lang="en" suppressHydrationWarning>
       <body className="font-body antialiased">
         {children}
 
