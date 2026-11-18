@@ -161,7 +161,7 @@ export const TOUR_SCENES: TourScene[] = [
     description: "A quiet environment for reading, research and independent learning.",
     category: "Learning",
     panoramaUrl: "/virtual-tour/panoramas/library.jpg",
-    videoPublicId: SCENE_VIDEO_PUBLIC_IDS["library"],
+    videoPublicId: "/images/gallery/Library.mp4",
     thumbnailUrl: "/virtual-tour/thumbnails/library.jpg",
     hotspots: [],
   },
