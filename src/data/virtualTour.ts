@@ -224,8 +224,8 @@ export const TOUR_SCENES: TourScene[] = [
     title: "Dance Studio",
     description: "Explore performing arts, movement and dance activities that build confidence and creative expression.",
     category: "Dance",
-    localVideoSources: ["/images/gallery/Dance_Studio.mp4"],
-    thumbnailUrl: "/images/gallery/Dance_Studio.mp4",
+    localVideoSources: ["/images/gallery/Dance_Studio.mp4.mp4"],
+    thumbnailUrl: "/images/gallery/Dance_Studio.mp4.mp4",
     hotspots: [],
   },
   {
