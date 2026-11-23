@@ -12,6 +12,7 @@ export const NAV_ITEMS: NavItem[] = [
       { label: "Principal's Message",  href: "/about#principal" },
       { label: "Vision & Mission",     href: "/about#vision" },
       { label: "Infrastructure",       href: "/about#infrastructure" },
+      { label: "Virtual Tour",          href: "/virtual-tour" },
     ],
   },
 
@@ -29,7 +30,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Notices",     href: "/notices" },
   { label: "Events",      href: "/events" },
   { label: "Admissions",  href: "/admissions" },
-  { label: "Disclosure",  href: "/mandatory-disclosure" },
+  { label: "Mandatory Disclosure",  href: "/mandatory-disclosure" },
   { label: "Contact",     href: "/contact" },
 ];
 
