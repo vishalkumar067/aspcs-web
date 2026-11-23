@@ -22,10 +22,22 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Close navigation overlays and return the new route to the top after navigation.
   useEffect(() => {
     setMobileOpen(false);
     setActiveDropdown(null);
+
+    // The navbar is fixed; reset the document scroll so the new page opens
+    // in the foreground instead of retaining the previous page's scroll position.
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [pathname]);
+
+  const closeNavigation = () => {
+    setMobileOpen(false);
+    setActiveDropdown(null);
+  };
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -140,7 +152,7 @@ export default function Navbar() {
                               <Link
                                 key={child.href}
                                 href={child.href}
-                                onClick={() => setActiveDropdown(null)}
+                                onClick={closeNavigation}
                                 className="flex items-center px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-brand-crimson/10 hover:text-brand-gold"
                               >
                                 {child.label}
@@ -153,6 +165,7 @@ export default function Navbar() {
                   ) : (
                     <Link
                       href={item.href}
+                      onClick={closeNavigation}
                       className={cn(
                         "block rounded-lg px-2 py-1.5 text-[12px] font-semibold transition-colors duration-150",
                         pathname === item.href
@@ -262,6 +275,7 @@ export default function Navbar() {
                                 <Link
                                   key={child.href}
                                   href={child.href}
+                                  onClick={closeNavigation}
                                   className="block rounded-xl px-8 py-2.5 text-sm font-medium text-white hover:text-brand-gold"
                                 >
                                   {child.label}
@@ -274,6 +288,7 @@ export default function Navbar() {
                     ) : (
                       <Link
                         href={item.href}
+                        onClick={closeNavigation}
                         className={cn(
                           "block rounded-xl px-4 py-3 text-sm font-bold transition-colors",
                           pathname === item.href ? "text-brand-gold" : "text-white"
